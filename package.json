@@ -1,0 +1,30 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "node src/excel/generate-excel-auto-lines.js",
+    "check": "node check-xml-content.js",
+    "test-multiline": "node generate-excel-from-multiple-lines.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "crypto": "^1.0.1",
+    "exceljs": "^4.3.0",
+    "fast-xml-parser": "^4.2.5",
+    "libxmljs2": "^0.37.0",
+    "xml-js": "^1.6.11",
+    "xml2js": "^0.6.2",
+    "xmldom": "^0.6.0",
+    "xpath": "^0.0.34"
+  },
+  "devDependencies": {
+    "jest": "^29.6.1"
+  },
+  "worker-packed": true
+}

@@ -1,0 +1,30 @@
+# 依赖目录
+node_modules/
+
+# 日志文件
+logs/
+*.log
+
+# 配置文件
+config.json
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 编辑器配置
+.vscode/
+.idea/
+
+# ESLint配置缓存
+.eslintcache
+
+# 本地文件
+src/local/
+
+# Excel输出文件
+*.xlsx
+output_table*.xlsx
+
+# XML优化文件
+优化文件.xml
