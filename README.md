@@ -1,3 +1,113 @@
+# XML Parser Optimizer
+
+一个优化的XML解析器，用于处理复杂的XML文件并生成Excel报表。
+
+## 项目概述
+
+XML Parser Optimizer是一个专门用于处理复杂XML文件的工具，它能够解析XML数据并生成结构化的Excel报表。该项目特别适用于处理包含大量嵌套结构和复杂数据的XML文件，如家具制造行业的生产数据文件。
+
+## 核心功能
+
+### 1. 多层XML解析策略
+项目采用多层解析策略，确保能够处理各种格式的XML文件：
+1. **首选方案**：使用fast-xml-parser最宽松配置解析整个XML文件
+2. **备选方案1**：如果首选方案失败，尝试其他解析器（xml2js, xmldom, libxmljs2）
+3. **备选方案2**：如果所有解析器都失败，尝试修复XML数据后再次使用首选方案，如果首选方案失败，尝试其他解析器
+4. **备选方案3**：如果修复后仍失败，尝试分段解析（按Cabinet节点分割）
+5. **备选方案4**：如果分段解析也失败，直接提取关键节点（Panels和Panel）
+6. **最终方案**：如果以上方案都失败，记录详细错误日志并跳过该文件
+
+### 2. 智能数据打包
+- 自动检测package.json变化
+- 只有当package.json真正发生变化时才标记数据为已打包
+- 空的或默认的package.json不会触发打包标记
+
+### 3. Excel报表生成
+- 生成包含详细板件信息的Excel报表
+- 支持多种样式设置（标题、表头、数据行等）
+- 自动计算面积等派生字段
+
+### 4. 网络同步功能
+- 支持将生成的Excel文件同步到网络路径
+- 按日期和客户名称创建目标文件夹
+- 支持数据分类（已打包数据和剩余数据）
+
+## 技术架构
+
+### 核心依赖
+- **fast-xml-parser**: 主要XML解析库
+- **xml2js**: 备选XML解析库
+- **xmldom**: 备选XML解析库
+- **libxmljs2**: 备选XML解析库
+- **exceljs**: Excel文件生成库
+
+### 项目结构
+```
+src/
+├── excel/
+│   └── generate-excel-auto-lines.js  # 主要处理逻辑
+├── tests/                            # 测试文件
+│   ├── integration.test.js           # 集成测试
+│   ├── functional.test.js            # 功能测试
+│   └── ...                           # 其他单元测试
+├── local/                            # 本地输出目录
+└── check-xml-content.js              # XML内容检查工具
+
+```
+
+## 安装与使用
+
+### 安装依赖
+```bash
+npm install
+```
+
+### 运行项目
+```bash
+npm run dev
+```
+
+### 运行测试
+```bash
+# 运行所有测试
+npm test
+
+# 运行集成测试
+npm run test-integration
+
+# 运行功能测试
+npm run test-functional
+
+# 运行多产线数据处理测试
+npm run test-multiline
+
+# 检查XML内容
+npm run check
+```
+
+## 配置说明
+
+项目配置文件为`config.json`，包含以下主要配置项：
+- `enableNetworkSync`: 是否启用网络同步功能
+- `networkPath`: 网络同步目标路径
+- `targetFileName`: 生成的Excel文件名模板
+- `localPath`: 本地输出路径
+
+## 测试体系
+
+项目包含完整的测试体系：
+1. **单元测试**: 验证各个功能模块的正确性
+2. **集成测试**: 验证整个项目的集成功能
+3. **功能测试**: 验证核心业务功能的正确性
+
+## 贡献指南
+
+欢迎提交Issue和Pull Request来改进这个项目。
+
+## 许可证
+
+MIT
+
 # XML 处理工具配置
 
 这个项目包含用于验证和处理XML文件的工具配置。

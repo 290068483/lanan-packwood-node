@@ -119,6 +119,64 @@ async function checkPackageChanged(outputDir, customerName) {
     }
 }
 
+/**
+ * 检查package.json是否发生变化（旧版本）
+ * @param {string} outputDir - 输出目录
+ * @param {string} customerName - 客户名称
+ * @returns {boolean} - package.json是否发生变化
+ */
+function checkPackageChangedOld(outputDir, customerName) {
+    try {
+        // 检查本地package.json文件是否存在，如果不存在则创建
+        const localPackagePath = path.join(outputDir, 'package.json');
+        if (!fs.existsSync(localPackagePath)) {
+            // 创建默认的package.json文件
+            const defaultPackage = {
+                name: customerName.toLowerCase().replace(/\s+/g, '-'),
+                version: "1.0.0",
+                description: `Package file for ${customerName}`,
+                private: true
+            };
+            fs.writeFileSync(localPackagePath, JSON.stringify(defaultPackage, null, 2), 'utf8');
+            console.log(`✓ 已为客户 "${customerName}" 创建package.json文件`);
+            logSuccess(customerName, 'PACKAGE_CHECK', `已创建package.json文件: ${localPackagePath}`);
+        }
+
+        // 读取当前package.json的内容
+        const packageData = fs.readFileSync(localPackagePath, 'utf8');
+        const currentPackageHash = require('crypto')
+            .createHash('md5')
+            .update(packageData)
+            .digest('hex');
+
+        // 检查是否存在之前的package.json哈希值文件
+        const packageHashFilePath = path.join(outputDir, 'package.hash');
+        if (fs.existsSync(packageHashFilePath)) {
+            // 读取之前的哈希值
+            const previousPackageHash = fs.readFileSync(packageHashFilePath, 'utf8');
+            
+            // 比较哈希值
+            if (currentPackageHash === previousPackageHash) {
+                console.log(`✓ 客户 "${customerName}" package.json未发生变化`);
+                logInfo(customerName, 'PACKAGE_CHECK', 'package.json未发生变化');
+                return false;
+            }
+        }
+
+        // 保存当前package.json哈希值
+        fs.writeFileSync(packageHashFilePath, currentPackageHash, 'utf8');
+        console.log(`✓ 客户 "${customerName}" package.json已更新`);
+        logSuccess(customerName, 'PACKAGE_CHECK', 'package.json已更新');
+        return true;
+    } catch (error) {
+        const errorMsg = `检查package.json变化时发生错误: ${error.message}`;
+        console.error(`✗ ${errorMsg}`);
+        logError(customerName, 'PACKAGE_CHECK', errorMsg, error.stack);
+        // 出错时默认package.json已变化
+        return true;
+    }
+}
+
 // 配置XML解析器，增加容错性
 const parser = new XMLParser({
     ignoreAttributes: false,
@@ -205,25 +263,6 @@ function parseXmlWithXml2js(xmlData) {
             reject(error);
         }
     });
-}
-
-/**
- * 使用xml-js库解析XML数据
- * @param {string} xmlData - XML数据
- */
-function parseXmlWithXmlJs(xmlData) {
-    const result = convert.xml2js(xmlData, {
-        compact: true,
-        ignoreComment: true,
-        ignoreDeclaration: true,
-        ignoreInstruction: true,
-        trim: true,
-        nativeType: true,
-        nativeTypeAttributes: true
-    });
-    
-    // 转换为与fast-xml-parser相似的结构
-    return result;
 }
 
 /**
@@ -388,127 +427,25 @@ function clearDirectory(dirPath) {
 }
 
 /**
- * 尝试使用不同解析器解析XML数据
+ * 配置最宽松的XML解析器，只使用xml-js
  * @param {string} xmlData - XML数据
- * @param {string} lineDir - 产线目录名
- * @param {string} customerName - 客户名称
  */
-function parseXmlWithFallback(xmlData, lineDir, customerName) {
-    try {
-        logInfo(customerName, lineDir, `尝试使用fast-xml-parser标准解析器解析XML`);
-        console.log(`  尝试使用fast-xml-parser标准解析器解析XML`);
-        return { success: true, data: parser.parse(xmlData), parser: 'fast-xml-parser (standard)' };
-    } catch (error) {
-        logWarning(customerName, lineDir, `fast-xml-parser标准解析器失败: ${error.message}`);
-        console.warn(`  fast-xml-parser标准解析器失败: ${error.message}`);
-        try {
-            logInfo(customerName, lineDir, `尝试使用fast-xml-parser宽松解析器解析XML`);
-            console.log(`  尝试使用fast-xml-parser宽松解析器解析XML`);
-            return { success: true, data: looseParser.parse(xmlData), parser: 'fast-xml-parser (loose)' };
-        } catch (looseError) {
-            logWarning(customerName, lineDir, `fast-xml-parser宽松解析器也失败: ${looseError.message}`);
-            console.warn(`  fast-xml-parser宽松解析器也失败: ${looseError.message}`);
-            try {
-                logInfo(customerName, lineDir, `尝试使用fast-xml-parser最宽松解析器解析XML`);
-                console.log(`  尝试使用fast-xml-parser最宽松解析器解析XML`);
-                return { success: true, data: veryLooseParser.parse(xmlData), parser: 'fast-xml-parser (very loose)' };
-            } catch (veryLooseError) {
-                logWarning(customerName, lineDir, `fast-xml-parser最宽松解析器也失败: ${veryLooseError.message}`);
-                console.warn(`  fast-xml-parser最宽松解析器也失败: ${veryLooseError.message}`);
-                try {
-                    logInfo(customerName, lineDir, `尝试使用xml2js解析器解析XML`);
-                    console.log(`  尝试使用xml2js解析器解析XML`);
-                    const data = parseXmlWithXml2js(xmlData);
-                    return { success: true, data: data, parser: 'xml2js' };
-                } catch (xml2jsError) {
-                    logWarning(customerName, lineDir, `xml2js解析器也失败: ${xml2jsError.message}`);
-                    console.warn(`  xml2js解析器也失败: ${xml2jsError.message}`);
-                    try {
-                        logInfo(customerName, lineDir, `尝试使用xml-js解析器解析XML`);
-                        console.log(`  尝试使用xml-js解析器解析XML`);
-                        const data = parseXmlWithXmlJs(xmlData);
-                        return { success: true, data: data, parser: 'xml-js' };
-                    } catch (xmlJsError) {
-                        logWarning(customerName, lineDir, `xml-js解析器也失败: ${xmlJsError.message}`);
-                        console.warn(`  xml-js解析器也失败: ${xmlJsError.message}`);
-                        try {
-                            logInfo(customerName, lineDir, `尝试使用xmldom解析器解析XML`);
-                            console.log(`  尝试使用xmldom解析器解析XML`);
-                            const data = parseXmlWithXmldom(xmlData);
-                            return { success: true, data: data, parser: 'xmldom' };
-                        } catch (xmldomError) {
-                            logWarning(customerName, lineDir, `xmldom解析器也失败: ${xmldomError.message}`);
-                            console.warn(`  xmldom解析器也失败: ${xmldomError.message}`);
-                            try {
-                                logInfo(customerName, lineDir, `尝试使用libxmljs2解析器解析XML`);
-                                console.log(`  尝试使用libxmljs2解析器解析XML`);
-                                const data = parseXmlWithLibxmljs(xmlData);
-                                return { success: true, data: data, parser: 'libxmljs2' };
-                            } catch (libxmljsError) {
-                                logError(customerName, lineDir, `所有解析器都失败，libxmljs2解析器也失败: ${libxmljsError.message}`, libxmljsError.stack);
-                                console.error(`  所有解析器都失败，libxmljs2解析器也失败: ${libxmljsError.message}`);
-                                return { success: false, error: error.message };
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * 分段解析XML数据，跳过错误部分
- * @param {string} xmlData - XML数据
- * @param {string} lineDir - 产线目录名
- * @param {string} customerName - 客户名称
- */
-function parseXmlInSegments(xmlData, lineDir, customerName) {
-    logInfo(customerName, lineDir, `开始分段解析XML数据`);
-    console.log(`  开始分段解析XML数据`);
-    
-    try {
-        // 尝试找到所有Cabinet节点
-        const cabinetMatches = xmlData.match(/<Cabinet\s+[^>]*>[\s\S]*?<\/Cabinet>/g);
-        if (!cabinetMatches) {
-            logWarning(customerName, lineDir, `未找到任何Cabinet节点`);
-            console.warn(`  未找到任何Cabinet节点`);
-            return { success: false, data: [] };
-        }
-        
-        logInfo(customerName, lineDir, `找到 ${cabinetMatches.length} 个Cabinet节点`);
-        console.log(`  找到 ${cabinetMatches.length} 个Cabinet节点`);
-        
-        const cabinets = [];
-        let successCount = 0;
-        let failCount = 0;
-        
-        // 尝试逐个解析Cabinet节点
-        for (let i = 0; i < cabinetMatches.length; i++) {
-            try {
-                const cabinetXml = `<Root>${cabinetMatches[i]}</Root>`;
-                const parsed = looseParser.parse(cabinetXml);
-                if (parsed.Root && parsed.Root.Cabinet) {
-                    cabinets.push(parsed.Root.Cabinet);
-                    successCount++;
-                }
-            } catch (segmentError) {
-                failCount++;
-                logWarning(customerName, lineDir, `解析第 ${i+1} 个Cabinet节点失败: ${segmentError.message}`);
-                console.warn(`  解析第 ${i+1} 个Cabinet节点失败: ${segmentError.message}`);
-            }
-        }
-        
-        logInfo(customerName, lineDir, `分段解析完成: 成功 ${successCount}, 失败 ${failCount}`);
-        console.log(`  分段解析完成: 成功 ${successCount}, 失败 ${failCount}`);
-        
-        return { success: true, data: cabinets };
-    } catch (error) {
-        logError(customerName, lineDir, `分段解析失败: ${error.message}`, error.stack);
-        console.error(`  分段解析失败: ${error.message}`);
-        return { success: false, error: error.message };
-    }
-}
+const xmlJsOptions = {
+    compact: true,
+    ignoreComment: true,
+    ignoreDeclaration: true,
+    ignoreInstruction: true,
+    trim: true,
+    nativeType: false, // 不强制转换类型，避免转换错误
+    nativeTypeAttributes: false, // 不强制转换属性类型
+    alwaysChildren: true, // 始终包含子元素数组
+    alwaysArray: false, // 不强制所有元素为数组
+    textFn: undefined, // 不处理文本节点
+    instructionFn: undefined, // 不处理处理指令
+    doctypeFn: undefined, // 不处理文档类型
+    commentFn: undefined, // 不处理注释
+    cdataFn: undefined // 不处理CDATA
+};
 
 /**
  * 尝试修复XML数据
@@ -538,6 +475,360 @@ function tryRepairXml(xmlData, lineDir, customerName) {
         logError(customerName, lineDir, `XML数据修复失败: ${error.message}`, error.stack);
         console.error(`  XML数据修复失败: ${error.message}`);
         return xmlData; // 返回原始数据
+    }
+}
+
+/**
+ * 分段解析XML数据，跳过错误部分
+ * @param {string} xmlData - XML数据
+ * @param {string} lineDir - 产线目录名
+ * @param {string} customerName - 客户名称
+ */
+function parseXmlInSegments(xmlData, lineDir, customerName) {
+    logInfo(customerName, lineDir, `开始分段解析XML数据`);
+    console.log(`  开始分段解析XML数据`);
+    
+    try {
+        // 尝试找到所有Cabinet节点
+        const cabinetMatches = xmlData.match(/<Cabinet\s+[^>]*>[\s\S]*?<\/Cabinet>/g);
+        if (!cabinetMatches) {
+            logWarning(customerName, lineDir, `未找到任何Cabinet节点`);
+            console.warn(`  未找到任何Cabinet节点`);
+            return { success: false, data: [] };
+        }
+        
+        logInfo(customerName, lineDir, `找到 ${cabinetMatches.length} 个Cabinet节点`);
+        console.log(`  找到 ${cabinetMatches.length} 个Cabinet节点`);
+        
+        const cabinets = [];
+        let successCount = 0;
+        let failCount = 0;
+        
+        // 尝试逐个解析Cabinet节点，使用多种解析器
+        for (let i = 0; i < cabinetMatches.length; i++) {
+            try {
+                const cabinetXml = `<Root>${cabinetMatches[i]}</Root>`;
+                
+                // 首选使用fast-xml-parser最宽松配置
+                try {
+                    const parsed = veryLooseParser.parse(cabinetXml);
+                    if (parsed.Root && parsed.Root.Cabinet) {
+                        cabinets.push(parsed.Root.Cabinet);
+                        successCount++;
+                        continue; // 成功解析，继续下一个Cabinet
+                    }
+                } catch (error) {
+                    // fast-xml-parser解析失败，尝试其他解析器
+                }
+                
+                // 尝试xml2js
+                try {
+                    const parsed = parseXmlWithXml2js(cabinetXml);
+                    if (parsed.Root && parsed.Root.Cabinet) {
+                        cabinets.push(parsed.Root.Cabinet);
+                        successCount++;
+                        continue; // 成功解析，继续下一个Cabinet
+                    }
+                } catch (error) {
+                    // xml2js解析失败，尝试其他解析器
+                }
+                
+                // 尝试xmldom
+                try {
+                    const parsed = parseXmlWithXmldom(cabinetXml);
+                    if (parsed.Root && parsed.Root.Cabinet) {
+                        cabinets.push(parsed.Root.Cabinet);
+                        successCount++;
+                        continue; // 成功解析，继续下一个Cabinet
+                    }
+                } catch (error) {
+                    // xmldom解析失败，尝试其他解析器
+                }
+                
+                // 尝试libxmljs2
+                try {
+                    const parsed = parseXmlWithLibxmljs(cabinetXml);
+                    if (parsed.Root && parsed.Root.Cabinet) {
+                        cabinets.push(parsed.Root.Cabinet);
+                        successCount++;
+                        continue; // 成功解析，继续下一个Cabinet
+                    }
+                } catch (error) {
+                    // libxmljs2解析失败
+                }
+                
+                // 所有解析器都失败
+                failCount++;
+                logWarning(customerName, lineDir, `解析第 ${i+1} 个Cabinet节点失败: 所有解析器都失败`);
+                console.warn(`  解析第 ${i+1} 个Cabinet节点失败: 所有解析器都失败`);
+            } catch (segmentError) {
+                failCount++;
+                logWarning(customerName, lineDir, `解析第 ${i+1} 个Cabinet节点失败: ${segmentError.message}`);
+                console.warn(`  解析第 ${i+1} 个Cabinet节点失败: ${segmentError.message}`);
+            }
+        }
+        
+        logInfo(customerName, lineDir, `分段解析完成: 成功 ${successCount}, 失败 ${failCount}`);
+        console.log(`  分段解析完成: 成功 ${successCount}, 失败 ${failCount}`);
+        
+        return { success: true, data: cabinets };
+    } catch (error) {
+        logError(customerName, lineDir, `分段解析失败: ${error.message}`, error.stack);
+        console.error(`  分段解析失败: ${error.message}`);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * 直接从XML文本中提取Panels和Panel节点
+ * @param {string} xmlData - XML数据
+ * @param {string} lineDir - 产线目录名
+ * @param {string} customerName - 客户名称
+ */
+function extractPanelsDirectly(xmlData, lineDir, customerName) {
+    logInfo(customerName, lineDir, `开始直接提取Panels和Panel节点`);
+    console.log(`  开始直接提取Panels和Panel节点`);
+    
+    try {
+        // 使用正则表达式直接提取Panel节点
+        const panelMatches = xmlData.match(/<Panel\s+[^>]*>[\s\S]*?<\/Panel>/g);
+        if (!panelMatches) {
+            logWarning(customerName, lineDir, `未找到任何Panel节点`);
+            console.warn(`  未找到任何Panel节点`);
+            return { success: false, data: [] };
+        }
+        
+        logInfo(customerName, lineDir, `找到 ${panelMatches.length} 个Panel节点`);
+        console.log(`  找到 ${panelMatches.length} 个Panel节点`);
+        
+        const panels = [];
+        let successCount = 0;
+        let failCount = 0;
+        
+        // 尝试逐个解析Panel节点，使用多种解析器
+        for (let i = 0; i < panelMatches.length; i++) {
+            try {
+                const panelXml = `<Root>${panelMatches[i]}</Root>`;
+                
+                // 首选使用fast-xml-parser最宽松配置
+                try {
+                    const parsed = veryLooseParser.parse(panelXml);
+                    if (parsed.Root && parsed.Root.Panel) {
+                        panels.push(parsed.Root.Panel);
+                        successCount++;
+                        continue; // 成功解析，继续下一个Panel
+                    }
+                } catch (error) {
+                    // fast-xml-parser解析失败，尝试其他解析器
+                }
+                
+                // 尝试xml2js
+                try {
+                    const parsed = parseXmlWithXml2js(panelXml);
+                    if (parsed.Root && parsed.Root.Panel) {
+                        panels.push(parsed.Root.Panel);
+                        successCount++;
+                        continue; // 成功解析，继续下一个Panel
+                    }
+                } catch (error) {
+                    // xml2js解析失败，尝试其他解析器
+                }
+                
+                // 尝试xmldom
+                try {
+                    const parsed = parseXmlWithXmldom(panelXml);
+                    if (parsed.Root && parsed.Root.Panel) {
+                        panels.push(parsed.Root.Panel);
+                        successCount++;
+                        continue; // 成功解析，继续下一个Panel
+                    }
+                } catch (error) {
+                    // xmldom解析失败，尝试其他解析器
+                }
+                
+                // 尝试libxmljs2
+                try {
+                    const parsed = parseXmlWithLibxmljs(panelXml);
+                    if (parsed.Root && parsed.Root.Panel) {
+                        panels.push(parsed.Root.Panel);
+                        successCount++;
+                        continue; // 成功解析，继续下一个Panel
+                    }
+                } catch (error) {
+                    // libxmljs2解析失败
+                }
+                
+                // 所有解析器都失败
+                failCount++;
+                logWarning(customerName, lineDir, `解析第 ${i+1} 个Panel节点失败: 所有解析器都失败`);
+                console.warn(`  解析第 ${i+1} 个Panel节点失败: 所有解析器都失败`);
+            } catch (panelError) {
+                failCount++;
+                logWarning(customerName, lineDir, `解析第 ${i+1} 个Panel节点失败: ${panelError.message}`);
+                console.warn(`  解析第 ${i+1} 个Panel节点失败: ${panelError.message}`);
+            }
+        }
+        
+        logInfo(customerName, lineDir, `Panel节点提取完成: 成功 ${successCount}, 失败 ${failCount}`);
+        console.log(`  Panel节点提取完成: 成功 ${successCount}, 失败 ${failCount}`);
+        
+        // 构造模拟的Cabinet结构
+        const cabinetStructure = {
+            Panels: {
+                Panel: panels
+            }
+        };
+        
+        return { success: true, data: [cabinetStructure] };
+    } catch (error) {
+        logError(customerName, lineDir, `直接提取Panel节点失败: ${error.message}`, error.stack);
+        console.error(`  直接提取Panel节点失败: ${error.message}`);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * 尝试使用不同解析器解析XML数据
+ * @param {string} xmlData - XML数据
+ * @param {string} lineDir - 产线目录名
+ * @param {string} customerName - 客户名称
+ */
+function parseXmlWithFallback(xmlData, lineDir, customerName) {
+    // 首选方案：使用fast-xml-parser最宽松配置解析整个XML文件
+    try {
+        logInfo(customerName, lineDir, `尝试使用fast-xml-parser最宽松配置解析XML`);
+        console.log(`  尝试使用fast-xml-parser最宽松配置解析XML`);
+        const data = veryLooseParser.parse(xmlData);
+        return { success: true, data: data, parser: 'fast-xml-parser (very loose)' };
+    } catch (error) {
+        logWarning(customerName, lineDir, `fast-xml-parser最宽松配置解析失败: ${error.message}`);
+        console.warn(`  fast-xml-parser最宽松配置解析失败: ${error.message}`);
+        
+        // 备选方案1：如果首选方案失败，尝试其他解析器（xml2js, xmldom, libxmljs2）
+        try {
+            logInfo(customerName, lineDir, `尝试使用xml2js解析器解析XML`);
+            console.log(`  尝试使用xml2js解析器解析XML`);
+            const data = parseXmlWithXml2js(xmlData);
+            return { success: true, data: data, parser: 'xml2js' };
+        } catch (xml2jsError) {
+            logWarning(customerName, lineDir, `xml2js解析器失败: ${xml2jsError.message}`);
+            console.warn(`  xml2js解析器失败: ${xml2jsError.message}`);
+            
+            try {
+                logInfo(customerName, lineDir, `尝试使用xmldom解析器解析XML`);
+                console.log(`  尝试使用xmldom解析器解析XML`);
+                const data = parseXmlWithXmldom(xmlData);
+                return { success: true, data: data, parser: 'xmldom' };
+            } catch (xmldomError) {
+                logWarning(customerName, lineDir, `xmldom解析器失败: ${xmldomError.message}`);
+                console.warn(`  xmldom解析器失败: ${xmldomError.message}`);
+                
+                try {
+                    logInfo(customerName, lineDir, `尝试使用libxmljs2解析器解析XML`);
+                    console.log(`  尝试使用libxmljs2解析器解析XML`);
+                    const data = parseXmlWithLibxmljs(xmlData);
+                    return { success: true, data: data, parser: 'libxmljs2' };
+                } catch (libxmljsError) {
+                    logWarning(customerName, lineDir, `libxmljs2解析器失败: ${libxmljsError.message}`);
+                    console.warn(`  libxmljs2解析器失败: ${libxmljsError.message}`);
+                    
+                    // 备选方案2：如果所有解析器都失败，尝试修复XML数据后再次使用首选方案，如果首选方案失败，尝试其他解析器
+                    try {
+                        logInfo(customerName, lineDir, `尝试修复XML数据`);
+                        console.log(`  尝试修复XML数据`);
+                        const repairedXml = tryRepairXml(xmlData, lineDir, customerName);
+                        
+                        // 修复后再次尝试首选方案
+                        try {
+                            logInfo(customerName, lineDir, `尝试使用修复后的XML数据和fast-xml-parser最宽松配置再次解析`);
+                            console.log(`  尝试使用修复后的XML数据和fast-xml-parser最宽松配置再次解析`);
+                            const data = veryLooseParser.parse(repairedXml);
+                            return { success: true, data: data, parser: 'fast-xml-parser (very loose, repaired)' };
+                        } catch (repairedError) {
+                            logWarning(customerName, lineDir, `修复后fast-xml-parser最宽松配置解析仍失败: ${repairedError.message}`);
+                            console.warn(`  修复后fast-xml-parser最宽松配置解析仍失败: ${repairedError.message}`);
+                            
+                            // 修复后尝试其他解析器
+                            try {
+                                logInfo(customerName, lineDir, `尝试使用修复后的XML数据和xml2js再次解析`);
+                                console.log(`  尝试使用修复后的XML数据和xml2js再次解析`);
+                                const data = parseXmlWithXml2js(repairedXml);
+                                return { success: true, data: data, parser: 'xml2js (repaired)' };
+                            } catch (repairedXml2jsError) {
+                                logWarning(customerName, lineDir, `修复后xml2js解析仍失败: ${repairedXml2jsError.message}`);
+                                console.warn(`  修复后xml2js解析仍失败: ${repairedXml2jsError.message}`);
+                                
+                                try {
+                                    logInfo(customerName, lineDir, `尝试使用修复后的XML数据和xmldom再次解析`);
+                                    console.log(`  尝试使用修复后的XML数据和xmldom再次解析`);
+                                    const data = parseXmlWithXmldom(repairedXml);
+                                    return { success: true, data: data, parser: 'xmldom (repaired)' };
+                                } catch (repairedXmldomError) {
+                                    logWarning(customerName, lineDir, `修复后xmldom解析仍失败: ${repairedXmldomError.message}`);
+                                    console.warn(`  修复后xmldom解析仍失败: ${repairedXmldomError.message}`);
+                                    
+                                    try {
+                                        logInfo(customerName, lineDir, `尝试使用修复后的XML数据和libxmljs2再次解析`);
+                                        console.log(`  尝试使用修复后的XML数据和libxmljs2再次解析`);
+                                        const data = parseXmlWithLibxmljs(repairedXml);
+                                        return { success: true, data: data, parser: 'libxmljs2 (repaired)' };
+                                    } catch (repairedLibxmljsError) {
+                                        logWarning(customerName, lineDir, `修复后libxmljs2解析仍失败: ${repairedLibxmljsError.message}`);
+                                        console.warn(`  修复后libxmljs2解析仍失败: ${repairedLibxmljsError.message}`);
+                                        
+                                        // 备选方案3：如果修复后仍失败，尝试分段解析
+                                        try {
+                                            logInfo(customerName, lineDir, `尝试分段解析XML数据`);
+                                            console.log(`  尝试分段解析XML数据`);
+                                            const segmentResult = parseXmlInSegments(xmlData, lineDir, customerName);
+                                            if (segmentResult.success) {
+                                                // 构造完整的数据结构
+                                                const fullData = {
+                                                    Root: {
+                                                        Cabinet: segmentResult.data
+                                                    }
+                                                };
+                                                return { success: true, data: fullData, parser: 'segmented' };
+                                            }
+                                        } catch (segmentError) {
+                                            logWarning(customerName, lineDir, `分段解析也失败: ${segmentError.message}`);
+                                            console.warn(`  分段解析也失败: ${segmentError.message}`);
+                                            
+                                            // 备选方案4：如果分段解析也失败，直接提取关键节点（Panels和Panel）
+                                            try {
+                                                logInfo(customerName, lineDir, `尝试直接查找Panels和Panel节点`);
+                                                console.log(`  尝试直接查找Panels和Panel节点`);
+                                                const panelResult = extractPanelsDirectly(xmlData, lineDir, customerName);
+                                                if (panelResult.success) {
+                                                    // 构造完整的数据结构
+                                                    const fullData = {
+                                                        Root: {
+                                                            Cabinet: panelResult.data
+                                                        }
+                                                    };
+                                                    return { success: true, data: fullData, parser: 'direct panels' };
+                                                }
+                                            } catch (panelError) {
+                                                logWarning(customerName, lineDir, `直接查找Panels和Panel节点也失败: ${panelError.message}`);
+                                                console.warn(`  直接查找Panels和Panel节点也失败: ${panelError.message}`);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } catch (repairError) {
+                        logWarning(customerName, lineDir, `XML数据修复失败: ${repairError.message}`);
+                        console.warn(`  XML数据修复失败: ${repairError.message}`);
+                    }
+                }
+            }
+        }
+        
+        // 最终方案：如果以上方案都失败，记录详细错误日志并跳过该文件
+        logError(customerName, lineDir, `所有XML解析方法都失败`, error.stack);
+        console.error(`  所有XML解析方法都失败`);
+        return { success: false, error: error.message };
     }
 }
 
@@ -1176,7 +1467,7 @@ async function generateExcel(cabinets, customerName, outputDir, isPackageChanged
                 dataRow.alignment = { vertical: 'middle', horizontal: 'center' };
                 dataRow.height = 18;
                 
-                // 如果package.json发生变化，设置灰色背景
+                // 如果package.json发生变化且不是空的默认package.json，设置灰色背景
                 if (isPackageChanged) {
                     // 记录已打包的行索引
                     packagedRows.push(worksheet.rowCount - 3); // 减去标题行和表头行
@@ -1300,6 +1591,21 @@ async function checkPackageChanged(outputDir, customerName) {
 
         // 读取当前package.json的内容
         const packageData = fs.readFileSync(localPackagePath, 'utf8');
+        
+        // 检查package.json是否为空或只包含默认内容
+        const packageJson = JSON.parse(packageData);
+        const isEmptyPackage = Object.keys(packageJson).length <= 4 && 
+                               packageJson.name && 
+                               packageJson.version === "1.0.0" && 
+                               packageJson.description && 
+                               packageJson.private === true;
+        
+        if (isEmptyPackage) {
+            console.log(`ℹ 客户 "${customerName}" package.json为空或仅包含默认内容`);
+            logInfo(customerName, 'PACKAGE_CHECK', 'package.json为空或仅包含默认内容');
+            return false;
+        }
+
         const currentPackageHash = require('crypto')
             .createHash('md5')
             .update(packageData)
@@ -1328,8 +1634,8 @@ async function checkPackageChanged(outputDir, customerName) {
         const errorMsg = `检查package.json变化时发生错误: ${error.message}`;
         console.error(`✗ ${errorMsg}`);
         logError(customerName, 'PACKAGE_CHECK', errorMsg, error.stack);
-        // 出错时默认package.json已变化
-        return true;
+        // 出错时默认package.json未变化
+        return false;
     }
 }
 
@@ -1367,13 +1673,29 @@ async function syncToNetwork(outputDir, customerName, packagedRows, totalRows) {
         const finalTargetPath = path.join(config.networkPath, targetFolderName);
         await fs.promises.mkdir(finalTargetPath, { recursive: true });
         
-        // 读取原始Excel文件
-        const sourceExcelFileName = fs.readdirSync(outputDir).find(file => file.endsWith('.xlsx'));
-        if (!sourceExcelFileName) {
-            throw new Error('未找到生成的Excel文件');
+        // 查找localPath中对应客户的Excel文件
+        const customerLocalPath = path.join(config.localPath, customerName);
+        let sourceExcelFile = null;
+        let sourceExcelFileName = null;
+        
+        if (fs.existsSync(customerLocalPath)) {
+            sourceExcelFileName = fs.readdirSync(customerLocalPath).find(file => file.endsWith('.xlsx'));
+            if (sourceExcelFileName) {
+                sourceExcelFile = path.join(customerLocalPath, sourceExcelFileName);
+            }
         }
         
-        const sourceExcelFile = path.join(outputDir, sourceExcelFileName);
+        // 如果在localPath中未找到，则使用outputDir中的文件
+        if (!sourceExcelFile) {
+            sourceExcelFileName = fs.readdirSync(outputDir).find(file => file.endsWith('.xlsx'));
+            if (sourceExcelFileName) {
+                sourceExcelFile = path.join(outputDir, sourceExcelFileName);
+            }
+        }
+        
+        if (!sourceExcelFile) {
+            throw new Error('未找到生成的Excel文件');
+        }
         
         // 创建工作簿用于分离已打包和未打包的数据
         const workbook = new ExcelJS.Workbook();
@@ -1405,6 +1727,15 @@ async function syncToNetwork(outputDir, customerName, packagedRows, totalRows) {
                     // 已打包数据
                     const newRow = packagedWorksheet.addRow(row.values);
                     copyRowStyle(row, newRow);
+                    
+                    // 为已打包数据行添加灰色背景
+                    newRow.eachCell((cell) => {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFCCCCCC' }
+                        };
+                    });
                 } else {
                     // 剩余数据
                     const newRow = remainingWorksheet.addRow(row.values);
@@ -1413,10 +1744,7 @@ async function syncToNetwork(outputDir, customerName, packagedRows, totalRows) {
             }
         });
         
-        // 删除原始工作表
-        workbook.removeWorksheet('板件明细');
-        
-        // 保存到网络路径
+        // 保存到网络路径（保留原始工作表）
         const targetExcelFile = path.join(finalTargetPath, sourceExcelFileName);
         await workbook.xlsx.writeFile(targetExcelFile);
         
@@ -1492,6 +1820,25 @@ if (require.main === module) {
                     console.log(`✗ 客户 "${customer}" 处理失败`);
                     logError(customer, 'MAIN', `客户处理失败`);
                 }
+                
+                // 检查package.json是否发生变化
+                const isPackageChanged = await checkPackageChanged(outputDir, customer);
+                if (isPackageChanged) {
+                    console.log(`✓ 客户 "${customer}" package.json已更新`);
+                } else {
+                    console.log(`✓ 客户 "${customer}" package.json未发生变化`);
+                }
+                
+                // 生成Excel文件
+                const result = await generateExcel(cabinets, customer, outputDir, isPackageChanged);
+                
+                if (result.success) {
+                    console.log('✓ Excel文件生成成功');
+                    logSuccess(customer, 'MAIN', 'Excel文件生成成功');
+                }
+                
+                console.log(`✓ 客户 "${customer}" 处理成功`);
+                logSuccess(customer, 'MAIN', '客户处理成功');
             } catch (error) {
                 const errorMsg = `处理客户 "${customer}" 时发生错误: ${error.message}`;
                 console.error(`✗ ${errorMsg}`);
