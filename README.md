@@ -32,6 +32,11 @@ XML Parser Optimizer是一个专门用于处理复杂XML文件的工具，它能
 - 按日期和客户名称创建目标文件夹
 - 支持数据分类（已打包数据和剩余数据）
 
+### 5. XML诊断工具
+- 提供专门的XML文件诊断工具
+- 检测XML文件的编码、格式、结构等问题
+- 生成详细的诊断报告帮助定位问题
+
 ## 技术架构
 
 ### 核心依赖
@@ -46,12 +51,16 @@ XML Parser Optimizer是一个专门用于处理复杂XML文件的工具，它能
 src/
 ├── excel/
 │   └── generate-excel-auto-lines.js  # 主要处理逻辑
+├── xml/
+│   ├── xml-diagnostics.js            # XML诊断工具
+│   ├── diagnose-xml.js               # XML诊断命令行工具
+│   └── check-xml-content.js          # XML内容检查工具
 ├── tests/                            # 测试文件
 │   ├── integration.test.js           # 集成测试
 │   ├── functional.test.js            # 功能测试
 │   └── ...                           # 其他单元测试
 ├── local/                            # 本地输出目录
-└── check-xml-content.js              # XML内容检查工具
+└── utils/                            # 工具函数
 
 ```
 
@@ -83,24 +92,45 @@ npm run test-multiline
 
 # 检查XML内容
 npm run check
+
+# 诊断XML文件问题
+npm run diagnose <xml_file_path>
 ```
 
-## 配置说明
+### 使用XML诊断工具
+XML诊断工具可以帮助您识别XML文件中的问题：
 
-项目配置文件为`config.json`，包含以下主要配置项：
-- `enableNetworkSync`: 是否启用网络同步功能
-- `networkPath`: 网络同步目标路径
-- `targetFileName`: 生成的Excel文件名模板
-- `localPath`: 本地输出路径
+```bash
+# 诊断特定XML文件
+npm run diagnose "path/to/your/xmlfile.xml"
 
-## 测试体系
+# 示例
+npm run diagnose "C:\data\优化文件.xml"
+```
 
-项目包含完整的测试体系：
-1. **单元测试**: 验证各个功能模块的正确性
-2. **集成测试**: 验证整个项目的集成功能
-3. **功能测试**: 验证核心业务功能的正确性
+诊断工具会检查以下方面：
+- 文件完整性
+- 基础XML格式
+- 编码问题
+- 结构验证
 
-## 贡献指南
+## 故障排除
+
+如果遇到XML解析失败问题，请使用诊断工具分析XML文件：
+
+1. 运行诊断工具：
+   ```bash
+   npm run diagnose "path/to/problematic/file.xml"
+   ```
+
+2. 根据诊断报告中的问题类型采取相应措施：
+   - **编码问题**：确保文件使用UTF-8编码
+   - **格式问题**：检查XML标签是否正确闭合，属性是否正确引用
+   - **结构问题**：确保包含必要的节点（Root, Cabinet, Panels, Panel）
+
+3. 如果问题仍然存在，请提供诊断报告给技术支持团队。
+
+## 贡献
 
 欢迎提交Issue和Pull Request来改进这个项目。
 

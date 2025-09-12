@@ -7,18 +7,17 @@
     "test": "src/tests"
   },
   "scripts": {
+    "dev": "node src/excel/generate-excel-auto-lines.js",
     "test": "jest",
     "test-integration": "jest src/tests/integration.test.js",
     "test-functional": "jest src/tests/functional.test.js",
-    "test-performance": "jest src/tests/performance.test.js",
-    "test-multiline": "node src/tests/multiline-data.test.js",
-    "dev": "node src/excel/generate-excel-auto-lines.js",
-    "check": "node src/check-xml-content.js",
-    "test-network": "jest src/tests/network-sync.test.js",
-    "test-excel": "jest src/tests/excel-worksheet.test.js"
+    "test-multiline": "jest src/tests/multiline-processing.test.js",
+    "check": "node src/xml/check-xml-content.js",
+    "diagnose": "node src/xml/diagnose-xml.js",
+    "compare": "node src/xml/compare-xml.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["xml", "parser", "excel", "furniture", "cabinet"],
+  "author": "XML Parser Optimizer Team",
   "license": "ISC",
   "dependencies": {
     "exceljs": "^4.3.0",
@@ -35,5 +34,7 @@
   "devDependencies": {
     "jest": "^29.5.0"
   },
-  "worker-packed": true
+  "jest": {
+    "testEnvironment": "node"
+  }
 }

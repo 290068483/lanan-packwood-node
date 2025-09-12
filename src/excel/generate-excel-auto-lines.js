@@ -701,7 +701,13 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
         const data = veryLooseParser.parse(xmlData);
         return { success: true, data: data, parser: 'fast-xml-parser (very loose)' };
     } catch (error) {
-        logWarning(customerName, lineDir, `fast-xml-parser最宽松配置解析失败: ${error.message}`);
+        const errorContext = {
+            parser: 'fast-xml-parser (very loose)',
+            errorPosition: getErrorPosition(xmlData, error),
+            xmlLength: xmlData.length
+        };
+        
+        logWarning(customerName, lineDir, `fast-xml-parser最宽松配置解析失败: ${error.message}`, errorContext);
         console.warn(`  fast-xml-parser最宽松配置解析失败: ${error.message}`);
         
         // 备选方案1：如果首选方案失败，尝试其他解析器（xml2js, xmldom, libxmljs2）
@@ -711,7 +717,13 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
             const data = parseXmlWithXml2js(xmlData);
             return { success: true, data: data, parser: 'xml2js' };
         } catch (xml2jsError) {
-            logWarning(customerName, lineDir, `xml2js解析器失败: ${xml2jsError.message}`);
+            const xml2jsErrorContext = {
+                parser: 'xml2js',
+                errorPosition: getErrorPosition(xmlData, xml2jsError),
+                xmlLength: xmlData.length
+            };
+            
+            logWarning(customerName, lineDir, `xml2js解析器失败: ${xml2jsError.message}`, xml2jsErrorContext);
             console.warn(`  xml2js解析器失败: ${xml2jsError.message}`);
             
             try {
@@ -720,7 +732,13 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
                 const data = parseXmlWithXmldom(xmlData);
                 return { success: true, data: data, parser: 'xmldom' };
             } catch (xmldomError) {
-                logWarning(customerName, lineDir, `xmldom解析器失败: ${xmldomError.message}`);
+                const xmldomErrorContext = {
+                    parser: 'xmldom',
+                    errorPosition: getErrorPosition(xmlData, xmldomError),
+                    xmlLength: xmlData.length
+                };
+                
+                logWarning(customerName, lineDir, `xmldom解析器失败: ${xmldomError.message}`, xmldomErrorContext);
                 console.warn(`  xmldom解析器失败: ${xmldomError.message}`);
                 
                 try {
@@ -729,7 +747,13 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
                     const data = parseXmlWithLibxmljs(xmlData);
                     return { success: true, data: data, parser: 'libxmljs2' };
                 } catch (libxmljsError) {
-                    logWarning(customerName, lineDir, `libxmljs2解析器失败: ${libxmljsError.message}`);
+                    const libxmljsErrorContext = {
+                        parser: 'libxmljs2',
+                        errorPosition: getErrorPosition(xmlData, libxmljsError),
+                        xmlLength: xmlData.length
+                    };
+                    
+                    logWarning(customerName, lineDir, `libxmljs2解析器失败: ${libxmljsError.message}`, libxmljsErrorContext);
                     console.warn(`  libxmljs2解析器失败: ${libxmljsError.message}`);
                     
                     // 备选方案2：如果所有解析器都失败，尝试修复XML数据后再次使用首选方案，如果首选方案失败，尝试其他解析器
@@ -745,7 +769,14 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
                             const data = veryLooseParser.parse(repairedXml);
                             return { success: true, data: data, parser: 'fast-xml-parser (very loose, repaired)' };
                         } catch (repairedError) {
-                            logWarning(customerName, lineDir, `修复后fast-xml-parser最宽松配置解析仍失败: ${repairedError.message}`);
+                            const repairedErrorContext = {
+                                parser: 'fast-xml-parser (very loose, repaired)',
+                                errorPosition: getErrorPosition(repairedXml, repairedError),
+                                xmlLength: repairedXml.length,
+                                originalLength: xmlData.length
+                            };
+                            
+                            logWarning(customerName, lineDir, `修复后fast-xml-parser最宽松配置解析仍失败: ${repairedError.message}`, repairedErrorContext);
                             console.warn(`  修复后fast-xml-parser最宽松配置解析仍失败: ${repairedError.message}`);
                             
                             // 修复后尝试其他解析器
@@ -755,7 +786,14 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
                                 const data = parseXmlWithXml2js(repairedXml);
                                 return { success: true, data: data, parser: 'xml2js (repaired)' };
                             } catch (repairedXml2jsError) {
-                                logWarning(customerName, lineDir, `修复后xml2js解析仍失败: ${repairedXml2jsError.message}`);
+                                const repairedXml2jsErrorContext = {
+                                    parser: 'xml2js (repaired)',
+                                    errorPosition: getErrorPosition(repairedXml, repairedXml2jsError),
+                                    xmlLength: repairedXml.length,
+                                    originalLength: xmlData.length
+                                };
+                                
+                                logWarning(customerName, lineDir, `修复后xml2js解析仍失败: ${repairedXml2jsError.message}`, repairedXml2jsErrorContext);
                                 console.warn(`  修复后xml2js解析仍失败: ${repairedXml2jsError.message}`);
                                 
                                 try {
@@ -764,7 +802,14 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
                                     const data = parseXmlWithXmldom(repairedXml);
                                     return { success: true, data: data, parser: 'xmldom (repaired)' };
                                 } catch (repairedXmldomError) {
-                                    logWarning(customerName, lineDir, `修复后xmldom解析仍失败: ${repairedXmldomError.message}`);
+                                    const repairedXmldomErrorContext = {
+                                        parser: 'xmldom (repaired)',
+                                        errorPosition: getErrorPosition(repairedXml, repairedXmldomError),
+                                        xmlLength: repairedXml.length,
+                                        originalLength: xmlData.length
+                                    };
+                                    
+                                    logWarning(customerName, lineDir, `修复后xmldom解析仍失败: ${repairedXmldomError.message}`, repairedXmldomErrorContext);
                                     console.warn(`  修复后xmldom解析仍失败: ${repairedXmldomError.message}`);
                                     
                                     try {
@@ -773,7 +818,14 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
                                         const data = parseXmlWithLibxmljs(repairedXml);
                                         return { success: true, data: data, parser: 'libxmljs2 (repaired)' };
                                     } catch (repairedLibxmljsError) {
-                                        logWarning(customerName, lineDir, `修复后libxmljs2解析仍失败: ${repairedLibxmljsError.message}`);
+                                        const repairedLibxmljsErrorContext = {
+                                            parser: 'libxmljs2 (repaired)',
+                                            errorPosition: getErrorPosition(repairedXml, repairedLibxmljsError),
+                                            xmlLength: repairedXml.length,
+                                            originalLength: xmlData.length
+                                        };
+                                        
+                                        logWarning(customerName, lineDir, `修复后libxmljs2解析仍失败: ${repairedLibxmljsError.message}`, repairedLibxmljsErrorContext);
                                         console.warn(`  修复后libxmljs2解析仍失败: ${repairedLibxmljsError.message}`);
                                         
                                         // 备选方案3：如果修复后仍失败，尝试分段解析
@@ -791,7 +843,13 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
                                                 return { success: true, data: fullData, parser: 'segmented' };
                                             }
                                         } catch (segmentError) {
-                                            logWarning(customerName, lineDir, `分段解析也失败: ${segmentError.message}`);
+                                            const segmentErrorContext = {
+                                                parser: 'segmented',
+                                                error: segmentError.message,
+                                                xmlLength: xmlData.length
+                                            };
+                                            
+                                            logWarning(customerName, lineDir, `分段解析也失败: ${segmentError.message}`, segmentErrorContext);
                                             console.warn(`  分段解析也失败: ${segmentError.message}`);
                                             
                                             // 备选方案4：如果分段解析也失败，直接提取关键节点（Panels和Panel）
@@ -809,7 +867,13 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
                                                     return { success: true, data: fullData, parser: 'direct panels' };
                                                 }
                                             } catch (panelError) {
-                                                logWarning(customerName, lineDir, `直接查找Panels和Panel节点也失败: ${panelError.message}`);
+                                                const panelErrorContext = {
+                                                    parser: 'direct panels',
+                                                    error: panelError.message,
+                                                    xmlLength: xmlData.length
+                                                };
+                                                
+                                                logWarning(customerName, lineDir, `直接查找Panels和Panel节点也失败: ${panelError.message}`, panelErrorContext);
                                                 console.warn(`  直接查找Panels和Panel节点也失败: ${panelError.message}`);
                                             }
                                         }
@@ -818,7 +882,13 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
                             }
                         }
                     } catch (repairError) {
-                        logWarning(customerName, lineDir, `XML数据修复失败: ${repairError.message}`);
+                        const repairErrorContext = {
+                            operation: 'xml repair',
+                            error: repairError.message,
+                            xmlLength: xmlData.length
+                        };
+                        
+                        logWarning(customerName, lineDir, `XML数据修复失败: ${repairError.message}`, repairErrorContext);
                         console.warn(`  XML数据修复失败: ${repairError.message}`);
                     }
                 }
@@ -826,7 +896,12 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
         }
         
         // 最终方案：如果以上方案都失败，记录详细错误日志并跳过该文件
-        logError(customerName, lineDir, `所有XML解析方法都失败`, error.stack);
+        const finalErrorContext = {
+            totalParsersAttempted: 9, // 4个原始解析器 + 4个修复后解析器 + 1个分段解析
+            xmlLength: xmlData.length
+        };
+        
+        logError(customerName, lineDir, `所有XML解析方法都失败`, error.stack, finalErrorContext);
         console.error(`  所有XML解析方法都失败`);
         return { success: false, error: error.message };
     }
