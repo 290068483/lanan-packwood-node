@@ -4,7 +4,7 @@
   "description": "一个优化的XML解析器，用于处理复杂的XML文件并生成Excel报表",
   "main": "src/main.js",
   "scripts": {
-    "dev": "node src/excel/generate-excel-auto-lines.js",
+    "dev": "node src/excel/generate-excel-modular.js",
     "test": "jest",
     "test-integration": "npm run test-multiline",
     "test-functional": "npm run test-excel",

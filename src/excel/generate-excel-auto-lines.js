@@ -82,6 +82,99 @@ async function checkPackageChanged(outputDir, customerName) {
   }
 }
 
+/**
+ * 检查数据是否发生变化
+ * @param {Array} cabinets - Cabinet数据数组
+ * @param {string} outputDir - 输出目录
+ * @param {string} customerName - 客户名称
+ * @returns {Promise<boolean>} - 数据是否发生变化
+ */
+async function checkDataChanged(cabinets, outputDir, customerName) {
+  try {
+    // 生成当前数据的哈希值
+    const currentDataHash = require('crypto')
+      .createHash('md5')
+      .update(JSON.stringify(cabinets))
+      .digest('hex');
+
+    // 检查是否存在之前的哈希值文件
+    const hashFilePath = path.join(outputDir, 'data.hash');
+    if (fs.existsSync(hashFilePath)) {
+      // 读取之前的哈希值
+      const previousHash = fs.readFileSync(hashFilePath, 'utf8');
+
+      // 比较哈希值
+      if (currentDataHash === previousHash) {
+        console.log(`✓ 客户 "${customerName}" 数据未发生变化`);
+        logInfo(customerName, 'DATA_CHECK', '数据未发生变化');
+        return false;
+      }
+    }
+
+    // 保存当前哈希值
+    fs.writeFileSync(hashFilePath, currentDataHash, 'utf8');
+    console.log(`✓ 客户 "${customerName}" 数据已更新`);
+    logSuccess(customerName, 'DATA_CHECK', '数据已更新');
+    return true;
+  } catch (error) {
+    const errorMsg = `检查数据变化时发生错误: ${error.message}`;
+    console.error(`✗ ${errorMsg}`);
+    logError(customerName, 'DATA_CHECK', errorMsg, error.stack);
+    // 出错时默认数据已变化
+    return true;
+  }
+}
+
+/**
+ * 同步更新package.json和data.hash文件
+ * 确保当数据发生变化时，package.json也同步更新，保持一致性
+ * @param {Array} cabinets - Cabinet数据数组
+ * @param {string} outputDir - 输出目录
+ * @param {string} customerName - 客户名称
+ * @returns {Promise<Object>} 包含数据和package是否发生变化的对象
+ */
+async function syncPackageAndData(cabinets, outputDir, customerName) {
+  try {
+    // 检查数据是否发生变化
+    const dataChanged = await checkDataChanged(
+      cabinets,
+      outputDir,
+      customerName
+    );
+
+    // 检查package.json是否发生变化
+    const packageChanged = await checkPackageChanged(outputDir, customerName);
+
+    // 如果数据发生变化，强制更新package.json
+    if (dataChanged && !packageChanged) {
+      // 数据变化了但package.json未检测到变化，需要强制更新package.json
+      const localPackagePath = path.join(outputDir, 'package.json');
+      const packageData = fs.readFileSync(localPackagePath, 'utf8');
+      const currentPackageHash = require('crypto')
+        .createHash('md5')
+        .update(packageData)
+        .digest('hex');
+
+      const packageHashFilePath = path.join(outputDir, 'package.hash');
+      fs.writeFileSync(packageHashFilePath, currentPackageHash, 'utf8');
+
+      console.log(`✓ 客户 "${customerName}" package.json已同步更新`);
+      logSuccess(customerName, 'PACKAGE_SYNC', 'package.json已同步更新');
+    }
+
+    return {
+      dataChanged,
+      packageChanged: dataChanged || packageChanged, // 如果数据变化，package也视为变化
+    };
+  } catch (error) {
+    const errorMsg = `同步package和数据变化检查时发生错误: ${error.message}`;
+    console.error(`✗ ${errorMsg}`);
+    logError(customerName, 'SYNC_CHECK', errorMsg, error.stack);
+    // 出错时默认都已变化
+    return { dataChanged: true, packageChanged: true };
+  }
+}
+
 // 配置XML解析器
 const parser = new XMLParser({
   ignoreAttributes: false,
