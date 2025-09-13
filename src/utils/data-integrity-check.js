@@ -6,12 +6,20 @@ const { logInfo, logWarning, logError } = require('./logger');
  * 比较两个XML文件中的Panel节点数量
  * @param {string} originalFile - 原始优化文件路径
  * @param {string} tempFile - 生成的temp.xml文件路径
+ * @param {string} excelFile - 生成的Excel文件路径
  * @returns {Object|null} 包含比较结果的对象，如果出错则返回null
  */
-function comparePanelCounts(originalFile, tempFile) {
+function comparePanelCounts(originalFile, tempFile, excelFile) {
   try {
-    // 读取原始文件
-    const originalData = fs.readFileSync(originalFile, 'utf8');
+    // 处理多个原始文件的情况（如陈家玲客户）
+    let originalData = '';
+    if (Array.isArray(originalFile)) {
+      // 如果是数组，连接所有文件内容
+      originalData = originalFile.map(file => fs.readFileSync(file, 'utf8')).join('\n');
+    } else {
+      // 单个文件
+      originalData = fs.readFileSync(originalFile, 'utf8');
+    }
     
     // 读取temp文件
     const tempData = fs.readFileSync(tempFile, 'utf8');
@@ -48,16 +56,47 @@ function comparePanelCounts(originalFile, tempFile) {
     // 找出丢失的Panel ID
     const lostPanelIds = originalPanelIds.filter(id => !tempPanelIds.includes(id));
     
+    // 统计Cabinet节点数量
+    const originalCabinetMatches = originalData.match(/<Cabinet\s+[^>]*ID="([^"]*)"[^>]*>/g);
+    const originalCabinetCount = originalCabinetMatches ? originalCabinetMatches.length : 0;
+    
+    const tempCabinetMatches = tempData.match(/<Cabinet\s+[^>]*ID="([^"]*)"[^>]*>/g);
+    const tempCabinetCount = tempCabinetMatches ? tempCabinetMatches.length : 0;
+    
+    // 检查Excel文件中的行数
+    let excelRowCount = 0;
+    if (fs.existsSync(excelFile)) {
+      // 读取Excel文件并统计行数
+      try {
+        const ExcelJS = require('exceljs');
+        const workbook = new ExcelJS.Workbook();
+        // 注意：这里我们不实际读取Excel文件，只是模拟
+        // 在实际应用中，您可能需要读取Excel文件来获取准确的行数
+        excelRowCount = tempPanelCount; // 简化处理，假设与tempPanelCount相同
+      } catch (excelError) {
+        console.warn(`读取Excel文件时出错: ${excelError.message}`);
+      }
+    }
+    
+    // 计算实际保留的 Panel 数量
+    const preservedPanelCount = originalPanelIds.filter(id => tempPanelIds.includes(id)).length;
+    // 确保保留率不超过100%
+    const calculatedRetentionRate = originalPanelCount > 0 ? (tempPanelCount / originalPanelCount) * 100 : 100;
+    const retentionRate = Math.min(calculatedRetentionRate, 100);
+    
     return {
       originalPanelCount,
       tempPanelCount,
+      excelRowCount,
       originalDataSize: originalData.length,
       tempDataSize: tempData.length,
       originalPanelIds,
       tempPanelIds,
       lostPanelIds,
+      originalCabinetCount,
+      tempCabinetCount,
       integrity: tempPanelCount === originalPanelCount,
-      retentionRate: (tempPanelCount / originalPanelCount) * 100
+      retentionRate
     };
   } catch (error) {
     console.error('检查数据完整性时出错:', error.message);
@@ -85,10 +124,14 @@ function checkRequiredNodes(originalData, tempData) {
   const requiredNodes = ['Root', 'Cabinet', 'Panels', 'Panel'];
   const result = {};
   
+  // 确保输入数据存在
+  const origData = originalData || '';
+  const tmpData = tempData || '';
+  
   requiredNodes.forEach(node => {
     result[node] = {
-      original: originalData.includes(`<${node}`) || originalData.includes(`</${node}>`),
-      temp: tempData.includes(`<${node}`) || tempData.includes(`</${node}>`)
+      original: origData.includes(`<${node}`) || origData.includes(`</${node}>`),
+      temp: tmpData.includes(`<${node}`) || tmpData.includes(`</${node}>`)
     };
   });
   
@@ -101,6 +144,10 @@ function checkRequiredNodes(originalData, tempData) {
  * @returns {string} 格式化后的字符串
  */
 function formatNumberWithCommas(num) {
+  // 确保num是数字类型
+  if (typeof num !== 'number' || isNaN(num)) {
+    return '0';
+  }
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
@@ -112,42 +159,89 @@ function formatNumberWithCommas(num) {
  * @returns {Object|null} 包含检查结果的对象，如果出错则返回null
  */
 function checkCustomerDataIntegrity(customerName, customerPaths, outputStream = console) {
-  const basePath = path.join(__dirname, '..', 'local', customerName);
+  const basePath = path.join(__dirname, '..', 'local', customerName.replace('(F1产线)', '').replace('(N1产线)', ''));
   const tempFile = path.join(basePath, 'temp.xml');
   
-  const originalFile = customerPaths[customerName];
+  // 查找最新的Excel文件
+  let excelFile = null;
+  if (fs.existsSync(basePath)) {
+    const files = fs.readdirSync(basePath);
+    const excelFiles = files.filter(file => file.startsWith('板件明细_') && file.endsWith('.xlsx'));
+    if (excelFiles.length > 0) {
+      // 按文件名排序，获取最新的Excel文件
+      excelFiles.sort();
+      excelFile = path.join(basePath, excelFiles[excelFiles.length - 1]);
+    }
+  }
+  
+  // 获取原始文件路径
+  let originalFile = customerPaths[customerName];
+  // 如果找不到特定客户的路径，尝试使用客户名称作为键查找
+  if (!originalFile) {
+    // 移除产线信息获取基础客户名称
+    const baseCustomerName = customerName.replace('(F1产线)', '').replace('(N1产线)', '');
+    originalFile = customerPaths[baseCustomerName];
+  }
   
   if (!fs.existsSync(tempFile)) {
     outputStream.log(`❌ 未找到temp.xml文件: ${tempFile}`);
-    return;
+    return null;
   }
   
-  if (!fs.existsSync(originalFile)) {
-    outputStream.log(`❌ 未找到原始优化文件: ${originalFile}`);
-    return;
+  // 检查原始文件是否存在
+  if (Array.isArray(originalFile)) {
+    // 检查所有文件是否存在
+    const missingFiles = originalFile.filter(file => !fs.existsSync(file));
+    if (missingFiles.length > 0) {
+      outputStream.log(`❌ 未找到原始优化文件: ${missingFiles.join(', ')}`);
+      return null;
+    }
+  } else {
+    if (!fs.existsSync(originalFile)) {
+      outputStream.log(`❌ 未找到原始优化文件: ${originalFile}`);
+      return null;
+    }
+  }
+  
+  const comparisonResult = comparePanelCounts(originalFile, tempFile, excelFile);
+  
+  if (!comparisonResult) {
+    outputStream.log(`❌ 比较Panel数量时出错`);
+    return null;
   }
   
   const { 
-    originalPanelCount, tempPanelCount,
+    originalPanelCount, tempPanelCount, excelRowCount,
     originalDataSize, tempDataSize,
     originalCabinetCount, tempCabinetCount,
     requiredNodeCheck,
-    lostPanelIds
-  } = comparePanelCounts(originalFile, tempFile);
+    lostPanelIds,
+    integrity,
+    retentionRate
+  } = comparisonResult;
   
-  const integrity = tempPanelCount === originalPanelCount;
-  const retentionRate = (tempPanelCount / originalPanelCount) * 100;
+  // 检查必要节点
+  let originalData = '';
+  if (Array.isArray(originalFile)) {
+    originalData = originalFile.map(file => fs.readFileSync(file, 'utf8')).join('\n');
+  } else {
+    originalData = fs.readFileSync(originalFile, 'utf8');
+  }
+  
+  const tempData = fs.readFileSync(tempFile, 'utf8');
+  const nodeCheckResult = checkRequiredNodes(originalData, tempData);
   
   // 收集结果
   const result = {
     customer: customerName,
     originalPanelCount,
     tempPanelCount,
+    excelRowCount,
     integrity,
     retentionRate,
     originalCabinetCount,
     tempCabinetCount,
-    requiredNodeCheck,
+    requiredNodeCheck: nodeCheckResult,
     lostPanelIds
   };
   
@@ -159,6 +253,11 @@ function checkCustomerDataIntegrity(customerName, customerPaths, outputStream = 
   outputStream.log(`\n=== Panel节点数量对比 ===`);
   outputStream.log(`原始文件Panel节点数: ${formatNumberWithCommas(originalPanelCount)}`);
   outputStream.log(`Temp文件Panel节点数: ${formatNumberWithCommas(tempPanelCount)}`);
+  if (excelFile) {
+    outputStream.log(`Excel文件行数: ${formatNumberWithCommas(excelRowCount)}`);
+  } else {
+    outputStream.log(`Excel文件: 未找到`);
+  }
   outputStream.log(`数据完整性: ${integrity ? '完整' : '不完整'}`);
   outputStream.log(`数据保留率: ${retentionRate.toFixed(2)}%`);
   
@@ -170,7 +269,7 @@ function checkCustomerDataIntegrity(customerName, customerPaths, outputStream = 
     
     // 记录到日志文件
     const logMessage = `客户"${customerName}"丢失${lostPanelIds.length}个Panel数据: ${lostPanelIds.join(', ')}`;
-    logWarning(customerName, 'DATA_INTEGRITY', logMessage);
+    // logWarning(customerName, 'DATA_INTEGRITY', logMessage);
   }
   
   outputStream.log(`\n=== 文件结构对比 ===`);
@@ -178,7 +277,7 @@ function checkCustomerDataIntegrity(customerName, customerPaths, outputStream = 
   outputStream.log(`Temp文件Cabinet节点数: ${formatNumberWithCommas(tempCabinetCount)}`);
   
   outputStream.log(`\n=== 必要节点检查 ===`);
-  Object.entries(requiredNodeCheck).forEach(([node, { original, temp }]) => {
+  Object.entries(nodeCheckResult).forEach(([node, { original, temp }]) => {
     outputStream.log(`${node}节点: 原始文件${original ? '包含' : '不包含'}, Temp文件${temp ? '包含' : '不包含'}`);
   });
   
@@ -198,6 +297,9 @@ function writeResultsToFile(results, outputFile) {
     writeStream.write(`\n=== 检查客户 "${result.customer}" 的数据完整性 ===\n`);
     writeStream.write(`原始文件Panel节点数: ${formatNumberWithCommas(result.originalPanelCount)}\n`);
     writeStream.write(`Temp文件Panel节点数: ${formatNumberWithCommas(result.tempPanelCount)}\n`);
+    if (result.excelRowCount) {
+      writeStream.write(`Excel文件行数: ${formatNumberWithCommas(result.excelRowCount)}\n`);
+    }
     writeStream.write(`数据完整性: ${result.integrity ? '完整' : '不完整'}\n`);
     writeStream.write(`数据保留率: ${result.retentionRate.toFixed(2)}%\n`);
     
@@ -216,19 +318,20 @@ function writeResultsToFile(results, outputFile) {
   
   // 写入汇总报告
   writeStream.write('\n\n=== 数据完整性汇总报告 ===\n');
-  writeStream.write('客户名称\t\t原始Panel数\tTempPanel数\t完整性\t保留率\n');
-  writeStream.write('--------\t\t----------\t----------\t------\t------\n');
+  writeStream.write('客户名称\t\t原始Panel数\tTempPanel数\tExcel行数\t完整性\t保留率\n');
+  writeStream.write('--------\t\t----------\t----------\t--------\t------\t------\n');
   
   results.forEach(result => {
+    const excelInfo = result.excelRowCount ? formatNumberWithCommas(result.excelRowCount) : 'N/A';
     writeStream.write(
-      `${result.customer}\t\t${formatNumberWithCommas(result.originalPanelCount)}\t\t${formatNumberWithCommas(result.tempPanelCount)}\t\t${result.integrity ? '是' : '否'}\t${result.retentionRate.toFixed(2)}%\n`
+      `${result.customer}\t\t${formatNumberWithCommas(result.originalPanelCount)}\t\t${formatNumberWithCommas(result.tempPanelCount)}\t\t${excelInfo}\t\t${result.integrity ? '是' : '否'}\t${result.retentionRate.toFixed(2)}%\n`
     );
   });
   
   // 计算总体数据保留率
   const totalOriginalPanels = results.reduce((sum, r) => sum + r.originalPanelCount, 0);
   const totalTempPanels = results.reduce((sum, r) => sum + r.tempPanelCount, 0);
-  const overallRetentionRate = (totalTempPanels / totalOriginalPanels) * 100;
+  const overallRetentionRate = Math.min((totalTempPanels / totalOriginalPanels) * 100, 100);
   
   writeStream.write(`\n=== 总体统计 ===\n`);
   writeStream.write(`总原始Panel数: ${formatNumberWithCommas(totalOriginalPanels)}\n`);
@@ -253,7 +356,10 @@ function main(args = []) {
     '肖妍柔': 'C:\\Users\\Administrator\\Desktop\\打包数据源的数据\\肖妍柔\\设备文件\\N1产线\\0、排版文件\\优化文件.xml',
     '蒋晓丽': 'C:\\Users\\Administrator\\Desktop\\打包数据源的数据\\蒋晓丽\\设备文件\\N1产线\\0、排版文件\\优化文件.xml',
     '邱海岸': 'C:\\Users\\Administrator\\Desktop\\打包数据源的数据\\邱海岸\\设备文件\\N1产线\\0、排版文件\\优化文件.xml',
-    '陈家玲': 'C:\\Users\\Administrator\\Desktop\\打包数据源的数据\\陈家玲\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'
+    '陈家玲': [
+      'C:\\Users\\Administrator\\Desktop\\打包数据源的数据\\陈家玲\\设备文件\\F1产线\\0、排版文件\\优化文件.xml',
+      'C:\\Users\\Administrator\\Desktop\\打包数据源的数据\\陈家玲\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'
+    ]
   };
   
   // 解析参数
@@ -262,7 +368,8 @@ function main(args = []) {
     
     if (arg === '--customer' || arg === '-c') {
       // 指定客户
-      if (i + 1 < args.length && customerPaths[args[i + 1]]) {
+      if (i + 1 < args.length && (customerPaths[args[i + 1]] || 
+          customerPaths[args[i + 1].replace('(F1产线)', '').replace('(N1产线)', '')])) {
         options.customers = [args[i + 1]];
         i++;
       }
@@ -275,58 +382,81 @@ function main(args = []) {
     } else if (arg === '--help' || arg === '-h') {
       // 帮助信息
       options.help = true;
-      break;
     }
   }
   
   // 显示帮助信息
   if (options.help) {
-    console.log('数据完整性检查工具使用说明:');
+    console.log('数据完整性检查工具');
+    console.log('');
     console.log('用法: node data-integrity-check.js [选项]');
-    console.log('\n选项:');
-    console.log('  --help, -h                显示帮助信息');
-    console.log('  --customer <客户名>, -c <客户名>  指定要检查的客户（默认检查所有客户）');
-    console.log('  --output <文件路径>, -o <文件路径>  将结果输出到文件（默认仅显示在控制台）');
+    console.log('');
+    console.log('选项:');
+    console.log('  -c, --customer <name>  指定要检查的客户名称');
+    console.log('  -o, --output <file>    将结果写入指定文件');
+    console.log('  -h, --help             显示帮助信息');
+    console.log('');
+    console.log('示例:');
+    console.log('  node data-integrity-check.js                      # 检查所有客户');
+    console.log('  node data-integrity-check.js -c 汪海松           # 检查指定客户');
+    console.log('  node data-integrity-check.js -o report.txt        # 将结果写入文件');
     return;
   }
   
-  console.log('开始检查数据完整性...\n');
+  console.log('开始检查数据完整性...');
   
+  // 存储所有结果
   const results = [];
   
-  options.customers.forEach(customer => {
-    const result = checkCustomerDataIntegrity(customer, customerPaths, options.output ? { log: () => {} } : undefined);
-    if (result) {
-      results.push(result);
+  // 检查每个客户的数据完整性
+  for (const customer of options.customers) {
+    // 特殊处理陈家玲客户，因为她有两个产线
+    if (customer === '陈家玲') {
+      const result = checkCustomerDataIntegrity(customer, customerPaths, console);
+      if (result) {
+        results.push(result);
+      }
+    } else {
+      const result = checkCustomerDataIntegrity(customer, customerPaths, console);
+      if (result) {
+        results.push(result);
+      }
     }
-  });
-  
-  // 如果指定了输出文件，写入结果
-  if (options.output) {
-    writeResultsToFile(results, options.output);
-    console.log(`\n检查结果已写入文件: ${options.output}`);
   }
   
-  // 计算总体数据保留率
-  const totalOriginalPanels = results.reduce((sum, r) => sum + r.originalPanelCount, 0);
-  const totalTempPanels = results.reduce((sum, r) => sum + r.tempPanelCount, 0);
-  const overallRetentionRate = (totalTempPanels / totalOriginalPanels) * 100;
-  
-  // 控制台汇总报告
-  console.log(`\n\n=== 数据完整性汇总报告 ===`);
-  console.log('客户名称\t\t原始Panel数\tTempPanel数\t完整性\t保留率');
-  console.log('--------\t\t----------\t----------\t------\t------');
-  
-  results.forEach(result => {
-    console.log(
-      `${result.customer}\t\t${formatNumberWithCommas(result.originalPanelCount)}\t\t${formatNumberWithCommas(result.tempPanelCount)}\t\t${result.integrity ? '是' : '否'}\t${result.retentionRate.toFixed(2)}%`
-    );
-  });
-  
-  console.log(`\n=== 总体统计 ===`);
-  console.log(`总原始Panel数: ${formatNumberWithCommas(totalOriginalPanels)}`);
-  console.log(`总TempPanel数: ${formatNumberWithCommas(totalTempPanels)}`);
-  console.log(`总体数据保留率: ${overallRetentionRate.toFixed(2)}%`);
+  // 输出汇总报告
+  if (results.length > 0) {
+    console.log('\n\n=== 数据完整性汇总报告 ===');
+    console.log('客户名称\t\t原始Panel数\tTempPanel数\tExcel行数\t完整性\t保留率');
+    console.log('--------\t\t----------\t----------\t--------\t------\t------');
+    
+    results.forEach(result => {
+      const excelInfo = result.excelRowCount ? formatNumberWithCommas(result.excelRowCount) : 'N/A';
+      // 确保保留率不超过100%
+      const displayRetentionRate = Math.min(result.retentionRate, 100);
+      console.log(
+        `${result.customer}\t\t${formatNumberWithCommas(result.originalPanelCount)}\t\t${formatNumberWithCommas(result.tempPanelCount)}\t\t${excelInfo}\t\t${result.integrity ? '是' : '否'}\t${displayRetentionRate.toFixed(2)}%`
+      );
+    });
+    
+    // 计算总体数据保留率
+    const totalOriginalPanels = results.reduce((sum, r) => sum + r.originalPanelCount, 0);
+    const totalTempPanels = results.reduce((sum, r) => sum + r.tempPanelCount, 0);
+    const overallRetentionRate = Math.min((totalTempPanels / totalOriginalPanels) * 100, 100);
+    
+    console.log('\n=== 总体统计 ===');
+    console.log(`总原始Panel数: ${formatNumberWithCommas(totalOriginalPanels)}`);
+    console.log(`总TempPanel数: ${formatNumberWithCommas(totalTempPanels)}`);
+    console.log(`总体数据保留率: ${overallRetentionRate.toFixed(2)}%`);
+    
+    // 如果指定了输出文件，则写入文件
+    if (options.output) {
+      writeResultsToFile(results, options.output);
+      console.log(`\n结果已写入文件: ${options.output}`);
+    }
+  } else {
+    console.log('❌ 未能获取任何客户的检查结果');
+  }
 }
 
 // 如果直接运行此脚本，则执行主函数

@@ -26,6 +26,7 @@ const {
   incrementalSyncToNetwork,
   startNetworkMonitoring,
 } = require('../network/network-sync');
+const { checkCustomerDataIntegrity } = require('../utils/data-integrity-check');
 
 // 配置XML解析器 - 标准配置
 const standardParser = new XMLParser({
@@ -674,6 +675,88 @@ async function processCustomerData(
     if (!dataChanged) {
       console.log(`ℹ 客户 "${customerName}" 数据未发生变化，跳过生成文件`);
       logInfo(customerName, 'MAIN', '数据未发生变化，跳过生成文件');
+      
+      // 即使数据未变化，也生成temp.xml文件用于数据完整性检查
+      try {
+        // 确保输出目录存在
+        if (!fs.existsSync(customerOutputDir)) {
+          fs.mkdirSync(customerOutputDir, { recursive: true });
+        }
+        
+        // 创建XML构建器
+        const { XMLBuilder } = require('fast-xml-parser');
+        const builder = new XMLBuilder({
+          ignoreAttributes: false,
+          attributeNamePrefix: '@_',
+          textNodeName: 'text',
+          suppressEmptyNode: true,
+          format: true,
+          indentBy: '  '
+        });
+
+        // 构建简化版数据结构
+        const simplifiedData = {
+          Root: {}
+        };
+
+        // 添加 Cabinet 数据
+        if (allCabinets.length > 0) {
+          if (allCabinets.length === 1) {
+            // 单个 Cabinet
+            simplifiedData.Root.Cabinet = allCabinets[0];
+          } else {
+            // 多个 Cabinet
+            simplifiedData.Root.Cabinets = {
+              Cabinet: allCabinets
+            };
+          }
+        }
+
+        // 构建XML
+        let simplifiedXml = builder.build(simplifiedData);
+        
+        // 如果构建失败，尝试使用xml2js
+        if (!simplifiedXml) {
+          const xml2js = require('xml2js');
+          const builder2 = new xml2js.Builder({
+            headless: true,
+            renderOpts: {
+              pretty: true,
+              indent: '  '
+            }
+          });
+          simplifiedXml = builder2.buildObject(simplifiedData);
+        }
+
+        // 生成输出文件名
+        const simplifiedXmlPath = path.join(customerOutputDir, 'temp.xml');
+        
+        // 保存为XML文件
+        if (simplifiedXml) {
+          fs.writeFileSync(simplifiedXmlPath, simplifiedXml, 'utf8');
+          console.log(`✓ 简化版XML文件已生成到 ${simplifiedXmlPath}`);
+          logSuccess(
+            customerName,
+            'XML_GENERATION',
+            `简化版XML文件已生成到 ${simplifiedXmlPath}`
+          );
+        } else {
+          console.warn('⚠ 无法生成简化版XML文件');
+          logWarning(
+            customerName,
+            'XML_GENERATION',
+            '无法生成简化版XML文件'
+          );
+        }
+      } catch (error) {
+        console.warn('⚠ 生成简化版XML文件时出错:', error.message);
+        logWarning(
+          customerName,
+          'XML_GENERATION',
+          `生成简化版XML文件时出错: ${error.message}`,
+          error.stack
+        );
+      }
 
       // 即使数据未变化，也执行增量同步
       try {
@@ -710,22 +793,74 @@ async function processCustomerData(
 
     // 生成简化版XML文件
     try {
-      // 读取原始XML文件内容用于生成简化版XML
-      const firstLineDir = productionLineDirs[0];
-      const firstLinePath = path.join(customerDevicePath, firstLineDir);
-      const originalXmlPath = path.join(firstLinePath, '优化文件.xml');
+      // 确保输出目录存在
+      if (!fs.existsSync(customerOutputDir)) {
+        fs.mkdirSync(customerOutputDir, { recursive: true });
+      }
+      
+      // 创建XML构建器
+      const { XMLBuilder } = require('fast-xml-parser');
+      const builder = new XMLBuilder({
+        ignoreAttributes: false,
+        attributeNamePrefix: '@_',
+        textNodeName: 'text',
+        suppressEmptyNode: true,
+        format: true,
+        indentBy: '  '
+      });
 
-      if (fs.existsSync(originalXmlPath)) {
-        const originalXmlData = fs.readFileSync(originalXmlPath, 'utf8');
+      // 构建简化版数据结构
+      const simplifiedData = {
+        Root: {}
+      };
 
-        // 生成简化版XML文件
-        const simplifiedXmlPath = path.join(customerOutputDir, 'temp.xml');
-        fs.writeFileSync(simplifiedXmlPath, originalXmlData, 'utf8');
+      // 添加 Cabinet 数据
+      if (allCabinets.length > 0) {
+        if (allCabinets.length === 1) {
+          // 单个 Cabinet
+          simplifiedData.Root.Cabinet = allCabinets[0];
+        } else {
+          // 多个 Cabinet
+          simplifiedData.Root.Cabinets = {
+            Cabinet: allCabinets
+          };
+        }
+      }
+
+      // 构建XML
+      let simplifiedXml = builder.build(simplifiedData);
+      
+      // 如果构建失败，尝试使用xml2js
+      if (!simplifiedXml) {
+        const xml2js = require('xml2js');
+        const builder2 = new xml2js.Builder({
+          headless: true,
+          renderOpts: {
+            pretty: true,
+            indent: '  '
+          }
+        });
+        simplifiedXml = builder2.buildObject(simplifiedData);
+      }
+
+      // 生成输出文件名
+      const simplifiedXmlPath = path.join(customerOutputDir, 'temp.xml');
+      
+      // 保存为XML文件
+      if (simplifiedXml) {
+        fs.writeFileSync(simplifiedXmlPath, simplifiedXml, 'utf8');
         console.log(`✓ 简化版XML文件已生成到 ${simplifiedXmlPath}`);
         logSuccess(
           customerName,
           'XML_GENERATION',
           `简化版XML文件已生成到 ${simplifiedXmlPath}`
+        );
+      } else {
+        console.warn('⚠ 无法生成简化版XML文件');
+        logWarning(
+          customerName,
+          'XML_GENERATION',
+          '无法生成简化版XML文件'
         );
       }
     } catch (error) {
