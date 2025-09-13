@@ -4,9 +4,9 @@ const path = require('path');
 const ExcelJS = require('exceljs');
 const xml2js = require('xml2js');
 const convert = require('xml-js');
-const { DOMParser } = require('xmldom');
+const { DOMParser } = require('@xmldom/xmldom');
 const xpath = require('xpath');
-const libxmljs = require('libxmljs2');
+
 const { logError, logInfo, logWarning, logSuccess } = require('../utils/logger');
 
 // 读取配置文件
@@ -43,6 +43,14 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 //     console.log(logEntry);
 //     fs.appendFileSync('success.log', logEntry);
 // };
+
+// const logSystemInfo = (message) => {
+//     const timestamp = new Date().toISOString();
+//     const logEntry = `[${timestamp}] [SYSTEM] [INFO] ${message}\n`;
+//     console.log(logEntry);
+//     fs.appendFileSync('system.log', logEntry);
+// };
+
 
 // const logSystemInfo = (message) => {
 //     const timestamp = new Date().toISOString();
@@ -234,6 +242,46 @@ const builder = new XMLBuilder({
     suppressEmptyNode: true,
     format: true
 });
+
+/**
+ * 直接从原始XML创建简化版XML文件
+ * @param {string} xmlFilePath - 原始XML文件路径
+ * @param {string} outputDir - 输出目录
+ * @param {string} customerName - 客户名称
+ */
+async function createSimplifiedXmlDirectly(xmlFilePath, outputDir, customerName) {
+    try {
+        // 读取原始XML文件
+        const xmlData = fs.readFileSync(xmlFilePath, 'utf8');
+        
+        // 使用正则表达式删除不需要的节点
+        let simplifiedXml = xmlData;
+        
+        // 删除Metals节点（包括内容）
+        simplifiedXml = simplifiedXml.replace(/<Metals\b[^>]*>[\s\S]*?<\/Metals>/g, '');
+        
+        // 删除Hardwares节点（包括内容）
+        simplifiedXml = simplifiedXml.replace(/<Hardwares\b[^>]*>[\s\S]*?<\/Hardwares>/g, '');
+        
+        // 删除ExtendBomLists节点（包括内容）
+        simplifiedXml = simplifiedXml.replace(/<ExtendBomLists\b[^>]*>[\s\S]*?<\/ExtendBomLists>/g, '');
+        
+        // 清理多余的空行
+        simplifiedXml = simplifiedXml.replace(/\n\s*\n/g, '\n');
+        
+        // 生成输出文件名
+        const outputFileName = path.join(outputDir, 'temp.xml');
+        
+        // 保存为XML文件
+        fs.writeFileSync(outputFileName, simplifiedXml, 'utf8');
+        console.log(`✓ 简化版XML文件已生成到 ${outputFileName}`);
+        logSuccess(customerName, 'XML_GENERATION', `简化版XML文件已生成到 ${outputFileName}`);
+    } catch (error) {
+        console.error('✗ 直接创建简化版XML文件时出错:', error.message);
+        logError(customerName, 'XML_GENERATION', `直接创建简化版XML文件时出错: ${error.message}`, error.stack);
+        throw error;
+    }
+}
 
 /**
  * 使用xml2js库解析XML数据
@@ -1012,6 +1060,7 @@ async function autoDetectAndProcessLines() {
         console.log(`✓ [SYSTEM] 检测到 ${customerDirs.length} 个客户目录: ${customerDirs.join(', ')}`);
         
         // 依次处理每个客户
+        let successCount = 0;
         for (const customerDir of customerDirs) {
             console.log(`\n正在处理客户: ${customerDir}`);
             logInfo(customerDir, 'MAIN', `开始处理客户`);
@@ -1033,6 +1082,7 @@ async function autoDetectAndProcessLines() {
                 );
                 
                 if (success) {
+                    successCount++;
                     console.log(`✓ 客户 "${customerDir}" 处理成功`);
                     logSuccess(customerDir, 'MAIN', '客户处理成功');
                 } else {
@@ -1045,11 +1095,13 @@ async function autoDetectAndProcessLines() {
             }
         }
         
-        console.log('\n✓ 处理完成，共处理了 %d 个客户', customerDirs.length);
-        console.log(`✓ [SYSTEM] 处理完成，共处理了 ${customerDirs.length} 个客户`);
+        console.log('\n✓ 处理完成，共处理了 %d 个客户', successCount);
+        console.log(`✓ [SYSTEM] 处理完成，共处理了 ${successCount} 个客户`);
+        return successCount === customerDirs.length;
     } catch (error) {
         console.error('✗ 自动检测并处理产线数据时发生错误:', error.message);
         console.error(`✗ [SYSTEM] 自动检测并处理产线数据时发生错误: ${error.message}`);
+        return false;
     }
 }
 
@@ -1311,21 +1363,13 @@ async function processCustomerData(customerDevicePath, customerOutputDir, custom
             const firstLineDir = productionLineDirs[0];
             const firstXmlFilePath = path.join(customerDevicePath, firstLineDir, '0、排版文件', '优化文件.xml');
             if (fs.existsSync(firstXmlFilePath)) {
-                const xmlData = fs.readFileSync(firstXmlFilePath, 'utf8');
-                const parser = new XMLParser({
-                    ignoreAttributes: false,
-                    attributeNamePrefix: "@_",
-                    textNodeName: "text",
-                    parseAttributeValue: true,
-                    parseTagValue: true,
-                    trimValues: true
-                });
-                const customerData = parser.parse(xmlData);
-                await generateSimplifiedXml(customerData, customerOutputDir, customerName);
+                // 直接从原始XML创建简化版XML，避免数据结构问题
+                await createSimplifiedXmlDirectly(firstXmlFilePath, customerOutputDir, customerName);
             }
         } catch (error) {
             console.error('✗ 生成简化版XML文件时出错:', error.message);
             logError(customerName, 'XML_GENERATION', `生成简化版XML文件时出错: ${error.message}`, error.stack);
+            // 不中断主流程，但记录错误
         }
         
         // 生成Excel文件
@@ -1341,13 +1385,13 @@ async function processCustomerData(customerDevicePath, customerOutputDir, custom
                 return false;
             }
         } catch (error) {
-            console.error('✗ 生成Excel文件时出错:', error.message);
-            logError(customerName, 'EXCEL_GENERATION', `生成Excel文件时出错: ${error.message}`, error.stack);
+            console.error('✗ Excel文件生成时出错:', error.message);
+            logError(customerName, 'EXCEL_GENERATION', `Excel文件生成时出错: ${error.message}`, error.stack);
             return false;
         }
     } catch (error) {
-        console.error('✗ 处理客户数据时发生未知错误:', error.message);
-        logError(customerName, 'MAIN', `处理客户数据时发生未知错误: ${error.message}`, error.stack);
+        console.error(`✗ 处理客户 "${customerName}" 数据时发生错误:`, error.message);
+        logError(customerName, 'MAIN', `处理客户数据时发生错误: ${error.message}`, error.stack);
         return false;
     }
 }
@@ -1360,63 +1404,105 @@ async function processCustomerData(customerDevicePath, customerOutputDir, custom
  */
 async function generateSimplifiedXml(customerData, outputDir, customerName) {
     try {
+        // 检查输入数据是否有效
+        if (!customerData || typeof customerData !== 'object') {
+            throw new Error('无效的客户数据');
+        }
+
+        // 深拷贝数据以避免修改原始数据
+        let simplifiedData = JSON.parse(JSON.stringify(customerData));
+
         // 删除不需要的标签结构
-        if (customerData && customerData.Root) {
+        if (simplifiedData && simplifiedData.Root) {
             // 删除Metals节点
-            if (customerData.Root.Metals) {
-                delete customerData.Root.Metals;
+            if (simplifiedData.Root.Metals) {
+                delete simplifiedData.Root.Metals;
                 console.log('✓ 已删除Metals节点');
                 logSuccess(customerName, 'XML_GENERATION', '已删除Metals节点');
             }
             
             // 删除Hardwares节点
-            if (customerData.Root.Hardwares) {
-                delete customerData.Root.Hardwares;
+            if (simplifiedData.Root.Hardwares) {
+                delete simplifiedData.Root.Hardwares;
                 console.log('✓ 已删除Hardwares节点');
                 logSuccess(customerName, 'XML_GENERATION', '已删除Hardwares节点');
             }
             
             // 删除ExtendBomLists节点
-            if (customerData.Root.ExtendBomLists) {
-                delete customerData.Root.ExtendBomLists;
+            if (simplifiedData.Root.ExtendBomLists) {
+                delete simplifiedData.Root.ExtendBomLists;
                 console.log('✓ 已删除ExtendBomLists节点');
                 logSuccess(customerName, 'XML_GENERATION', '已删除ExtendBomLists节点');
             }
             
             // 只保留必要的 Cabinet 数据
-            if (customerData.Root.Cabinet) {
+            if (simplifiedData.Root.Cabinet) {
                 // 如果是数组，处理每个 Cabinet
-                if (Array.isArray(customerData.Root.Cabinet)) {
-                    customerData.Root.Cabinet = customerData.Root.Cabinet.map(cabinet => {
-                        // 删除 Cabinet 中的 Metals, Hardwares 和 ExtendBomLists（如果存在）
-                        if (cabinet.Metals) {
-                            delete cabinet.Metals;
-                        }
-                        if (cabinet.Hardwares) {
-                            delete cabinet.Hardwares;
-                        }
-                        if (cabinet.ExtendBomLists) {
-                            delete cabinet.ExtendBomLists;
+                if (Array.isArray(simplifiedData.Root.Cabinet)) {
+                    simplifiedData.Root.Cabinet = simplifiedData.Root.Cabinet.map(cabinet => {
+                        // 检查 Cabinet 是否有效
+                        if (cabinet && typeof cabinet === 'object') {
+                            // 删除 Cabinet 中的 Metals, Hardwares 和 ExtendBomLists（如果存在）
+                            if (cabinet.Metals) {
+                                delete cabinet.Metals;
+                            }
+                            if (cabinet.Hardwares) {
+                                delete cabinet.Hardwares;
+                            }
+                            if (cabinet.ExtendBomLists) {
+                                delete cabinet.ExtendBomLists;
+                            }
                         }
                         return cabinet;
-                    });
+                    }).filter(cabinet => cabinet !== null && cabinet !== undefined); // 过滤掉null或undefined的cabinet
                 } else {
                     // 单个 Cabinet 对象
-                    if (customerData.Root.Cabinet.Metals) {
-                        delete customerData.Root.Cabinet.Metals;
-                    }
-                    if (customerData.Root.Cabinet.Hardwares) {
-                        delete customerData.Root.Cabinet.Hardwares;
-                    }
-                    if (customerData.Root.Cabinet.ExtendBomLists) {
-                        delete customerData.Root.Cabinet.ExtendBomLists;
+                    if (simplifiedData.Root.Cabinet && typeof simplifiedData.Root.Cabinet === 'object') {
+                        if (simplifiedData.Root.Cabinet.Metals) {
+                            delete simplifiedData.Root.Cabinet.Metals;
+                        }
+                        if (simplifiedData.Root.Cabinet.Hardwares) {
+                            delete simplifiedData.Root.Cabinet.Hardwares;
+                        }
+                        if (simplifiedData.Root.Cabinet.ExtendBomLists) {
+                            delete simplifiedData.Root.Cabinet.ExtendBomLists;
+                        }
                     }
                 }
             }
         }
+
+        // 验证简化后的数据是否有效
+        if (!simplifiedData || Object.keys(simplifiedData).length === 0) {
+            throw new Error('简化后的数据为空');
+        }
         
-        // 构建简化版XML
-        const simplifiedXml = builder.build(customerData);
+        // 使用更安全的方式构建XML
+        let simplifiedXml;
+        try {
+            simplifiedXml = builder.build(simplifiedData);
+        } catch (buildError) {
+            // 如果构建失败，尝试使用xml2js创建XML
+            console.warn(`⚠ XMLBuilder构建失败，尝试使用xml2js: ${buildError.message}`);
+            logWarning(customerName, 'XML_GENERATION', `XMLBuilder构建失败，尝试使用xml2js: ${buildError.message}`);
+            
+            // 尝试使用xml2js构建XML
+            const xml2js = require('xml2js');
+            const builder2 = new xml2js.Builder({
+                headless: true, // 不添加XML声明
+                renderOpts: {
+                    pretty: true,
+                    indent: '  '
+                }
+            });
+            
+            simplifiedXml = builder2.buildObject(simplifiedData);
+        }
+        
+        // 验证生成的XML是否有效
+        if (!simplifiedXml || simplifiedXml.length === 0) {
+            throw new Error('生成的XML内容为空');
+        }
         
         // 生成输出文件名
         const outputFileName = path.join(outputDir, 'temp.xml');
@@ -1426,6 +1512,9 @@ async function generateSimplifiedXml(customerData, outputDir, customerName) {
         console.log(`✓ 简化版XML文件已生成到 ${outputFileName}`);
         logSuccess(customerName, 'XML_GENERATION', `简化版XML文件已生成到 ${outputFileName}`);
     } catch (error) {
+        console.error('✗ 生成简化版XML文件时出错:', error.message);
+        logError(customerName, 'XML_GENERATION', `生成简化版XML文件时出错: ${error.message}`, error.stack);
+        // 重新抛出错误，以便调用方知道temp.xml生成失败
         throw new Error(`生成简化版XML文件失败: ${error.message}`);
     }
 }
@@ -1895,25 +1984,6 @@ if (require.main === module) {
                     console.log(`✗ 客户 "${customer}" 处理失败`);
                     logError(customer, 'MAIN', `客户处理失败`);
                 }
-                
-                // 检查package.json是否发生变化
-                const isPackageChanged = await checkPackageChanged(outputDir, customer);
-                if (isPackageChanged) {
-                    console.log(`✓ 客户 "${customer}" package.json已更新`);
-                } else {
-                    console.log(`✓ 客户 "${customer}" package.json未发生变化`);
-                }
-                
-                // 生成Excel文件
-                const result = await generateExcel(cabinets, customer, outputDir, isPackageChanged);
-                
-                if (result.success) {
-                    console.log('✓ Excel文件生成成功');
-                    logSuccess(customer, 'MAIN', 'Excel文件生成成功');
-                }
-                
-                console.log(`✓ 客户 "${customer}" 处理成功`);
-                logSuccess(customer, 'MAIN', '客户处理成功');
             } catch (error) {
                 const errorMsg = `处理客户 "${customer}" 时发生错误: ${error.message}`;
                 console.error(`✗ ${errorMsg}`);
