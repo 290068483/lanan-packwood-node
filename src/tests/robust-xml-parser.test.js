@@ -84,7 +84,7 @@ describe('RobustXmlParser', () => {
   });
 
   test('应该在所有方法都失败时返回错误信息', () => {
-    const xml = `<<<>>>><<<>>><<<>>`;
+    const xml = '<<<>>>><<<>>><<<>>';
 
     const result = RobustXmlParser.parse(xml);
     // 由于使用了正则表达式作为最后的手段，即使是无效的XML也可能返回成功

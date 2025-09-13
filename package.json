@@ -2,39 +2,45 @@
   "name": "xml-parser-optimizer",
   "version": "1.0.0",
   "description": "一个优化的XML解析器，用于处理复杂的XML文件并生成Excel报表",
-  "main": "src/excel/generate-excel-auto-lines.js",
-  "directories": {
-    "test": "src/tests"
-  },
+  "main": "src/main.js",
   "scripts": {
     "dev": "node src/excel/generate-excel-auto-lines.js",
     "test": "jest",
-    "test-integration": "jest src/tests/integration.test.js",
-    "test-functional": "jest src/tests/functional.test.js",
-    "test-multiline": "jest src/tests/multiline-processing.test.js",
+    "test-integration": "npm run test-multiline",
+    "test-functional": "npm run test-excel",
+    "test-multiline": "node src/tests/integration.test.js",
+    "test-excel": "node src/tests/excel-generation.test.js",
     "check": "node src/xml/check-xml-content.js",
-    "diagnose": "node src/xml/diagnose-xml.js",
-    "compare": "node src/xml/compare-xml.js"
+    "validate": "node src/xml/validate-xml-advanced.js",
+    "compare": "node src/xml/compare-xml.js",
+    "diagnose": "node src/xml/xml-diagnostics.js",
+    "integrity": "node src/utils/data-integrity-check.js",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write src/"
   },
-  "keywords": ["xml", "parser", "excel", "furniture", "cabinet"],
-  "author": "XML Parser Optimizer Team",
-  "license": "ISC",
+  "keywords": [
+    "xml",
+    "parser",
+    "excel",
+    "report"
+  ],
+  "author": "Developer",
+  "license": "MIT",
   "dependencies": {
+    "@xmldom/xmldom": "^0.8.10",
     "exceljs": "^4.3.0",
     "fast-xml-parser": "^4.2.5",
-    "xml2js": "^0.6.0",
-    "@xmldom/xmldom": "^0.9.0",
-    "convert": "^4.1.0",
-    "chalk": "^4.1.2",
-    "crypto": "^1.0.1",
-    "xml-js": "^1.6.11",
-    "xpath": "^0.0.34",
-    "cheerio": "^1.0.0-rc.12"
+    "xml2js": "^0.6.0"
+  },
+  "optionalDependencies": {
+    "libxmljs2": "^0.32.0"
   },
   "devDependencies": {
-    "jest": "^29.5.0"
-  },
-  "jest": {
-    "testEnvironment": "node"
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^29.5.0",
+    "prettier": "^3.6.2"
   }
 }

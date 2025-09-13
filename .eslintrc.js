@@ -2,32 +2,20 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
+    node: true,
   },
-  extends: [
-    'eslint:recommended',
-  ],
+  extends: ['eslint:recommended', 'plugin:prettier/recommended'],
   parserOptions: {
     ecmaVersion: 12,
     sourceType: 'module',
   },
+  plugins: ['prettier'],
   rules: {
     // 通用规则
-    'indent': ['error', 2],
-    'linebreak-style': ['error', 'windows'],
-    'quotes': ['error', 'single'],
-    'semi': ['error', 'always'],
+    indent: ['error', 2],
+    'linebreak-style': 'off', // 关闭行尾风格检查，让Prettier处理
+    quotes: ['error', 'single'],
+    semi: ['error', 'always'],
+    'prettier/prettier': 'error',
   },
-  // 对于XML文件，我们使用overrides来设置特定规则
-  overrides: [
-    {
-      files: ['*.xml'],
-      // 对于XML文件，我们禁用JavaScript规则，因为它们不适用
-      rules: {
-        // 禁用所有JavaScript规则
-        'indent': 'off',
-        'quotes': 'off',
-        'semi': 'off',
-      },
-    },
-  ],
 };

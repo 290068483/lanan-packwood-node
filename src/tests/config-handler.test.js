@@ -3,16 +3,16 @@ const path = require('path');
 
 // 模拟配置文件
 jest.mock('../../config.json', () => ({
-  sourcePath: "C:\\Users\\Administrator\\Desktop\\打包数据源的数据",
-  localPath: "./src/local",
-  networkPath: "\\\\c1\\mpm\\temp\\local\\test",
-  targetFileName: "板件明细.xlsx",
-  enableNetworkSync: true
+  sourcePath: 'C:\\Users\\Administrator\\Desktop\\打包数据源的数据',
+  localPath: './src/local',
+  networkPath: '\\\\c1\\mpm\\temp\\local\\test',
+  targetFileName: '板件明细.xlsx',
+  enableNetworkSync: true,
 }));
 
 describe('Config Handler Tests', () => {
   let config;
-  
+
   beforeEach(() => {
     config = require('../../config.json');
   });

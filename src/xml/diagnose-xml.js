@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const path = require('path');
 const XMLDiagnostics = require('./xml-diagnostics');
 
 /**
@@ -54,7 +53,3 @@ if (require.main === module) {
   main();
 }
 
-module.exports = {
-  diagnose: XMLDiagnostics.generateReport,
-  printReport: XMLDiagnostics.printReport
-};
