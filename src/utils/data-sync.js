@@ -102,28 +102,18 @@ async function checkDataChanged(cabinets, outputDir, customerName) {
 async function syncPackageAndData(cabinets, outputDir, customerName) {
   try {
     // 检查数据是否发生变化
-    const dataChanged = await checkDataChanged(cabinets, outputDir, customerName);
-    
+    const dataChanged = await checkDataChanged(
+      cabinets,
+      outputDir,
+      customerName
+    );
+
     // 检查package.json是否发生变化
     const packageChanged = await checkPackageChanged(outputDir, customerName);
-    
-    // 如果数据发生变化，强制更新package.json
-    if (dataChanged && !packageChanged) {
-      // 数据变化了但package.json未检测到变化，需要强制更新package.json
-      const localPackagePath = path.join(outputDir, 'package.json');
-      const packageData = fs.readFileSync(localPackagePath, 'utf8');
-      const currentPackageHash = crypto
-        .createHash('md5')
-        .update(packageData)
-        .digest('hex');
-      
-      const packageHashFilePath = path.join(outputDir, 'package.hash');
-      fs.writeFileSync(packageHashFilePath, currentPackageHash, 'utf8');
-    }
-    
+
     return {
       dataChanged,
-      packageChanged: dataChanged || packageChanged // 如果数据变化，package也视为变化
+      packageChanged,
     };
   } catch (error) {
     // 出错时默认都已变化

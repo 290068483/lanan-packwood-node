@@ -27,7 +27,7 @@ async function generateExcel(
     titleRow.font = { bold: true, size: 16 };
     titleRow.alignment = { vertical: 'middle', horizontal: 'center' };
     titleRow.height = 20;
-    
+
     // 合并标题行单元格
     worksheet.mergeCells(1, 1, 1, 19);
 
@@ -75,6 +75,22 @@ async function generateExcel(
 
     // 记录总行数
     let totalPanels = 0;
+
+    // 读取package.json中的已打包ID列表（如果存在且发生变化）
+    let packagedIds = new Set();
+    const localPackagePath = path.join(outputDir, 'package.json');
+    if (packageChanged && fs.existsSync(localPackagePath)) {
+      try {
+        const packageData = JSON.parse(
+          fs.readFileSync(localPackagePath, 'utf8')
+        );
+        if (packageData.packagedIds && Array.isArray(packageData.packagedIds)) {
+          packagedIds = new Set(packageData.packagedIds);
+        }
+      } catch (error) {
+        console.warn('读取package.json中的已打包ID列表时出错:', error.message);
+      }
+    }
 
     // 遍历每个柜体
     cabinets.forEach(cabinet => {
@@ -136,10 +152,10 @@ async function generateExcel(
           dataRow.alignment = { vertical: 'middle', horizontal: 'center' };
           dataRow.height = 18;
 
-          // 如果package.json发生变化且不是空的默认package.json，设置灰色背景
-          if (packageChanged) {
+          // 只有当package.json发生变化时，才检查并标记已打包的行
+          if (packageChanged && idNumber && packagedIds.has(idNumber)) {
             // 记录已打包的行索引
-            packagedRows.push(worksheet.rowCount); // 不再减去表头行，因为现在有标题行
+            packagedRows.push(worksheet.rowCount);
 
             dataRow.fill = {
               type: 'pattern',

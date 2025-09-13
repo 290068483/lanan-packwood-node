@@ -18,7 +18,14 @@ const configPath = path.join(__dirname, '..', '..', 'config.json');
 
 // 导入工具函数
 const { generateExcel } = require('./excel-generator');
-const { syncPackageAndData } = require('../utils/data-sync');
+const {
+  syncPackageAndData,
+  checkPackageChanged,
+} = require('../utils/data-sync');
+const {
+  incrementalSyncToNetwork,
+  startNetworkMonitoring,
+} = require('../network/network-sync');
 
 // 配置XML解析器 - 标准配置
 const standardParser = new XMLParser({
@@ -31,9 +38,24 @@ const standardParser = new XMLParser({
   // 添加更多容错配置
   allowBooleanAttributes: true,
   parseTrueNumberOnly: false,
-  stopNodes: ['*'] // 跳过错误节点
+  stopNodes: ['*'], // 跳过错误节点
 });
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+// 启动网络状态监控
+try {
+  startNetworkMonitoring(config);
+  logSuccess('SYSTEM', 'NETWORK', '网络监控已启动');
+  console.log('✓ 网络监控已启动');
+} catch (error) {
+  logError(
+    'SYSTEM',
+    'NETWORK',
+    `网络监控启动失败: ${error.message}`,
+    error.stack
+  );
+  console.warn(`⚠ 网络监控启动失败: ${error.message}`);
+}
 
 // 配置XML解析器 - 宽松配置
 const looseParser = new XMLParser({
@@ -46,7 +68,7 @@ const looseParser = new XMLParser({
   // 添加更多容错配置
   allowBooleanAttributes: true,
   parseTrueNumberOnly: false,
-  stopNodes: ['*'] // 跳过错误节点
+  stopNodes: ['*'], // 跳过错误节点
 });
 
 /**
@@ -232,7 +254,6 @@ function parseXmlWithFallback(xmlData, lineDir, customerName) {
     }
   }
 }
-
 
 /**
  * 使用正则表达式从XML数据中提取Panel节点
@@ -653,6 +674,37 @@ async function processCustomerData(
     if (!dataChanged) {
       console.log(`ℹ 客户 "${customerName}" 数据未发生变化，跳过生成文件`);
       logInfo(customerName, 'MAIN', '数据未发生变化，跳过生成文件');
+
+      // 即使数据未变化，也执行增量同步
+      try {
+        const syncResult = await incrementalSyncToNetwork(
+          customerName,
+          customerOutputDir
+        );
+        if (syncResult.success) {
+          console.log(`✓ 客户 "${customerName}" 增量同步成功`);
+          logSuccess(customerName, 'NETWORK_SYNC', '增量同步成功');
+        } else {
+          console.log(
+            `⚠ 客户 "${customerName}" 增量同步失败: ${syncResult.message}`
+          );
+          logWarning(
+            customerName,
+            'NETWORK_SYNC',
+            `增量同步失败: ${syncResult.message}`
+          );
+        }
+      } catch (syncError) {
+        console.error(
+          `✗ 客户 "${customerName}" 增量同步异常: ${syncError.message}`
+        );
+        logError(
+          customerName,
+          'NETWORK_SYNC',
+          `增量同步异常: ${syncError.message}`
+        );
+      }
+
       return true;
     }
 
@@ -694,9 +746,45 @@ async function processCustomerData(
         customerOutputDir,
         packageChanged
       );
+      
       if (result && result.success) {
         console.log('✓ Excel文件生成成功');
         logSuccess(customerName, 'EXCEL_GENERATION', 'Excel文件生成成功');
+        
+        // 检查数据完整性
+        await checkDataIntegrityAfterProcessing(customerName, config);
+        
+        // 调用网络同步功能
+        if (config.enableNetworkSync) {
+          try {
+            const syncResult = await incrementalSyncToNetwork(
+              {
+                outputDir: customerOutputDir,
+                customerName,
+                packagedRows: result.packagedRows,
+                totalRows: result.totalRows
+              },
+              config
+            );
+            
+            if (!syncResult.success) {
+              console.warn('⚠ 网络同步失败:', syncResult.message);
+              logWarning(
+                customerName,
+                'NETWORK_SYNC',
+                `网络同步失败: ${syncResult.message}`
+              );
+            }
+          } catch (syncError) {
+            console.warn('⚠ 网络同步异常:', syncError.message);
+            logWarning(
+              customerName,
+              'NETWORK_SYNC',
+              `网络同步异常: ${syncError.message}`
+            );
+          }
+        }
+        
         return true;
       } else {
         console.error('✗ Excel文件生成失败');
@@ -729,11 +817,64 @@ async function processCustomerData(
 }
 
 /**
+ * 在处理完成后检查数据完整性
+ * @param {string} customerName - 客户名称
+ * @param {Object} config - 配置对象
+ */
+async function checkDataIntegrityAfterProcessing(customerName, config) {
+  try {
+    // 根据客户确定原始文件路径
+    const customerPaths = {
+      '汪海松': path.join(config.sourcePath, '汪海松\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'),
+      '肖妍柔': path.join(config.sourcePath, '肖妍柔\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'),
+      '蒋晓丽': path.join(config.sourcePath, '蒋晓丽\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'),
+      '邱海岸': path.join(config.sourcePath, '邱海岸\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'),
+      '陈家玲': path.join(config.sourcePath, '陈家玲\\设备文件\\N1产线\\0、排版文件\\优化文件.xml')
+    };
+
+    // 检查数据完整性
+    const result = checkCustomerDataIntegrity(
+      customerName, 
+      customerPaths, 
+      console
+    );
+    
+    if (result) {
+      // 记录完整性检查结果到日志
+      logInfo(
+        customerName, 
+        'DATA_INTEGRITY', 
+        `数据完整性检查完成: 保留率 ${result.retentionRate.toFixed(2)}%`
+      );
+      
+      // 如果数据不完整，记录警告
+      if (!result.integrity) {
+        logWarning(
+          customerName, 
+          'DATA_INTEGRITY', 
+          `数据不完整，丢失 ${result.lostPanelIds.length} 个Panel`
+        );
+      }
+    }
+  } catch (error) {
+    console.error('✗ 数据完整性检查时出错:', error.message);
+    logError(
+      customerName,
+      'DATA_INTEGRITY',
+      `数据完整性检查时出错: ${error.message}`,
+      error.stack
+    );
+  }
+}
+
+/**
  * 主函数
  */
 async function main() {
   try {
     console.log('🚀 开始处理客户数据...');
+
+    // 网络监控已经在模块加载时启动，这里不需要重复启动
 
     // 检查源路径和本地路径是否存在
     if (!fs.existsSync(config.sourcePath)) {
