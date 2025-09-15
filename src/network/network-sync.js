@@ -181,7 +181,33 @@ async function incrementalSyncToNetwork(syncData, config) {
     await fs.mkdir(finalTargetPath, { recursive: true });
 
     // 查找localPath中对应客户的Excel文件
-    const customerLocalPath = path.join(config.localPath, customerName);
+    // 需要查找带有日期前缀和#后缀的客户目录
+    let customerLocalPath = '';
+    try {
+      const localDirs = await fs.readdir(config.localPath);
+      const datePrefix = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+      const dirWithDate = localDirs.find(dir => 
+        dir.startsWith(datePrefix) && 
+        dir.endsWith('#') && 
+        dir.includes(` ${customerName}#`)
+      );
+      
+      if (dirWithDate) {
+        customerLocalPath = path.join(config.localPath, dirWithDate);
+      } else {
+        // 如果没找到带日期的目录，尝试查找不带日期但带#后缀的目录（兼容旧版本）
+        const dirWithoutDate = localDirs.find(dir => 
+          dir === `${customerName}#`
+        );
+        if (dirWithoutDate) {
+          customerLocalPath = path.join(config.localPath, dirWithoutDate);
+        }
+      }
+    } catch (error) {
+      console.error('✗ 读取本地目录时出错:', error.message);
+      logError(customerName, 'NETWORK_SYNC', `读取本地目录时出错: ${error.message}`);
+    }
+
     let sourceExcelFile = null;
     let sourceExcelFileName = null;
 

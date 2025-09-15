@@ -978,11 +978,15 @@ async function main() {
     // 处理每个客户
     for (const customerDir of customerDirs) {
       console.log(`\n📋 正在处理客户: ${customerDir}`);
-
-      // 为客户创建输出目录
-      const customerOutputDir = path.join(config.localPath, customerDir);
+      
+      // 为客户创建输出目录，添加日期前缀和特殊符号防止其他机器修改文件名
+      const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+      const customerDirWithDateAndSymbol = `${dateStr} ${customerDir}#`;
+      const customerOutputDir = path.join(config.localPath, customerDirWithDateAndSymbol);
+      
+      // 创建输出目录
       fs.mkdirSync(customerOutputDir, { recursive: true });
-
+      
       // 处理客户数据
       const success = await processCustomerData(
         path.join(config.sourcePath, customerDir, '设备文件'),
@@ -992,26 +996,14 @@ async function main() {
 
       if (success) {
         successCount++;
-        console.log(`✓ 客户 "${customerDir}" 处理成功`);
-      } else {
-        console.error(`✗ 客户 "${customerDir}" 处理失败`);
-        logError(customerDir, 'MAIN', '客户处理失败');
       }
     }
 
-    console.log(
-      `\n🎉 处理完成，共处理了 ${customerDirs.length} 个客户，成功 ${successCount} 个`
-    );
+    console.log(`\n✅ 处理完成，成功处理 ${successCount} 个客户数据`);
   } catch (error) {
-    console.error('✗ 程序执行过程中发生错误:', error.message);
-    console.error(error.stack);
+    console.error('✗ 处理客户数据时发生错误:', error.message);
     process.exit(1);
   }
 }
 
-// 如果直接运行此脚本，则执行主函数
-if (require.main === module) {
-  main();
-}
-
-module.exports = { processCustomerData, main };
+main();
