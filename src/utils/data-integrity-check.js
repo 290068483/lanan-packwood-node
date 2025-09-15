@@ -287,66 +287,74 @@ function checkCustomerDataIntegrity(customerName, customerPaths, outputStream = 
   };
   
   // 输出结果
-  outputStream.log(`\n=== 检查客户 "${customerName}" 的数据完整性 ===`);
+  const currentDate = new Date().toISOString().slice(0, 10);
+  outputStream.log(`\n=== ${currentDate} ${customerName} 数据检查 ===`);
   outputStream.log(`原始文件大小: ${formatNumberWithCommas(originalDataSize)} 字符`);
   outputStream.log(`Temp文件大小: ${formatNumberWithCommas(tempDataSize)} 字符`);
   
-  outputStream.log(`\n=== Panel节点数量对比 ===`);
-  outputStream.log(`原始文件Panel节点数: ${formatNumberWithCommas(originalPanelCount)}`);
-  outputStream.log(`Temp文件Panel节点数: ${formatNumberWithCommas(tempPanelCount)}`);
-  if (excelFile) {
-    outputStream.log(`Excel文件行数: ${formatNumberWithCommas(excelRowCount)}`);
-  } else {
-    outputStream.log(`Excel文件: 未找到`);
-  }
-  outputStream.log(`数据完整性: ${integrity ? '完整' : '不完整'}`);
-  outputStream.log(`数据保留率: ${retentionRate.toFixed(2)}%`);
-  
-  // 如果有丢失的数据，记录日志
-  if (lostPanelIds && lostPanelIds.length > 0) {
-    outputStream.log(`\n=== 丢失的Panel数据 ===`);
-    outputStream.log(`丢失Panel数量: ${lostPanelIds.length}`);
-    outputStream.log(`丢失的Panel ID: ${lostPanelIds.join(', ')}`);
+  outputStream.log(`\n=== 必要节点检查 ===`);
+  Object.entries(nodeCheckResult).forEach(([node, { original, temp }]) => {
+    // 检查Excel文件中是否包含该节点
+    let excelContainsNode = false;
+    let excelData = null;
+    if (excelFile && fs.existsSync(excelFile)) {
+      try {
+        excelData = fs.readFileSync(excelFile, 'utf8');
+        excelContainsNode = excelData.includes(node);
+      } catch (error) {
+        // 忽略Excel文件读取错误
+      }
+    }
     
-    // 记录到日志文件
-    const logMessage = `客户"${customerName}"丢失${lostPanelIds.length}个Panel数据: ${lostPanelIds.join(', ')}`;
-    // logWarning(customerName, 'DATA_INTEGRITY', logMessage);
+    // 根据节点类型使用不同的输出格式
+    if (node === 'Panels' || node === 'Panel') {
+      outputStream.log(`${node}节点: 原始节点：${original ? '包含' : '不包含'}, Temp节点：${temp ? '包含' : '不包含'}，表格数据的节点：${excelContainsNode ? '包含' : '不包含'}`);
+    } else {
+      // 统计各节点数量
+      const originalCount = (originalData.match(new RegExp(`<${node}`, 'g')) || []).length;
+      const tempCount = (tempData.match(new RegExp(`<${node}`, 'g')) || []).length;
+      let excelCount = 0;
+      
+      if (excelContainsNode && excelData !== null) {
+        excelCount = (excelData.match(new RegExp(node, 'g')) || []).length;
+      }
+      
+      outputStream.log(`${node}节点: 原始节点：${originalCount}, Temp节点：${tempCount}，表格数据的节点：${excelCount}`);
+    }
+  });
+  
+  // 判断是否有重复数据
+  let hasDuplicateData = false;
+  const panelCheck = nodeCheckResult.Panel || { original: false, temp: false };
+  const panelsCheck = nodeCheckResult.Panels || { original: false, temp: false };
+  
+  // 检查Panel节点
+  if (panelCheck.temp || panelsCheck.temp) {
+    if (tempPanelCount > originalPanelCount) {
+      hasDuplicateData = true;
+    }
   }
   
-  outputStream.log(`\n=== 文件结构对比 ===`);
-  outputStream.log(`原始文件Cabinet节点数: ${formatNumberWithCommas(cabinetAnalysis.originalCabinetIds.length)}`);
-  outputStream.log(`Temp文件Cabinet节点数: ${formatNumberWithCommas(cabinetAnalysis.tempCabinetIds.length)}`);
+  outputStream.log(`\nif多出了 节点，判断重复数据 ${hasDuplicateData}`);
   
   // 分析Cabinet节点差异
   const originalCount = cabinetAnalysis.originalCabinetIds.length;
   const tempCount = cabinetAnalysis.tempCabinetIds.length;
   
-  if (tempCount > originalCount) {
-    outputStream.log(`多出了 ${tempCount - originalCount} 个节点，可能存在重复数据`);
-    if (cabinetAnalysis.addedCabinetIds.length > 0) {
-      outputStream.log(`新增的Cabinet ID: ${cabinetAnalysis.addedCabinetIds.join(', ')}`);
-    }
-  } else if (tempCount < originalCount) {
-    outputStream.log(`少了 ${originalCount - tempCount} 个节点，可能存在数据缺失`);
+  if (tempCount < originalCount) {
+    outputStream.log(`\n少了节点 输出 缺失节点存放日志路径`);
     if (cabinetAnalysis.lostCabinetIds.length > 0) {
       outputStream.log(`缺失的Cabinet ID: ${cabinetAnalysis.lostCabinetIds.join(', ')}`);
       
-      // 记录缺失节点的日志路径
-      const logPath = path.join(__dirname, '..', '..', 'logs', `${new Date().toISOString().slice(0, 10)}_missing_cabinets.log`);
+      // 记录缺失节点的日志路径（按要求的格式）
+      const logPath = path.join(__dirname, '..', '..', 'logs', `${currentDate}_${customerName}_缺失_Cabinet.log`);
       outputStream.log(`缺失节点信息已存放至日志路径: ${logPath}`);
       
       // 写入日志文件
       const logMessage = `[${new Date().toISOString()}] 客户"${customerName}"缺失${cabinetAnalysis.lostCabinetIds.length}个Cabinet节点: ${cabinetAnalysis.lostCabinetIds.join(', ')}\n`;
       fs.appendFileSync(logPath, logMessage);
     }
-  } else {
-    outputStream.log(`Cabinet节点数量一致`);
   }
-  
-  outputStream.log(`\n=== 必要节点检查 ===`);
-  Object.entries(nodeCheckResult).forEach(([node, { original, temp }]) => {
-    outputStream.log(`${node}节点: 原始文件${original ? '包含' : '不包含'}, Temp文件${temp ? '包含' : '不包含'}`);
-  });
   
   return result;
 }

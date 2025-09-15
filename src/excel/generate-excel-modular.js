@@ -432,11 +432,6 @@ async function processCustomerData(
               console.log(
                 `ℹ [${customerName}] 解析后数据结构关键字段: ${Object.keys(result.data.Root).join(',')}`
               );
-              logInfo(
-                customerName,
-                lineDir,
-                `解析后数据结构关键字段: ${Object.keys(result.data.Root).join(',')}`
-              );
 
               // 处理不同的XML结构
               let cabinets = [];
@@ -675,14 +670,14 @@ async function processCustomerData(
     if (!dataChanged) {
       console.log(`ℹ 客户 "${customerName}" 数据未发生变化，跳过生成文件`);
       logInfo(customerName, 'MAIN', '数据未发生变化，跳过生成文件');
-      
+
       // 即使数据未变化，也生成temp.xml文件用于数据完整性检查
       try {
         // 确保输出目录存在
         if (!fs.existsSync(customerOutputDir)) {
           fs.mkdirSync(customerOutputDir, { recursive: true });
         }
-        
+
         // 创建XML构建器
         const { XMLBuilder } = require('fast-xml-parser');
         const builder = new XMLBuilder({
@@ -691,12 +686,12 @@ async function processCustomerData(
           textNodeName: 'text',
           suppressEmptyNode: true,
           format: true,
-          indentBy: '  '
+          indentBy: '  ',
         });
 
-        // 构建简化版数据结构
+        // 构建xml数据结构
         const simplifiedData = {
-          Root: {}
+          Root: {},
         };
 
         // 添加 Cabinet 数据
@@ -707,14 +702,14 @@ async function processCustomerData(
           } else {
             // 多个 Cabinet
             simplifiedData.Root.Cabinets = {
-              Cabinet: allCabinets
+              Cabinet: allCabinets,
             };
           }
         }
 
         // 构建XML
         let simplifiedXml = builder.build(simplifiedData);
-        
+
         // 如果构建失败，尝试使用xml2js
         if (!simplifiedXml) {
           const xml2js = require('xml2js');
@@ -722,38 +717,34 @@ async function processCustomerData(
             headless: true,
             renderOpts: {
               pretty: true,
-              indent: '  '
-            }
+              indent: '  ',
+            },
           });
           simplifiedXml = builder2.buildObject(simplifiedData);
         }
 
         // 生成输出文件名
         const simplifiedXmlPath = path.join(customerOutputDir, 'temp.xml');
-        
+
         // 保存为XML文件
         if (simplifiedXml) {
           fs.writeFileSync(simplifiedXmlPath, simplifiedXml, 'utf8');
-          console.log(`✓ 简化版XML文件已生成到 ${simplifiedXmlPath}`);
+          console.log(`✓ XML文件已生成到 ${simplifiedXmlPath}`);
           logSuccess(
             customerName,
             'XML_GENERATION',
-            `简化版XML文件已生成到 ${simplifiedXmlPath}`
+            `XML文件已生成到 ${simplifiedXmlPath}`
           );
         } else {
-          console.warn('⚠ 无法生成简化版XML文件');
-          logWarning(
-            customerName,
-            'XML_GENERATION',
-            '无法生成简化版XML文件'
-          );
+          console.warn('⚠ 无法生成XML文件');
+          logWarning(customerName, 'XML_GENERATION', '无法生成 XML文件');
         }
       } catch (error) {
-        console.warn('⚠ 生成简化版XML文件时出错:', error.message);
+        console.warn('⚠ 生成XML文件时出错:', error.message);
         logWarning(
           customerName,
           'XML_GENERATION',
-          `生成简化版XML文件时出错: ${error.message}`,
+          `生成 XML文件时出错: ${error.message}`,
           error.stack
         );
       }
@@ -791,13 +782,13 @@ async function processCustomerData(
       return true;
     }
 
-    // 生成简化版XML文件
+    // 生成 XML文件
     try {
       // 确保输出目录存在
       if (!fs.existsSync(customerOutputDir)) {
         fs.mkdirSync(customerOutputDir, { recursive: true });
       }
-      
+
       // 创建XML构建器
       const { XMLBuilder } = require('fast-xml-parser');
       const builder = new XMLBuilder({
@@ -806,12 +797,12 @@ async function processCustomerData(
         textNodeName: 'text',
         suppressEmptyNode: true,
         format: true,
-        indentBy: '  '
+        indentBy: '  ',
       });
 
-      // 构建简化版数据结构
+      // 构建 数据结构
       const simplifiedData = {
-        Root: {}
+        Root: {},
       };
 
       // 添加 Cabinet 数据
@@ -822,14 +813,14 @@ async function processCustomerData(
         } else {
           // 多个 Cabinet
           simplifiedData.Root.Cabinets = {
-            Cabinet: allCabinets
+            Cabinet: allCabinets,
           };
         }
       }
 
       // 构建XML
       let simplifiedXml = builder.build(simplifiedData);
-      
+
       // 如果构建失败，尝试使用xml2js
       if (!simplifiedXml) {
         const xml2js = require('xml2js');
@@ -837,38 +828,34 @@ async function processCustomerData(
           headless: true,
           renderOpts: {
             pretty: true,
-            indent: '  '
-          }
+            indent: '  ',
+          },
         });
         simplifiedXml = builder2.buildObject(simplifiedData);
       }
 
       // 生成输出文件名
       const simplifiedXmlPath = path.join(customerOutputDir, 'temp.xml');
-      
+
       // 保存为XML文件
       if (simplifiedXml) {
         fs.writeFileSync(simplifiedXmlPath, simplifiedXml, 'utf8');
-        console.log(`✓ 简化版XML文件已生成到 ${simplifiedXmlPath}`);
+        console.log(`✓  XML文件已生成到 ${simplifiedXmlPath}`);
         logSuccess(
           customerName,
           'XML_GENERATION',
-          `简化版XML文件已生成到 ${simplifiedXmlPath}`
+          ` XML文件已生成到 ${simplifiedXmlPath}`
         );
       } else {
-        console.warn('⚠ 无法生成简化版XML文件');
-        logWarning(
-          customerName,
-          'XML_GENERATION',
-          '无法生成简化版XML文件'
-        );
+        console.warn('⚠ 无法生成 XML文件');
+        logWarning(customerName, 'XML_GENERATION', '无法生成 XML文件');
       }
     } catch (error) {
-      console.warn('⚠ 生成简化版XML文件时出错:', error.message);
+      console.warn('⚠ 生成 XML文件时出错:', error.message);
       logWarning(
         customerName,
         'XML_GENERATION',
-        `生成简化版XML文件时出错: ${error.message}`,
+        `生成 XML文件时出错: ${error.message}`,
         error.stack
       );
     }
@@ -881,14 +868,14 @@ async function processCustomerData(
         customerOutputDir,
         packageChanged
       );
-      
+
       if (result && result.success) {
         console.log('✓ Excel文件生成成功');
         logSuccess(customerName, 'EXCEL_GENERATION', 'Excel文件生成成功');
-        
+
         // 检查数据完整性
         await checkDataIntegrityAfterProcessing(customerName, config);
-        
+
         // 调用网络同步功能
         if (config.enableNetworkSync) {
           try {
@@ -897,11 +884,11 @@ async function processCustomerData(
                 outputDir: customerOutputDir,
                 customerName,
                 packagedRows: result.packagedRows,
-                totalRows: result.totalRows
+                totalRows: result.totalRows,
               },
               config
             );
-            
+
             if (!syncResult.success) {
               console.warn('⚠ 网络同步失败:', syncResult.message);
               logWarning(
@@ -919,7 +906,7 @@ async function processCustomerData(
             );
           }
         }
-        
+
         return true;
       } else {
         console.error('✗ Excel文件生成失败');
@@ -960,33 +947,48 @@ async function checkDataIntegrityAfterProcessing(customerName, config) {
   try {
     // 根据客户确定原始文件路径
     const customerPaths = {
-      '汪海松': path.join(config.sourcePath, '汪海松\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'),
-      '肖妍柔': path.join(config.sourcePath, '肖妍柔\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'),
-      '蒋晓丽': path.join(config.sourcePath, '蒋晓丽\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'),
-      '邱海岸': path.join(config.sourcePath, '邱海岸\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'),
-      '陈家玲': path.join(config.sourcePath, '陈家玲\\设备文件\\N1产线\\0、排版文件\\优化文件.xml')
+      汪海松: path.join(
+        config.sourcePath,
+        '汪海松\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'
+      ),
+      肖妍柔: path.join(
+        config.sourcePath,
+        '肖妍柔\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'
+      ),
+      蒋晓丽: path.join(
+        config.sourcePath,
+        '蒋晓丽\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'
+      ),
+      邱海岸: path.join(
+        config.sourcePath,
+        '邱海岸\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'
+      ),
+      陈家玲: path.join(
+        config.sourcePath,
+        '陈家玲\\设备文件\\N1产线\\0、排版文件\\优化文件.xml'
+      ),
     };
 
     // 检查数据完整性
     const result = checkCustomerDataIntegrity(
-      customerName, 
-      customerPaths, 
+      customerName,
+      customerPaths,
       console
     );
-    
+
     if (result) {
       // 记录完整性检查结果到日志
       logInfo(
-        customerName, 
-        'DATA_INTEGRITY', 
+        customerName,
+        'DATA_INTEGRITY',
         `数据完整性检查完成: 保留率 ${result.retentionRate.toFixed(2)}%`
       );
-      
+
       // 如果数据不完整，记录警告
       if (!result.integrity) {
         logWarning(
-          customerName, 
-          'DATA_INTEGRITY', 
+          customerName,
+          'DATA_INTEGRITY',
           `数据不完整，丢失 ${result.lostPanelIds.length} 个Panel`
         );
       }
@@ -1055,6 +1057,7 @@ async function main() {
         console.log(`✓ 客户 "${customerDir}" 处理成功`);
       } else {
         console.error(`✗ 客户 "${customerDir}" 处理失败`);
+        logError(customerDir, 'MAIN', '客户处理失败');
       }
     }
 
