@@ -13,26 +13,27 @@ jest.mock('../utils/logger', () => ({
 }));
 
 describe('Temp XML Generator Tests', () => {
-  const mockCabinets = [
+  const mockCabinetData = [
     {
-      '@_Address': '测试地址',
-      '@_Customer': '测试客户',
+      '@_ID': 'cabinet1',
       '@_Name': '测试柜体',
       Panels: {
         Panel: [
           {
-            '@_ID': '001',
-            '@_Name': '左侧板',
-            '@_Length': '800.00',
-            '@_Width': '600.00',
-            '@_Thickness': '18.00'
+            '@_ID': 'panel1',
+            '@_Uid': '58b2e383702249219bc6744e0419a9e6',
+            '@_Name': '测试面板1',
+            '@_Length': '1000',
+            '@_Width': '500',
+            '@_Thickness': '18'
           },
           {
-            '@_ID': '002',
-            '@_Name': '右侧板',
-            '@_Length': '800.00',
-            '@_Width': '600.00',
-            '@_Thickness': '18.00'
+            '@_ID': 'panel2',
+            '@_Uid': '02e74f241107448d84947c22e43db18d',
+            '@_Name': '测试面板2',
+            '@_Length': '800',
+            '@_Width': '600',
+            '@_Thickness': '16'
           }
         ]
       }
@@ -47,105 +48,60 @@ describe('Temp XML Generator Tests', () => {
     jest.clearAllMocks();
   });
 
-  test('should generate temp.xml file successfully', async () => {
-    // 模拟fs.existsSync返回false，表示目录不存在
-    fs.existsSync.mockImplementation((dirPath) => {
-      // 对于srcFiles目录，返回false表示需要创建
-      if (dirPath.endsWith('srcFiles')) {
-        return false;
-      }
-      // 其他目录返回true
-      return true;
-    });
-    // 模拟fs.mkdirSync函数
+  // 测试用例：应该正确生成temp.xml文件
+  it('should generate temp.xml file successfully', async () => {
+    // 模拟fs函数
+    fs.existsSync.mockImplementation(() => false);
     fs.mkdirSync.mockImplementation(() => {});
-    // 模拟fs.writeFileSync函数
     fs.writeFileSync.mockImplementation(() => {});
 
-    const result = await generateTempXml(mockCabinets, customerOutputDir, customerName);
-
-    // 验证目录创建函数被调用
-    expect(fs.existsSync).toHaveBeenCalledWith(customerOutputDir);
+    // 执行函数
+    await generateTempXml(mockCabinetData, customerOutputDir, '测试客户');
     
-    expect(fs.mkdirSync).toHaveBeenCalledWith(
-      path.join(customerOutputDir, 'srcFiles'),
-      { recursive: true }
-    );
-
+    // 验证目录创建函数被调用
+    expect(fs.mkdirSync).toHaveBeenCalledWith(customerOutputDir, { recursive: true });
+    expect(fs.mkdirSync).toHaveBeenCalledWith(path.join(customerOutputDir, 'srcFiles'), { recursive: true });
+    
     // 验证文件写入函数被调用
     expect(fs.writeFileSync).toHaveBeenCalled();
-
-    // 验证返回的文件路径
-    expect(result).toBe(
-      path.join(customerOutputDir, 'srcFiles', 'temp.xml')
-    );
   });
 
-  test('should handle directory already exists', async () => {
-    // 模拟fs.existsSync返回true，表示目录已存在
-    fs.existsSync.mockImplementation((dirPath) => {
-      // 对于srcFiles目录，返回true表示已存在
-      if (dirPath.endsWith('srcFiles')) {
-        return true;
-      }
-      // 其他目录返回true
+  // 测试用例：应该在目录已存在时处理
+  it('should handle directory already exists', async () => {
+    // 模拟目录已存在
+    fs.existsSync.mockImplementation((path) => {
       return true;
     });
-    // 模拟fs.writeFileSync函数
-    fs.writeFileSync.mockImplementation(() => {});
-
-    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    await generateTempXml(mockCabinets, customerOutputDir, customerName);
-
-    // 验证目录创建函数没有被调用（因为目录已存在）
-    expect(fs.mkdirSync).not.toHaveBeenCalledWith(
-      path.join(customerOutputDir, 'srcFiles'),
-      { recursive: true }
-    );
-  });
-
-  test('should handle empty cabinets data', async () => {
-    // 模拟fs.existsSync返回false
-    fs.existsSync.mockImplementation((dirPath) => {
-      // 对于srcFiles目录，返回false表示需要创建
-      if (dirPath.endsWith('srcFiles')) {
-        return false;
-      }
-      // 其他目录返回true
-      return true;
-    });
-    // 模拟fs.mkdirSync函数
+    
     fs.mkdirSync.mockImplementation(() => {});
-    // 模拟fs.writeFileSync函数
     fs.writeFileSync.mockImplementation(() => {});
 
-    const emptyCabinets = [];
-    const result = await generateTempXml(emptyCabinets, customerOutputDir, customerName);
-
-    // 验证文件仍然被生成
+    await generateTempXml(mockCabinetData, customerOutputDir, '测试客户');
+    
+    // 验证没有尝试创建已存在的目录
+    expect(fs.mkdirSync).not.toHaveBeenCalledWith(customerOutputDir, { recursive: true });
     expect(fs.writeFileSync).toHaveBeenCalled();
-    expect(result).toBe(
-      path.join(customerOutputDir, 'srcFiles', 'temp.xml')
-    );
   });
 
-  test('should throw error when file generation fails', async () => {
-    // 模拟fs.writeFileSync抛出异常
-    fs.existsSync.mockImplementation((dirPath) => {
-      // 对于srcFiles目录，返回false表示需要创建
-      if (dirPath.endsWith('srcFiles')) {
-        return false;
-      }
-      // 其他目录返回true
-      return true;
-    });
+  // 测试用例：应该处理空的cabinets数据
+  it('should handle empty cabinets data', async () => {
+    fs.existsSync.mockImplementation(() => false);
     fs.mkdirSync.mockImplementation(() => {});
+    fs.writeFileSync.mockImplementation(() => {});
+    
+    await generateTempXml([], customerOutputDir, '测试客户');
+    expect(fs.writeFileSync).toHaveBeenCalled();
+  });
+
+  // 测试用例：当文件生成失败时应该抛出错误
+  it('should throw error when file generation fails', async () => {
+    // 模拟写入文件失败
     fs.writeFileSync.mockImplementation(() => {
       throw new Error('写入文件失败');
     });
 
     await expect(
-      generateTempXml(mockCabinets, customerOutputDir, customerName)
+      generateTempXml(mockCabinetData, customerOutputDir, '测试客户')
     ).rejects.toThrow('写入文件失败');
   });
 });

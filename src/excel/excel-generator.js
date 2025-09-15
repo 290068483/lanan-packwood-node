@@ -81,11 +81,37 @@ async function generateExcel(
     const localPackagePath = path.join(outputDir, 'packages.json');
     if (packageChanged && fs.existsSync(localPackagePath)) {
       try {
-        const packageData = JSON.parse(
+        const packagesData = JSON.parse(
           fs.readFileSync(localPackagePath, 'utf8')
         );
-        if (packageData.packagedIds && Array.isArray(packageData.packagedIds)) {
-          packagedIds = new Set(packageData.packagedIds);
+
+        // 如果packagesData是数组（多个打包记录）
+        if (Array.isArray(packagesData)) {
+          packagesData.forEach(packageItem => {
+            if (packageItem.partIDs && Array.isArray(packageItem.partIDs)) {
+              packageItem.partIDs.forEach(partId => {
+                // 从右往左数5位作为ID号
+                if (partId && 
+                    typeof partId === 'string' && 
+                    partId.length >= 5) {
+                  const idNumber = partId.substring(partId.length - 5, partId.length);
+                  packagedIds.add(idNumber);
+                }
+              });
+            }
+          });
+        } 
+        // 如果packagesData有partIDs字段（单个打包记录）
+        else if (packagesData.partIDs && Array.isArray(packagesData.partIDs)) {
+          packagesData.partIDs.forEach(partId => {
+            // 从右往左数5位作为ID号
+            if (partId && 
+                typeof partId === 'string' && 
+                partId.length >= 5) {
+              const idNumber = partId.substring(partId.length - 5, partId.length);
+              packagedIds.add(idNumber);
+            }
+          });
         }
       } catch (error) {
         console.warn('读取packages.json中的已打包ID列表时出错:', error.message);
@@ -120,10 +146,16 @@ async function generateExcel(
               ? `${basicMaterial}/${materialColor}`
               : basicMaterial || materialColor || '';
 
-          // 从Uid提取ID号（后5位）
+          // 从Uid提取ID号（从右往左数5位）
           let idNumber = '';
           if (item['@_Uid']) {
-            idNumber = item['@_Uid'].slice(-5);
+            const uid = item['@_Uid'];
+            // 从右往左数5位
+            if (uid.length >= 5) {
+              idNumber = uid.substring(uid.length - 5, uid.length);
+            } else {
+              idNumber = uid;
+            }
           }
 
           const dataRow = worksheet.addRow([

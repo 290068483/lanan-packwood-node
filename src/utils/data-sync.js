@@ -121,4 +121,31 @@ async function syncPackageAndData(cabinets, outputDir, customerName) {
   }
 }
 
+function extractPanelIds(cabinets) {
+  const ids = [];
+  
+  cabinets.forEach(cabinet => {
+    if (cabinet && cabinet.Panels && cabinet.Panels.Panel) {
+      const panels = Array.isArray(cabinet.Panels.Panel)
+        ? cabinet.Panels.Panel
+        : [cabinet.Panels.Panel];
+        
+      panels.forEach(panel => {
+        if (panel['@_Uid']) {
+          // 从右往左数5位作为ID号
+          const uid = panel['@_Uid'];
+          if (uid.length >= 5) {
+            const idNumber = uid.substring(uid.length - 5, uid.length);
+            ids.push(idNumber);
+          } else {
+            ids.push(uid);
+          }
+        }
+      });
+    }
+  });
+  
+  return ids;
+}
+
 module.exports = { checkPackageChanged, checkDataChanged, syncPackageAndData };
