@@ -32,11 +32,6 @@ XML Parser Optimizer是一个专门用于处理复杂XML文件的工具，它能
 - 按日期和客户名称创建目标文件夹
 - 支持数据分类（已打包数据和剩余数据）
 
-### 5. XML诊断工具
-- 提供专门的XML文件诊断工具
-- 检测XML文件的编码、格式、结构等问题
-- 生成详细的诊断报告帮助定位问题
-
 ## 技术架构
 
 ### 核心依赖
@@ -51,10 +46,6 @@ XML Parser Optimizer是一个专门用于处理复杂XML文件的工具，它能
 src/
 ├── excel/
 │   └── generate-excel-auto-lines.js  # 主要处理逻辑
-├── xml/
-│   ├── xml-diagnostics.js            # XML诊断工具
-│   ├── diagnose-xml.js               # XML诊断命令行工具
-│   └── check-xml-content.js          # XML内容检查工具
 ├── tests/                            # 测试文件
 │   ├── integration.test.js           # 集成测试
 │   ├── functional.test.js            # 功能测试
@@ -89,46 +80,41 @@ npm run test-functional
 
 # 运行多产线数据处理测试
 npm run test-multiline
-
-# 检查XML内容
-npm run check
-
-# 诊断XML文件问题
-npm run diagnose <xml_file_path>
 ```
 
-### 使用XML诊断工具
-XML诊断工具可以帮助您识别XML文件中的问题：
+### 使用XML内容检查工具
+XML内容检查工具可以帮助您识别XML文件中的问题：
 
 ```bash
-# 诊断特定XML文件
-npm run diagnose "path/to/your/xmlfile.xml"
+# 检查特定XML文件
+npm run check "path/to/your/xmlfile.xml"
 
 # 示例
-npm run diagnose "C:\data\优化文件.xml"
+npm run check "C:\data\优化文件.xml"
 ```
 
-诊断工具会检查以下方面：
+检查工具会检查以下方面：
 - 文件完整性
 - 基础XML格式
-- 编码问题
-- 结构验证
+- 是否包含中文字符
+- 特殊字符转义问题
 
 ## 故障排除
 
-如果遇到XML解析失败问题，请使用诊断工具分析XML文件：
+如果遇到XML解析失败问题，请使用内容检查工具分析XML文件：
 
-1. 运行诊断工具：
+1. 运行内容检查工具：
    ```bash
-   npm run diagnose "path/to/problematic/file.xml"
+   npm run check "path/to/problematic/file.xml"
    ```
 
-2. 根据诊断报告中的问题类型采取相应措施：
-   - **编码问题**：确保文件使用UTF-8编码
+2. 根据检查报告中的问题类型采取相应措施：
    - **格式问题**：检查XML标签是否正确闭合，属性是否正确引用
+   - **编码问题**：确保文件使用UTF-8编码
+   - **特殊字符问题**：检查是否有未转义的特殊字符
    - **结构问题**：确保包含必要的节点（Root, Cabinet, Panels, Panel）
 
-3. 如果问题仍然存在，请提供诊断报告给技术支持团队。
+3. 如果问题仍然存在，请提供检查报告给技术支持团队。
 
 ## 贡献
 
