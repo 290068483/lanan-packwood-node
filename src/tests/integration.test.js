@@ -51,7 +51,7 @@ describe('XML Parser Optimizer Integration Tests', () => {
     expect(xmlData).toContain('Panel');
   });
 
-  test('should correctly identify package.json changes', async () => {
+  test('should correctly identify packages.json changes', async () => {
     // Skip this test as it requires a full environment setup
     expect(true).toBe(true);
   });

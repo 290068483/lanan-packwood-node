@@ -199,7 +199,7 @@ function formatNumberWithCommas(num) {
  */
 function checkCustomerDataIntegrity(customerName, customerPaths, outputStream = console) {
   const basePath = path.join(__dirname, '..', 'local', customerName.replace('(F1产线)', '').replace('(N1产线)', ''));
-  const tempFile = path.join(basePath, 'temp.xml');
+  const tempFile = path.join(basePath, 'srcFiles', 'temp.xml');
   
   // 查找最新的Excel文件
   let excelFile = null;
@@ -292,54 +292,55 @@ function checkCustomerDataIntegrity(customerName, customerPaths, outputStream = 
   outputStream.log(`原始文件大小: ${formatNumberWithCommas(originalDataSize)} 字符`);
   outputStream.log(`Temp文件大小: ${formatNumberWithCommas(tempDataSize)} 字符`);
   
+  outputStream.log(`\n=== Panel节点数量对比 ===`);
+  outputStream.log(`原始文件Panel节点数: ${formatNumberWithCommas(originalPanelCount)}`);
+  outputStream.log(`Temp文件Panel节点数: ${formatNumberWithCommas(tempPanelCount)}`);
+  if (excelFile) {
+    outputStream.log(`Excel文件行数: ${formatNumberWithCommas(excelRowCount)}`);
+  } else {
+    outputStream.log(`Excel文件: 未找到`);
+  }
+  outputStream.log(`数据完整性: ${integrity ? '完整' : '不完整'}`);
+  outputStream.log(`数据保留率: ${retentionRate.toFixed(2)}%`);
+  
+  // 如果有丢失的数据，记录日志
+  if (lostPanelIds && lostPanelIds.length > 0) {
+    outputStream.log(`\n=== 丢失的Panel数据 ===`);
+    outputStream.log(`丢失Panel数量: ${lostPanelIds.length}`);
+    outputStream.log(`丢失的Panel ID: ${lostPanelIds.join(', ')}`);
+    
+    // 记录到日志文件
+    const logMessage = `客户"${customerName}"丢失${lostPanelIds.length}个Panel数据: ${lostPanelIds.join(', ')}`;
+    // logWarning(customerName, 'DATA_INTEGRITY', logMessage);
+  }
+  
   outputStream.log(`\n=== 必要节点检查 ===`);
   Object.entries(nodeCheckResult).forEach(([node, { original, temp }]) => {
     // 检查Excel文件中是否包含该节点
     let excelContainsNode = false;
-    let excelData = null;
     if (excelFile && fs.existsSync(excelFile)) {
       try {
-        excelData = fs.readFileSync(excelFile, 'utf8');
+        const excelData = fs.readFileSync(excelFile, 'utf8');
         excelContainsNode = excelData.includes(node);
       } catch (error) {
         // 忽略Excel文件读取错误
       }
     }
     
-    // 根据节点类型使用不同的输出格式
+    // 修改输出格式为新格式
     if (node === 'Panels' || node === 'Panel') {
       outputStream.log(`${node}节点: 原始节点：${original ? '包含' : '不包含'}, Temp节点：${temp ? '包含' : '不包含'}，表格数据的节点：${excelContainsNode ? '包含' : '不包含'}`);
     } else {
-      // 统计各节点数量
-      const originalCount = (originalData.match(new RegExp(`<${node}`, 'g')) || []).length;
-      const tempCount = (tempData.match(new RegExp(`<${node}`, 'g')) || []).length;
-      let excelCount = 0;
-      
-      if (excelContainsNode && excelData !== null) {
-        excelCount = (excelData.match(new RegExp(node, 'g')) || []).length;
-      }
-      
-      outputStream.log(`${node}节点: 原始节点：${originalCount}, Temp节点：${tempCount}，表格数据的节点：${excelCount}`);
+      outputStream.log(`${node}节点: 原始节点：${original ? '包含' : '不包含'}, Temp节点：${temp ? '包含' : '不包含'}，表格数据的节点：${excelContainsNode ? '包含' : '不包含'}`);
     }
   });
-  
-  // 判断是否有重复数据
-  let hasDuplicateData = false;
-  const panelCheck = nodeCheckResult.Panel || { original: false, temp: false };
-  const panelsCheck = nodeCheckResult.Panels || { original: false, temp: false };
-  
-  // 检查Panel节点
-  if (panelCheck.temp || panelsCheck.temp) {
-    if (tempPanelCount > originalPanelCount) {
-      hasDuplicateData = true;
-    }
-  }
-  
-  outputStream.log(`\nif多出了 节点，判断重复数据 ${hasDuplicateData}`);
   
   // 分析Cabinet节点差异
   const originalCount = cabinetAnalysis.originalCabinetIds.length;
   const tempCount = cabinetAnalysis.tempCabinetIds.length;
+  const hasDuplicateData = tempCount > originalCount;
+  
+  outputStream.log(`\nif多出了 节点，判断重复数据 ${hasDuplicateData}`);
   
   if (tempCount < originalCount) {
     outputStream.log(`\n少了节点 输出 缺失节点存放日志路径`);

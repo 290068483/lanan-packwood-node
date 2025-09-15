@@ -7,7 +7,7 @@ const ExcelJS = require('exceljs');
  * @param {Array} cabinets - Cabinet数据数组
  * @param {string} customerName - 客户名称
  * @param {string} outputDir - 输出目录
- * @param {boolean} packageChanged - packages.json是否发生变化
+ * @param {boolean} packageChanged - package.json是否发生变化
  * @returns {Promise<Object>} 生成结果对象
  */
 async function generateExcel(
@@ -76,7 +76,7 @@ async function generateExcel(
     // 记录总行数
     let totalPanels = 0;
 
-    // 读取package.json中的已打包ID列表（如果存在且发生变化）
+    // 读取packages.json中的已打包ID列表（如果存在且发生变化）
     let packagedIds = new Set();
     const localPackagePath = path.join(outputDir, 'packages.json');
     if (packageChanged && fs.existsSync(localPackagePath)) {
@@ -88,7 +88,7 @@ async function generateExcel(
           packagedIds = new Set(packageData.packagedIds);
         }
       } catch (error) {
-        console.warn('读取package.json中的已打包ID列表时出错:', error.message);
+        console.warn('读取packages.json中的已打包ID列表时出错:', error.message);
       }
     }
 
