@@ -20,7 +20,7 @@ async function generateTempXml(allCabinets, customerOutputDir, customerName) {
     const builder = new XMLBuilder({
       ignoreAttributes: false,
       attributeNamePrefix: '@_',
-      textNodeName: '#text', // 使用#text以匹配temp-pack格式
+      textNodeName: '#text',
       suppressEmptyNode: true,
       format: true,
       indentBy: '  ',
@@ -45,7 +45,7 @@ async function generateTempXml(allCabinets, customerOutputDir, customerName) {
     if (!simplifiedXml) {
       const xml2js = require('xml2js');
       const builder2 = new xml2js.Builder({
-        headless: false, // 设置为false以包含XML声明
+        headless: false,
         renderOpts: {
           pretty: true,
           indent: '  '
@@ -86,10 +86,7 @@ async function generateTempXml(allCabinets, customerOutputDir, customerName) {
       return null;
     }
   } catch (error) {
-    console.error(
-      `✗ 生成简化版XML文件时出错:`,
-      error.message
-    );
+    console.error('✗ 生成简化版XML文件时出错:', error.message);
     logError(
       customerName,
       'XML_GENERATION',
