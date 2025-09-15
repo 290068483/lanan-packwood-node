@@ -117,8 +117,37 @@ async function retry(fn, maxRetries = MAX_RETRY_ATTEMPTS, delayMs = RETRY_DELAY)
 async function incrementalSyncToNetwork(syncData, config) {
   const { outputDir, customerName, packagedRows, totalRows } = syncData;
   
+  // 添加参数验证
+  if (!outputDir || typeof outputDir !== 'string') {
+    const errorMsg = `无效的outputDir参数: ${outputDir}`;
+    console.error('✗ 参数错误:', errorMsg);
+    logError(customerName || 'UNKNOWN', 'NETWORK_SYNC', errorMsg);
+    return { success: false, message: errorMsg };
+  }
+  
+  if (!customerName || typeof customerName !== 'string') {
+    const errorMsg = `无效的customerName参数: ${customerName}`;
+    console.error('✗ 参数错误:', errorMsg);
+    logError('UNKNOWN', 'NETWORK_SYNC', errorMsg);
+    return { success: false, message: errorMsg };
+  }
+  
+  if (!config || typeof config !== 'object') {
+    const errorMsg = `无效的config参数`;
+    console.error('✗ 参数错误:', errorMsg);
+    logError(customerName, 'NETWORK_SYNC', errorMsg);
+    return { success: false, message: errorMsg };
+  }
+  
   try {
     // 检查网络路径是否可访问
+    if (!config.networkPath || typeof config.networkPath !== 'string') {
+      const errorMsg = `无效的networkPath配置: ${config.networkPath}`;
+      console.error('✗ 配置错误:', errorMsg);
+      logError(customerName, 'NETWORK_SYNC', errorMsg);
+      return { success: false, message: errorMsg };
+    }
+    
     const networkAccessible = await checkNetworkAccess(config.networkPath);
     if (!networkAccessible) {
       // 网络不可访问，将同步任务加入待处理队列
@@ -177,17 +206,32 @@ async function incrementalSyncToNetwork(syncData, config) {
     }
 
     if (!sourceExcelFile) {
-      throw new Error('未找到生成的Excel文件');
+      const errorMsg = `未找到生成的Excel文件，outputDir: ${outputDir}, customerName: ${customerName}`;
+      throw new Error(errorMsg);
     }
 
     // 创建工作簿用于分离已打包和未打包的数据
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(sourceExcelFile);
 
-    // 获取原始工作表
-    const originalWorksheet = workbook.getWorksheet('板件明细');
+    // 获取原始工作表 (修复工作表名称不匹配的问题)
+    let originalWorksheet = workbook.getWorksheet('板件明细');
     if (!originalWorksheet) {
-      throw new Error('未找到"板件明细"工作表');
+      // 尝试使用默认工作表名称
+      originalWorksheet = workbook.getWorksheet('Sheet1');
+    }
+    
+    if (!originalWorksheet) {
+      // 如果还是找不到，尝试获取第一个工作表
+      const worksheets = workbook.worksheets;
+      if (worksheets && worksheets.length > 0) {
+        originalWorksheet = worksheets[0];
+      }
+    }
+    
+    if (!originalWorksheet) {
+      const availableSheets = workbook.worksheets.map(ws => ws.name).join(', ');
+      throw new Error(`未找到有效的工作表。可用工作表: ${availableSheets}`);
     }
 
     // 创建两个新工作表

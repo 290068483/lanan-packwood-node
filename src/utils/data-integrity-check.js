@@ -139,6 +139,45 @@ function checkRequiredNodes(originalData, tempData) {
 }
 
 /**
+ * 分析Cabinet节点差异
+ * @param {string} originalData - 原始文件内容
+ * @param {string} tempData - Temp文件内容
+ * @returns {Object} Cabinet节点差异分析结果
+ */
+function analyzeCabinetDifferences(originalData, tempData) {
+  // 提取原始文件中的Cabinet ID
+  const originalCabinetIds = [];
+  const originalCabinetMatches = originalData.match(/<Cabinet\s+([^>]+)>([\s\S]*?)<\/Cabinet>/g) || [];
+  originalCabinetMatches.forEach(match => {
+    const idMatch = match.match(/ID="([^"]*)"/);
+    if (idMatch) {
+      originalCabinetIds.push(idMatch[1]);
+    }
+  });
+  
+  // 提取temp文件中的Cabinet ID
+  const tempCabinetIds = [];
+  const tempCabinetMatches = tempData.match(/<Cabinet\s+([^>]+)>([\s\S]*?)<\/Cabinet>/g) || [];
+  tempCabinetMatches.forEach(match => {
+    const idMatch = match.match(/ID="([^"]*)"/);
+    if (idMatch) {
+      tempCabinetIds.push(idMatch[1]);
+    }
+  });
+  
+  // 找出新增和丢失的Cabinet ID
+  const addedCabinetIds = tempCabinetIds.filter(id => !originalCabinetIds.includes(id));
+  const lostCabinetIds = originalCabinetIds.filter(id => !tempCabinetIds.includes(id));
+  
+  return {
+    originalCabinetIds,
+    tempCabinetIds,
+    addedCabinetIds,
+    lostCabinetIds
+  };
+}
+
+/**
  * 格式化数字为千分位格式
  * @param {number} num - 要格式化的数字
  * @returns {string} 格式化后的字符串
@@ -230,6 +269,7 @@ function checkCustomerDataIntegrity(customerName, customerPaths, outputStream = 
   
   const tempData = fs.readFileSync(tempFile, 'utf8');
   const nodeCheckResult = checkRequiredNodes(originalData, tempData);
+  const cabinetAnalysis = analyzeCabinetDifferences(originalData, tempData);
   
   // 收集结果
   const result = {
@@ -242,7 +282,8 @@ function checkCustomerDataIntegrity(customerName, customerPaths, outputStream = 
     originalCabinetCount,
     tempCabinetCount,
     requiredNodeCheck: nodeCheckResult,
-    lostPanelIds
+    lostPanelIds,
+    cabinetAnalysis
   };
   
   // 输出结果
@@ -273,8 +314,34 @@ function checkCustomerDataIntegrity(customerName, customerPaths, outputStream = 
   }
   
   outputStream.log(`\n=== 文件结构对比 ===`);
-  outputStream.log(`原始文件Cabinet节点数: ${formatNumberWithCommas(originalCabinetCount)}`);
-  outputStream.log(`Temp文件Cabinet节点数: ${formatNumberWithCommas(tempCabinetCount)}`);
+  outputStream.log(`原始文件Cabinet节点数: ${formatNumberWithCommas(cabinetAnalysis.originalCabinetIds.length)}`);
+  outputStream.log(`Temp文件Cabinet节点数: ${formatNumberWithCommas(cabinetAnalysis.tempCabinetIds.length)}`);
+  
+  // 分析Cabinet节点差异
+  const originalCount = cabinetAnalysis.originalCabinetIds.length;
+  const tempCount = cabinetAnalysis.tempCabinetIds.length;
+  
+  if (tempCount > originalCount) {
+    outputStream.log(`多出了 ${tempCount - originalCount} 个节点，可能存在重复数据`);
+    if (cabinetAnalysis.addedCabinetIds.length > 0) {
+      outputStream.log(`新增的Cabinet ID: ${cabinetAnalysis.addedCabinetIds.join(', ')}`);
+    }
+  } else if (tempCount < originalCount) {
+    outputStream.log(`少了 ${originalCount - tempCount} 个节点，可能存在数据缺失`);
+    if (cabinetAnalysis.lostCabinetIds.length > 0) {
+      outputStream.log(`缺失的Cabinet ID: ${cabinetAnalysis.lostCabinetIds.join(', ')}`);
+      
+      // 记录缺失节点的日志路径
+      const logPath = path.join(__dirname, '..', '..', 'logs', `${new Date().toISOString().slice(0, 10)}_missing_cabinets.log`);
+      outputStream.log(`缺失节点信息已存放至日志路径: ${logPath}`);
+      
+      // 写入日志文件
+      const logMessage = `[${new Date().toISOString()}] 客户"${customerName}"缺失${cabinetAnalysis.lostCabinetIds.length}个Cabinet节点: ${cabinetAnalysis.lostCabinetIds.join(', ')}\n`;
+      fs.appendFileSync(logPath, logMessage);
+    }
+  } else {
+    outputStream.log(`Cabinet节点数量一致`);
+  }
   
   outputStream.log(`\n=== 必要节点检查 ===`);
   Object.entries(nodeCheckResult).forEach(([node, { original, temp }]) => {
