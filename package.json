@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "dev": "node src/excel/generate-excel-modular.js",
-    "test-multiline": "node src/tests/multiline-test.js"
+    "test-multiline": "node src/tests/multiline-test.js",
+    "worker do": "node simple-worker.js"
   },
   "keywords": [
     "xml",

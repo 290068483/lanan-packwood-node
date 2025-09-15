@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const FileCompressor = require('./file-compressor');
+const FileWatcher = require('./file-watcher');
+const PackageDataExtractor = require('./package-data-extractor');
 
 /**
  * 客户打包数据工具类
@@ -13,53 +15,7 @@ class CustomerPackageUtils {
    * @returns {Array} 客户打包数据数组
    */
   static extractCustomerPackageData(packagesPath) {
-    try {
-      // 检查文件是否存在
-      if (!fs.existsSync(packagesPath)) {
-        console.log(`packages.json文件不存在: ${packagesPath}`);
-        return [];
-      }
-
-      // 读取packages.json文件
-      const packageData = fs.readFileSync(packagesPath, 'utf8');
-      const packageJson = JSON.parse(packageData);
-
-      // 如果是数组类型，表示是多个打包记录
-      if (Array.isArray(packageJson)) {
-        return packageJson;
-      } 
-      
-      // 如果是对象类型，将其转换为数组格式
-      if (packageJson && typeof packageJson === 'object') {
-        // 检查是否有partIDs字段（客户打包数据）
-        if (packageJson.partIDs && Array.isArray(packageJson.partIDs)) {
-          return [{
-            id: packageJson.name || 'default',
-            partIDs: packageJson.partIDs,
-            timestamp: packageJson.timestamp || Date.now()
-          }];
-        }
-        
-        // 检查是否有其他打包数据结构
-        const result = [];
-        for (const key in packageJson) {
-          if (packageJson[key] && packageJson[key].partIDs && Array.isArray(packageJson[key].partIDs)) {
-            result.push({
-              id: key,
-              partIDs: packageJson[key].partIDs,
-              timestamp: packageJson[key].timestamp || Date.now()
-            });
-          }
-        }
-        
-        return result;
-      }
-      
-      return [];
-    } catch (error) {
-      console.error(`读取packages.json时发生错误: ${error.message}`);
-      return [];
-    }
+    return PackageDataExtractor.extractCustomerPackageData(packagesPath);
   }
 
   /**
@@ -130,10 +86,12 @@ class CustomerPackageUtils {
       throw new Error('配置对象必须包含workerPackagesPath和customerPackedPath');
     }
 
+    const packagesPath = path.join(config.workerPackagesPath, 'packages.json');
+    
     // 立即执行一次保存
     this.saveCustomerPackageData(
-      path.join(config.workerPackagesPath.trim(), 'packages.json'),
-      config.customerPackedPath.trim(),
+      packagesPath,
+      config.customerPackedPath,
       config.autoSave && config.autoSave.compress
     );
 
@@ -141,8 +99,8 @@ class CustomerPackageUtils {
     const interval = intervalMinutes * 60 * 1000; // 转换为毫秒
     const timer = setInterval(() => {
       this.saveCustomerPackageData(
-        path.join(config.workerPackagesPath.trim(), 'packages.json'),
-        config.customerPackedPath.trim(),
+        packagesPath,
+        config.customerPackedPath,
         config.autoSave && config.autoSave.compress
       );
     }, interval);
@@ -150,16 +108,121 @@ class CustomerPackageUtils {
     console.log(`客户打包数据自动保存已启动，间隔: ${intervalMinutes} 分钟`);
     return timer;
   }
+  
+  /**
+   * 根据配置启动自动保存（支持保存模式切换）
+   * @param {Object} config - 配置对象
+   * @returns {NodeJS.Timeout|fs.FSWatcher} 定时器对象或文件监视器
+   */
+  static startAutoSave(config) {
+    // 验证配置
+    if (!config || !config.workerPackagesPath || !config.customerPackedPath) {
+      throw new Error('配置对象必须包含workerPackagesPath和customerPackedPath');
+    }
+
+    // 检查是否启用了自动保存
+    if (!config.autoSave || !config.autoSave.enabled) {
+      console.log('自动保存未启用');
+      return null;
+    }
+
+    // 获取保存模式
+    const saveMode = config.autoSave.saveMode || 'onChange';
+    const intervalMinutes = config.autoSave.intervalMinutes || 5;
+    
+    // 创建文件监控器
+    const fileWatcher = new FileWatcher(config);
+    
+    // 添加回调函数
+    fileWatcher.addCallback(async (filePath) => {
+      try {
+        await this.saveCustomerPackageData(
+          filePath,
+          config.customerPackedPath,
+          config.autoSave && config.autoSave.compress
+        );
+      } catch (error) {
+        console.error('保存客户打包数据时发生错误:', error);
+      }
+    });
+    
+    // 启动监控
+    return fileWatcher.start(saveMode, intervalMinutes);
+  }
+  
+  /**
+   * 扫描并处理所有客户目录
+   * @param {Object} config - 配置对象
+   */
+  static scanAndProcessAllCustomers(config) {
+    try {
+      const workerPackagesPath = config.workerPackagesPath;
+      
+      // 检查目录是否存在
+      if (!fs.existsSync(workerPackagesPath)) {
+        console.log(`工人打包数据目录不存在: ${workerPackagesPath}`);
+        return;
+      }
+      
+      // 检查是否有直接的packages.json文件
+      const packagesPath = path.join(workerPackagesPath, 'packages.json');
+      if (fs.existsSync(packagesPath)) {
+        console.log('处理单个packages.json文件');
+        this.saveCustomerPackageData(
+          packagesPath,
+          config.customerPackedPath,
+          config.autoSave && config.autoSave.compress
+        ).catch(error => {
+          console.error('处理packages.json时发生错误:', error);
+        });
+        return;
+      }
+      
+      // 读取目录中的所有子目录
+      let customerDirs = [];
+      try {
+        customerDirs = fs.readdirSync(workerPackagesPath)
+          .filter(dir => {
+            const fullPath = path.join(workerPackagesPath, dir);
+            return fs.statSync(fullPath).isDirectory();
+          });
+      } catch (error) {
+        console.log('读取客户目录时出错:', error.message);
+        return;
+      }
+      
+      console.log(`发现 ${customerDirs.length} 个客户目录`);
+      
+      // 处理每个客户目录
+      customerDirs.forEach(dir => {
+        const packagesPath = path.join(workerPackagesPath, dir, 'packages.json');
+        if (fs.existsSync(packagesPath)) {
+          console.log(`处理客户目录: ${dir}`);
+          this.saveCustomerPackageData(
+            packagesPath,
+            config.customerPackedPath,
+            config.autoSave && config.autoSave.compress
+          ).catch(error => {
+            console.error(`处理客户 ${dir} 时发生错误:`, error);
+          });
+        } else {
+          console.log(`客户目录 ${dir} 中未找到 packages.json 文件`);
+        }
+      });
+    } catch (error) {
+      console.error('扫描客户目录时发生错误:', error);
+    }
+  }
 }
 
-// 如果直接运行此文件，则启动定期保存
+// 如果直接运行此文件，则启动自动保存
 if (require.main === module) {
   // 加载配置文件
   const configPath = path.join(__dirname, '..', '..', 'config.json');
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
   
-  // 启动定期保存
-  CustomerPackageUtils.startPeriodicSave(config, config.autoSave.intervalMinutes);
+  // 启动自动保存
+  CustomerPackageUtils.startAutoSave(config);
 }
 
 module.exports = CustomerPackageUtils;
