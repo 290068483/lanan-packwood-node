@@ -22,6 +22,7 @@ const {
   syncPackageAndData,
   checkPackageChanged,
 } = require('../utils/data-sync');
+const { generateTempXml } = require('../utils/temp-xml-generator');
 const {
   incrementalSyncToNetwork,
   startNetworkMonitoring,
@@ -673,81 +674,7 @@ async function processCustomerData(
       
       // 即使数据未变化，也生成temp.xml文件用于数据完整性检查
       try {
-        // 确保输出目录存在
-        if (!fs.existsSync(customerOutputDir)) {
-          fs.mkdirSync(customerOutputDir, { recursive: true });
-        }
-        
-        // 创建XML构建器
-        const { XMLBuilder } = require('fast-xml-parser');
-        const builder = new XMLBuilder({
-          ignoreAttributes: false,
-          attributeNamePrefix: '@_',
-          textNodeName: 'text',
-          suppressEmptyNode: true,
-          format: true,
-          indentBy: '  '
-        });
-
-        // 构建简化版数据结构
-        const simplifiedData = {
-          Root: {}
-        };
-
-        // 添加 Cabinet 数据
-        if (allCabinets.length > 0) {
-          if (allCabinets.length === 1) {
-            // 单个 Cabinet
-            simplifiedData.Root.Cabinet = allCabinets[0];
-          } else {
-            // 多个 Cabinet
-            simplifiedData.Root.Cabinets = {
-              Cabinet: allCabinets
-            };
-          }
-        }
-
-        // 构建XML
-        let simplifiedXml = builder.build(simplifiedData);
-        
-        // 如果构建失败，尝试使用xml2js
-        if (!simplifiedXml) {
-          const xml2js = require('xml2js');
-          const builder2 = new xml2js.Builder({
-            headless: true,
-            renderOpts: {
-              pretty: true,
-              indent: '  '
-            }
-          });
-          simplifiedXml = builder2.buildObject(simplifiedData);
-        }
-
-        // 生成输出文件名（在srcFiles目录中）
-        const srcFilesDir = path.join(customerOutputDir, 'srcFiles');
-        // 确保srcFiles目录存在
-        if (!fs.existsSync(srcFilesDir)) {
-          fs.mkdirSync(srcFilesDir, { recursive: true });
-        }
-        const simplifiedXmlPath = path.join(srcFilesDir, 'temp.xml');
-        
-        // 保存为XML文件
-        if (simplifiedXml) {
-          fs.writeFileSync(simplifiedXmlPath, simplifiedXml, 'utf8');
-          console.log(`✓ 简化版XML文件已生成到 ${simplifiedXmlPath}`);
-          logSuccess(
-            customerName,
-            'XML_GENERATION',
-            `简化版XML文件已生成到 ${simplifiedXmlPath}`
-          );
-        } else {
-          console.warn('⚠ 无法生成简化版XML文件');
-          logWarning(
-            customerName,
-            'XML_GENERATION',
-            '无法生成简化版XML文件'
-          );
-        }
+        await generateTempXml(allCabinets, customerOutputDir, customerName);
       } catch (error) {
         console.warn('⚠ 生成简化版XML文件时出错:', error.message);
         logWarning(
@@ -885,6 +812,19 @@ async function processCustomerData(
       if (result && result.success) {
         console.log('✓ Excel文件生成成功');
         logSuccess(customerName, 'EXCEL_GENERATION', 'Excel文件生成成功');
+        
+        // 生成temp.xml文件
+        try {
+          await generateTempXml(allCabinets, customerOutputDir, customerName);
+        } catch (error) {
+          console.warn('⚠ 生成简化版XML文件时出错:', error.message);
+          logWarning(
+            customerName,
+            'XML_GENERATION',
+            `生成简化版XML文件时出错: ${error.message}`,
+            error.stack
+          );
+        }
         
         // 检查数据完整性
         await checkDataIntegrityAfterProcessing(customerName, config);
