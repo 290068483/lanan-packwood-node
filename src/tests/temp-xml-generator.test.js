@@ -39,7 +39,7 @@ describe('Temp XML Generator Tests', () => {
     }
   ];
 
-  const customerOutputDir = path.join(__dirname, 'test-output');
+  const customerOutputDir = path.join(__dirname, 'test-output', '20250915_测试客户.');
   const customerName = '测试客户';
 
   beforeEach(() => {
@@ -49,7 +49,14 @@ describe('Temp XML Generator Tests', () => {
 
   test('should generate temp.xml file successfully', async () => {
     // 模拟fs.existsSync返回false，表示目录不存在
-    fs.existsSync.mockReturnValue(false);
+    fs.existsSync.mockImplementation((dirPath) => {
+      // 对于srcFiles目录，返回false表示需要创建
+      if (dirPath.endsWith('srcFiles')) {
+        return false;
+      }
+      // 其他目录返回true
+      return true;
+    });
     // 模拟fs.mkdirSync函数
     fs.mkdirSync.mockImplementation(() => {});
     // 模拟fs.writeFileSync函数
@@ -59,6 +66,7 @@ describe('Temp XML Generator Tests', () => {
 
     // 验证目录创建函数被调用
     expect(fs.existsSync).toHaveBeenCalledWith(customerOutputDir);
+    
     expect(fs.mkdirSync).toHaveBeenCalledWith(
       path.join(customerOutputDir, 'srcFiles'),
       { recursive: true }
@@ -76,9 +84,9 @@ describe('Temp XML Generator Tests', () => {
   test('should handle directory already exists', async () => {
     // 模拟fs.existsSync返回true，表示目录已存在
     fs.existsSync.mockImplementation((dirPath) => {
-      // 如果检查的是srcFiles目录，返回false表示需要创建
-      if (dirPath === path.join(customerOutputDir, 'srcFiles')) {
-        return false;
+      // 对于srcFiles目录，返回true表示已存在
+      if (dirPath.endsWith('srcFiles')) {
+        return true;
       }
       // 其他目录返回true
       return true;
@@ -86,10 +94,11 @@ describe('Temp XML Generator Tests', () => {
     // 模拟fs.writeFileSync函数
     fs.writeFileSync.mockImplementation(() => {});
 
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     await generateTempXml(mockCabinets, customerOutputDir, customerName);
 
-    // 验证目录创建函数被调用（检查srcFiles目录）
-    expect(fs.mkdirSync).toHaveBeenCalledWith(
+    // 验证目录创建函数没有被调用（因为目录已存在）
+    expect(fs.mkdirSync).not.toHaveBeenCalledWith(
       path.join(customerOutputDir, 'srcFiles'),
       { recursive: true }
     );
@@ -97,7 +106,14 @@ describe('Temp XML Generator Tests', () => {
 
   test('should handle empty cabinets data', async () => {
     // 模拟fs.existsSync返回false
-    fs.existsSync.mockReturnValue(false);
+    fs.existsSync.mockImplementation((dirPath) => {
+      // 对于srcFiles目录，返回false表示需要创建
+      if (dirPath.endsWith('srcFiles')) {
+        return false;
+      }
+      // 其他目录返回true
+      return true;
+    });
     // 模拟fs.mkdirSync函数
     fs.mkdirSync.mockImplementation(() => {});
     // 模拟fs.writeFileSync函数
@@ -115,7 +131,14 @@ describe('Temp XML Generator Tests', () => {
 
   test('should throw error when file generation fails', async () => {
     // 模拟fs.writeFileSync抛出异常
-    fs.existsSync.mockReturnValue(false);
+    fs.existsSync.mockImplementation((dirPath) => {
+      // 对于srcFiles目录，返回false表示需要创建
+      if (dirPath.endsWith('srcFiles')) {
+        return false;
+      }
+      // 其他目录返回true
+      return true;
+    });
     fs.mkdirSync.mockImplementation(() => {});
     fs.writeFileSync.mockImplementation(() => {
       throw new Error('写入文件失败');

@@ -58,12 +58,14 @@ async function generateTempXml(allCabinets, customerOutputDir, customerName) {
       simplifiedXml = builder2.buildObject(simplifiedData);
     }
 
-    // 只在srcFiles目录中生成temp.xml文件
+    // 在客户输出目录中创建srcFiles子目录
     const srcFilesDir = path.join(customerOutputDir, 'srcFiles');
     // 确保srcFiles目录存在
     if (!fs.existsSync(srcFilesDir)) {
       fs.mkdirSync(srcFilesDir, { recursive: true });
     }
+    
+    // 在srcFiles目录中生成temp.xml文件
     const simplifiedXmlPath = path.join(srcFilesDir, 'temp.xml');
     
     // 保存为XML文件
