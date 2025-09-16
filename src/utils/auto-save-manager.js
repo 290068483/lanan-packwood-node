@@ -46,8 +46,15 @@ class AutoSaveManager {
 
       // 构建保存路径
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const saveDir = path.join(this.workerPackagesPath, '..', 'backup', 'worker', timestamp);
-      
+      const backupRoot = path.resolve(this.workerPackagesPath, '..'); // D:/backup_data/backup
+      const saveDir = path.join(backupRoot, 'backup', 'worker', timestamp);
+
+      // 确保备份根目录存在
+      if (!fs.existsSync(backupRoot)) {
+        console.log(`备份根目录不存在，正在创建: ${backupRoot}`);
+        fs.mkdirSync(backupRoot, { recursive: true });
+      }
+
       // 确保保存目录存在
       fs.mkdirSync(saveDir, { recursive: true });
 
@@ -56,9 +63,12 @@ class AutoSaveManager {
         const filePaths = files
           .map(file => path.join(this.workerPackagesPath, file))
           .filter(filePath => fs.statSync(filePath).isFile());
-        
+
         if (filePaths.length > 0) {
-          const zipPath = path.join(saveDir, `worker-packages-${timestamp}.zip`);
+          const zipPath = path.join(
+            saveDir,
+            `worker-packages-${timestamp}.zip`
+          );
           await FileCompressor.compressFilesToZip(filePaths, zipPath);
           console.log(`工人打包数据已压缩保存到: ${zipPath}`);
         }
@@ -67,7 +77,7 @@ class AutoSaveManager {
         for (const file of files) {
           const srcPath = path.join(this.workerPackagesPath, file);
           const destPath = path.join(saveDir, file);
-          
+
           if (fs.statSync(srcPath).isFile()) {
             fs.copyFileSync(srcPath, destPath);
           }
@@ -105,7 +115,8 @@ class AutoSaveManager {
 
       // 构建保存路径
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const saveDir = path.join(this.customerPackedPath, '..', 'backup', 'customer', timestamp);
+      const backupRoot = path.resolve(this.customerPackedPath, '..'); // D:/backup_data/backup
+      const saveDir = path.join(backupRoot, 'backup', 'customer', timestamp);
       
       // 确保保存目录存在
       fs.mkdirSync(saveDir, { recursive: true });
@@ -117,7 +128,10 @@ class AutoSaveManager {
           .filter(filePath => fs.statSync(filePath).isFile());
         
         if (filePaths.length > 0) {
-          const zipPath = path.join(saveDir, `customer-packed-${timestamp}.zip`);
+          const zipPath = path.join(
+            saveDir,
+            `customer-packed-${timestamp}.zip`
+          );
           await FileCompressor.compressFilesToZip(filePaths, zipPath);
           console.log(`客户已打包数据已压缩保存到: ${zipPath}`);
         }
@@ -147,9 +161,14 @@ class AutoSaveManager {
       return;
     }
 
+    // 首次启动时立即执行一次保存操作
+    console.log('执行初始保存操作...');
+    this.saveWorkerPackagesData();
+    this.saveCustomerPackedData();
+
     // 启动客户打包数据自动保存
     this.watcher = CustomerPackageUtils.startAutoSave(this.config);
-    
+
     console.log(`自动保存监控已启动，模式: ${this.autoSaveConfig.saveMode}`);
   }
   

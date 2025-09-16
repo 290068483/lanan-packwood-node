@@ -5,8 +5,7 @@ node_modules/
 logs/
 *.log
 
-# 配置文件
-config.json
+
 
 # 系统文件
 .DS_Store
@@ -28,3 +27,13 @@ output_table*.xlsx
 
 # XML优化文件
 优化文件.xml
+
+test/
+test_data/
+temp-data/
+temp-output/
+temp-tests/
+temp-files/
+temp-cache/
+temp-logs/
+fomat-xml/

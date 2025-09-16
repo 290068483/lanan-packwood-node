@@ -1,0 +1,24 @@
+{
+  "basePath": {
+    "workspace": "c:/Users/Administrator/Desktop/pack-node-1.0",
+    "projectStorage": "${basePath.workspace}/temp-pack"
+  },
+  "sourcePath": "//A6/蓝岸文件/1、客户总文件/3、生产/1、正单",
+  "localPath": "C:/Program Files (x86)/MPM/temp/local",
+  "networkPath": "//c1/mpm/temp/local/test",
+  "targetFileName": "打包明细.xlsx",
+  "workerPackagesPath": "D:/backup_data/backup/worker",
+  "customerPackedPath": "D:/backup_data/backup/customer",
+  "autoSave": {
+    "enabled": true,
+    "changeDetection": "当packages.json数据发生变化时，自动保存已打包的数据",
+    "saveMode": "onChange",
+    "intervalMinutes": 5,
+    "keepTime": 0,
+    "compress": true
+  },
+  "customFileNameFomat": "250901 王大海#",
+  "enableNetworkSync": false,
+  "outputXmlName": "temp.xml",
+  "outputXmlPath": "${basePath.projectStorage}/temp.xml"
+}

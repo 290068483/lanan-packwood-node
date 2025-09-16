@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest",
     "dev": "node src/excel/generate-excel-modular.js",
+    "auto-save": "node src/utils/auto-save-manager.js",
     "test-multiline": "node src/tests/multiline-test.js",
     "worker do": "node simple-worker.js"
   },
