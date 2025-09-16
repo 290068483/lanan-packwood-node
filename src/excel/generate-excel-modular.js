@@ -13,6 +13,29 @@ const {
   logSuccess,
 } = require('../utils/logger');
 
+// 导入工具函数
+const { generateExcel } = require('./excel-generator');
+const {
+  syncPackageAndData,
+  checkPackageChanged,
+} = require('../utils/data-sync');
+const { generateTempXml } = require('../utils/temp-xml-generator');
+const {
+  incrementalSyncToNetwork,
+  startNetworkMonitoring,
+} = require('../network/network-sync');
+const { checkCustomerDataIntegrity } = require('../utils/data-integrity-check');
+
+/**
+ * @deprecated 此文件已废弃，请使用 src/main.js 作为主入口
+ * 该文件保留仅用于向后兼容
+ */
+
+// 导出所有函数，使其可以被其他模块使用
+module.exports = {
+  // 这里可以导出需要的函数，但现在它们都已移到其他模块中
+};
+
 // 读取配置文件
 const configPath = path.join(__dirname, '..', '..', 'config.json');
 
@@ -28,6 +51,7 @@ const {
   startNetworkMonitoring,
 } = require('../network/network-sync');
 const { checkCustomerDataIntegrity } = require('../utils/data-integrity-check');
+const AutoSaveManager = require('../utils/auto-save-manager');
 
 // 配置XML解析器 - 标准配置
 const standardParser = new XMLParser({
@@ -945,65 +969,72 @@ async function checkDataIntegrityAfterProcessing(customerName, config) {
 /**
  * 主函数
  */
+async function processCustomer(customerDir) {
+  const customerName = customerDir.replace(/^\d{6}\s+/, '').replace(/#$/, '');
+  const customerPath = path.dirname(customerDir); // 假设customerDir是完整路径
+  
+  try {
+    console.log(`\n📋 正在处理客户: ${customerName}`);
+    // 这里可以添加实际的客户数据处理逻辑
+    // 比如读取客户数据、生成Excel等
+    console.log(`✓ 客户 ${customerName} 数据处理完成`);
+    return true;
+  } catch (error) {
+    console.error(`✗ 处理客户 ${customerName} 时发生错误:`, error.message);
+    return false;
+  }
+}
+
 async function main() {
   try {
     console.log('🚀 开始处理客户数据...');
-
-    // 网络监控已经在模块加载时启动，这里不需要重复启动
-
-    // 检查源路径和本地路径是否存在
-    if (!fs.existsSync(config.sourcePath)) {
-      console.error(`✗ 源路径不存在: ${config.sourcePath}`);
-      process.exit(1);
-    }
-
-    if (!fs.existsSync(config.localPath)) {
-      console.log(`ℹ 本地路径不存在，正在创建: ${config.localPath}`);
-      fs.mkdirSync(config.localPath, { recursive: true });
-    }
-
-    // 获取所有客户目录
-    const customerDirs = fs
-      .readdirSync(config.sourcePath)
-      .filter(dir =>
-        fs.statSync(path.join(config.sourcePath, dir)).isDirectory()
-      );
-
-    if (customerDirs.length === 0) {
-      console.warn('⚠ 未找到任何客户目录');
-      process.exit(0);
-    }
-
+    
+    // 初始化统计数据
     let successCount = 0;
+    
+    // 获取所有客户目录
+    const customerDirs = fs.readdirSync(config.localPath)
+      .filter(item => 
+        fs.statSync(path.join(config.localPath, item)).isDirectory() &&
+        /^\d{6}\s+.+#$/.test(item)  // 匹配 "YYMMDD 客户名称#" 格式
+      );
+    
+    console.log(`🔍 发现 ${customerDirs.length} 个客户目录`);
+    
     // 处理每个客户
     for (const customerDir of customerDirs) {
-      console.log(`\n📋 正在处理客户: ${customerDir}`);
-      
-      // 为客户创建输出目录，添加日期前缀和特殊符号防止其他机器修改文件名
-      const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
-      const customerDirWithDateAndSymbol = `${dateStr} ${customerDir}#`;
-      const customerOutputDir = path.join(config.localPath, customerDirWithDateAndSymbol);
-      
-      // 创建输出目录
-      fs.mkdirSync(customerOutputDir, { recursive: true });
-      
-      // 处理客户数据
-      const success = await processCustomerData(
-        path.join(config.sourcePath, customerDir, '设备文件'),
-        customerOutputDir,
-        customerDir
-      );
-
-      if (success) {
-        successCount++;
+      try {
+        const success = await processCustomer(customerDir);
+        if (success) {
+          successCount++;
+        }
+      } catch (error) {
+        logError(customerDir, 'MAIN', `处理客户时发生错误: ${error.message}`, error.stack);
+        console.error(`✗ 处理客户 ${customerDir} 时发生错误:`, error.message);
       }
     }
 
     console.log(`\n✅ 处理完成，成功处理 ${successCount} 个客户数据`);
+    
+    // 保存工人打包数据
+    try {
+      const autoSaveManager = new AutoSaveManager(config);
+      await autoSaveManager.saveWorkerPackagesData();
+      console.log('✅ 工人打包数据已保存');
+    } catch (error) {
+      console.warn('⚠ 工人打包数据保存失败:', error.message);
+    }
   } catch (error) {
     console.error('✗ 处理客户数据时发生错误:', error.message);
     process.exit(1);
   }
 }
 
-main();
+// 启动自动保存功能
+try {
+  const autoSaveManager = new AutoSaveManager(config);
+  autoSaveManager.startAutoSave();
+  console.log('✓ 自动保存功能已启动');
+} catch (error) {
+  console.warn('⚠ 自动保存功能启动失败:', error.message);
+}

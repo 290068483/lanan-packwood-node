@@ -112,12 +112,18 @@ async function syncPackageAndData(cabinets, outputDir, customerName) {
     const packageChanged = await checkPackageChanged(outputDir, customerName);
 
     return {
+      success: true,
       dataChanged,
       packageChanged,
     };
   } catch (error) {
     // 出错时默认都已变化
-    return { dataChanged: true, packageChanged: true };
+    return { 
+      success: false, 
+      message: error.message,
+      dataChanged: true, 
+      packageChanged: true 
+    };
   }
 }
 
