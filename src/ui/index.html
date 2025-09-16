@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>客户数据打包管理系统</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .header {
+        background-color: #3498db;
+        color: white;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .control-panel {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+      }
+
+      button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      button:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+      }
+
+      .run-button {
+        background-color: #27ae60;
+      }
+
+      .run-button:hover {
+        background-color: #229954;
+      }
+
+      .stop-button {
+        background-color: #e74c3c;
+      }
+
+      .stop-button:hover {
+        background-color: #c0392b;
+      }
+
+      .path-config {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 3px;
+        margin-top: 15px;
+        border: 1px solid #eee;
+      }
+
+      .path-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        gap: 10px;
+      }
+
+      .path-label {
+        width: 120px;
+        font-weight: bold;
+      }
+
+      .path-input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+      }
+
+      .customers-table {
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+
+      th {
+        background-color: #34495e;
+        color: white;
+        font-weight: bold;
+      }
+
+      tr:hover {
+        background-color: #f8f9fa;
+      }
+
+      .status-processing {
+        color: #f39c12;
+        font-weight: bold;
+      }
+
+      .status-completed {
+        color: #27ae60;
+        font-weight: bold;
+      }
+
+      .status-error {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .path-cell {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .footer {
+        margin-top: 20px;
+        text-align: center;
+        color: #7f8c8d;
+        font-size: 12px;
+      }
+
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px;
+        border-radius: 5px;
+        color: white;
+        background-color: #27ae60;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        display: none;
+        z-index: 1000;
+      }
+
+      .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+
+      .status-running {
+        background-color: #27ae60;
+      }
+
+      .status-stopped {
+        background-color: #e74c3c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>客户数据打包管理系统</h1>
+    </div>
+
+    <div class="control-panel">
+      <h2>操作面板</h2>
+      <div class="button-group">
+        <button id="selectSourceBtn">选择源地址</button>
+        <button id="selectOutputBtn">选择输出地址</button>
+        <button id="autoSaveCustomerBtn">自动保存客户打包数据</button>
+        <button id="autoSaveWorkerBtn">自动保存工人打包数据</button>
+        <button id="viewDataBtn">查看自动保存的数据</button>
+        <button id="refreshBtn">刷新数据</button>
+      </div>
+
+      <div class="button-group">
+        <button id="runBtn" class="run-button">运行</button>
+        <button id="stopBtn" class="stop-button" disabled>停止运行</button>
+        <span id="statusIndicator">
+          <span class="status-indicator status-stopped"></span>
+          <span>已停止</span>
+        </span>
+      </div>
+
+      <div class="path-config">
+        <h3>路径配置</h3>
+        <div class="path-row">
+          <span class="path-label">源地址:</span>
+          <input
+            type="text"
+            class="path-input"
+            id="sourcePath"
+            placeholder="选择源地址"
+          />
+        </div>
+        <div class="path-row">
+          <span class="path-label">输出地址:</span>
+          <input
+            type="text"
+            class="path-input"
+            id="outputPath"
+            placeholder="选择输出地址"
+          />
+        </div>
+        <div class="path-row">
+          <span class="path-label">网络路径:</span>
+          <input
+            type="text"
+            class="path-input"
+            id="networkPath"
+            placeholder="网络同步路径（可选）"
+          />
+        </div>
+        <button id="saveConfigBtn">保存配置</button>
+      </div>
+    </div>
+
+    <div class="customers-table">
+      <h2 style="padding: 20px 20px 0 20px">客户信息和打包状态</h2>
+      <table id="customersTable">
+        <thead>
+          <tr>
+            <th>客户名称</th>
+            <th>源地址</th>
+            <th>输出地址</th>
+            <th>打包状态</th>
+            <th>最后更新时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 数据将通过JavaScript动态填充 -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <div class="footer">
+      <p>客户数据打包管理系统 v1.0</p>
+    </div>
+
+    <script>
+      // 全局变量
+      let isRunning = false;
+      let config = {};
+
+      // 显示通知
+      function showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.style.display = 'block';
+        notification.style.backgroundColor =
+          type === 'success' ? '#27ae60' : '#e74c3c';
+
+        setTimeout(() => {
+          notification.style.display = 'none';
+        }, 3000);
+      }
+
+      // 更新运行状态显示
+      function updateRunStatus() {
+        const runBtn = document.getElementById('runBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const statusIndicator = document.getElementById('statusIndicator');
+
+        runBtn.disabled = isRunning;
+        stopBtn.disabled = !isRunning;
+
+        if (isRunning) {
+          statusIndicator.innerHTML =
+            '<span class="status-indicator status-running"></span><span>运行中</span>';
+        } else {
+          statusIndicator.innerHTML =
+            '<span class="status-indicator status-stopped"></span><span>已停止</span>';
+        }
+      }
+
+      // 检查路径配置
+      function checkPaths() {
+        const sourcePath = document.getElementById('sourcePath').value.trim();
+        const outputPath = document.getElementById('outputPath').value.trim();
+
+        if (!sourcePath || !outputPath) {
+          showNotification('请先配置源地址和输出地址', 'error');
+          return false;
+        }
+
+        return true;
+      }
+
+      // 保存配置到服务器
+      async function saveConfig() {
+        try {
+          const newConfig = {
+            sourcePath: document.getElementById('sourcePath').value.trim(),
+            localPath: document.getElementById('outputPath').value.trim(),
+            networkPath: document.getElementById('networkPath').value.trim(),
+          };
+
+          const response = await fetch('/api/config', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newConfig),
+          });
+
+          if (response.ok) {
+            showNotification('配置已保存');
+            loadConfig(); // 重新加载配置
+          } else {
+            showNotification('保存配置失败', 'error');
+          }
+        } catch (error) {
+          console.error('保存配置出错:', error);
+          showNotification('保存配置出错: ' + error.message, 'error');
+        }
+      }
+
+      // 加载配置
+      async function loadConfig() {
+        try {
+          const response = await fetch('/api/config');
+          if (response.ok) {
+            config = await response.json();
+            document.getElementById('sourcePath').value =
+              config.sourcePath || '';
+            document.getElementById('outputPath').value =
+              config.localPath || '';
+            document.getElementById('networkPath').value =
+              config.networkPath || '';
+          }
+        } catch (error) {
+          console.error('加载配置出错:', error);
+        }
+      }
+
+      // 页面加载完成后获取客户数据
+      document.addEventListener('DOMContentLoaded', async () => {
+        await loadCustomers();
+        await loadConfig();
+      });
+
+      // 刷新按钮事件
+      document
+        .getElementById('refreshBtn')
+        .addEventListener('click', async () => {
+          await loadCustomers();
+          showNotification('数据已刷新');
+        });
+
+      // 运行按钮事件
+      document.getElementById('runBtn').addEventListener('click', () => {
+        if (checkPaths()) {
+          isRunning = true;
+          updateRunStatus();
+          showNotification('开始运行数据处理');
+          // 这里应该调用实际的处理函数
+        }
+      });
+
+      // 停止按钮事件
+      document.getElementById('stopBtn').addEventListener('click', () => {
+        isRunning = false;
+        updateRunStatus();
+        showNotification('已停止运行');
+        // 这里应该停止实际的处理函数
+      });
+
+      // 保存配置按钮事件
+      document
+        .getElementById('saveConfigBtn')
+        .addEventListener('click', saveConfig);
+
+      // 加载客户数据
+      async function loadCustomers() {
+        try {
+          const response = await fetch('/api/customers');
+          const customers = await response.json();
+          const tbody = document.querySelector('#customersTable tbody');
+          tbody.innerHTML = '';
+
+          if (customers.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                        <td colspan="6" style="text-align: center; font-style: italic; color: #7f8c8d;">
+                            暂无客户数据
+                        </td>
+                    `;
+            tbody.appendChild(row);
+            return;
+          }
+
+          customers.forEach(customer => {
+            const row = document.createElement('tr');
+            const lastUpdate = customer.lastUpdate
+              ? new Date(customer.lastUpdate).toLocaleDateString()
+              : '未知';
+
+            // 状态样式处理
+            let statusClass = '';
+            switch (customer.status) {
+              case '已处理':
+              case '已完成':
+                statusClass = 'status-completed';
+                break;
+              case '处理中':
+              case '进行中':
+                statusClass = 'status-processing';
+                break;
+              case '处理失败':
+              case '错误':
+                statusClass = 'status-error';
+                break;
+            }
+
+            row.innerHTML = `
+                        <td>${customer.name || ''}</td>
+                        <td class="path-cell" title="${
+                          customer.sourcePath || ''
+                        }">${abbreviatePath(customer.sourcePath) || ''}</td>
+                        <td class="path-cell" title="${
+                          customer.outputPath || ''
+                        }">${abbreviatePath(customer.outputPath) || ''}</td>
+                        <td class="${statusClass}">${
+              customer.status || '未知'
+            }</td>
+                        <td>${lastUpdate}</td>
+                    `;
+            tbody.appendChild(row);
+          });
+        } catch (error) {
+          console.error('加载客户数据失败:', error);
+          showNotification('加载数据失败: ' + error.message, 'error');
+        }
+      }
+
+      // 缩短路径显示
+      function abbreviatePath(fullPath) {
+        if (!fullPath) return '';
+
+        // 只显示路径的最后两个部分
+        const parts = fullPath.split(/[/\\]/);
+        if (parts.length <= 2) {
+          return fullPath;
+        }
+        return `...${parts[parts.length - 2]}${window.location.sep || '\\'}${
+          parts[parts.length - 1]
+        }`;
+      }
+
+      // 按钮事件处理
+      document
+        .getElementById('selectSourceBtn')
+        .addEventListener('click', () => {
+          showNotification('选择源地址功能已触发');
+        });
+
+      document
+        .getElementById('selectOutputBtn')
+        .addEventListener('click', () => {
+          showNotification('选择输出地址功能已触发');
+        });
+
+      document
+        .getElementById('autoSaveCustomerBtn')
+        .addEventListener('click', () => {
+          showNotification('自动保存客户打包数据功能已启动');
+        });
+
+      document
+        .getElementById('autoSaveWorkerBtn')
+        .addEventListener('click', () => {
+          showNotification('自动保存工人打包数据功能已启动');
+        });
+
+      document.getElementById('viewDataBtn').addEventListener('click', () => {
+        showNotification('查看自动保存的数据功能已触发');
+      });
+    </script>
+  </body>
+</html>

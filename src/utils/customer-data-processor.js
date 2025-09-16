@@ -258,8 +258,13 @@ async function processCustomerData(
     console.log(`📁 正在处理客户路径: ${customerSourcePath}`);
     logInfo(customerName, 'PROCESS', '开始处理客户数据');
 
-    // 检查设备文件目录
-    const deviceDir = path.join(customerSourcePath, 'N1产线', '0、排版文件');
+    // 检查设备文件目录 (支持两种可能的路径结构)
+    let deviceDir = path.join(customerSourcePath, 'N1产线', '0、排版文件');
+    if (!fs.existsSync(deviceDir)) {
+      // 尝试另一种路径结构
+      deviceDir = path.join(customerSourcePath, '设备文件', 'N1产线', '0、排版文件');
+    }
+    
     if (!fs.existsSync(deviceDir)) {
       console.log(`⚠ 未找到设备文件目录: ${customerName}`);
       logWarning(customerName, 'PROCESS', '未找到设备文件目录');
