@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root>
+	<Cabinet Address="" AlongSys="" BasicMaterial="亿维雅" BatchNo="PC018341992508290004" BatchNoRemark="测试客户" CabinetNo="1" CabinetType="group" ClassType="wardrobe" Comment="" ContactAddress="" ContactRealName="测试客户" ContactWay="" CraftMark="" CustomAddress="" CustomId="" Customer="测试客户" DealerName="" DeliveryDate="" Designer="" DisOrderNickName="" DiyOrderNo="" GroupName="测试客户" Height="0.00" HouseType="" Id="" IsUrgent="0" ItemNo="" Length="0.00" Material="LR-19" Model="" Name="柜子1" OrderCount="1" OrderDate="2025-09-16 06:18:50" OrderName="测试客户" OrderNo="F250916" OrderSortingNo="0" OrderType="衣柜" OriginalUid="VIRTUALCABINET" OutsideOrderNo="" PartNumber="group-001" RoomId="0" RoomName="测试客户" SchemeId="" Series="" ShopName="测试客户" SignUserNickName="" SubType="" TaskID="" TaskNO="" Tel="" ThickEdgeValue="1.00" ThinEdgeValue="1.00" Uid="VIRTUALCABINET" Uid2="virtualcabinet" Width="0.00" bomUserRealName="测试客户" cityName="" contractNo="" designerMobile="" designerName="测试客户" designerUserRealName="测试客户" districtName="" placeTypeD="零售单" provinceName="" shopOrderCode="S2509160001" shopOrderName="测试客户" shopOrderSubmitTime="2025-09-16 06:18:50" submitName="测试客户">
+		<Panels>
+			<Panel ID="panel1" Name="面板1"/>
+			<Panel ID="panel2" Name="面板2"/>
+		</Panels>
+	</Cabinet>
+	<Cabinet Address="" AlongSys="" BasicMaterial="亿维雅" BatchNo="PC018341992508290004" BatchNoRemark="测试客户" CabinetNo="2" CabinetType="group" ClassType="wardrobe" Comment="" ContactAddress="" ContactRealName="测试客户" ContactWay="" CraftMark="" CustomAddress="" CustomId="" Customer="测试客户" DealerName="" DeliveryDate="" Designer="" DisOrderNickName="" DiyOrderNo="" GroupName="测试客户" Height="0.00" HouseType="" Id="" IsUrgent="0" ItemNo="" Length="0.00" Material="LR-19" Model="" Name="柜子2" OrderCount="1" OrderDate="2025-09-16 06:18:50" OrderName="测试客户" OrderNo="F250916" OrderSortingNo="0" OrderType="衣柜" OriginalUid="VIRTUALCABINET" OutsideOrderNo="" PartNumber="group-001" RoomId="0" RoomName="测试客户" SchemeId="" Series="" ShopName="测试客户" SignUserNickName="" SubType="" TaskID="" TaskNO="" Tel="" ThickEdgeValue="1.00" ThinEdgeValue="1.00" Uid="VIRTUALCABINET" Uid2="virtualcabinet" Width="0.00" bomUserRealName="测试客户" cityName="" contractNo="" designerMobile="" designerName="测试客户" designerUserRealName="测试客户" districtName="" placeTypeD="零售单" provinceName="" shopOrderCode="S2509160001" shopOrderName="测试客户" shopOrderSubmitTime="2025-09-16 06:18:50" submitName="测试客户">
+		<Panels>
+			<Panel ID="panel3" Name="面板3"/>
+		</Panels>
+	</Cabinet>
+</Root>

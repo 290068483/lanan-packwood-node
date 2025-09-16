@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const DataManager = require('../utils/data-manager');
+const { processAllCustomers } = require('../main');
 
 // MIME 类型映射
 const mimeTypes = {
@@ -19,9 +20,11 @@ const mimeTypes = {
   '.woff': 'application/font-woff',
   '.ttf': 'application/font-ttf',
   '.eot': 'application/vnd.ms-fontobject',
-  '.otf': 'application/font-otf',
+  '.otf': 'application/font-of',
   '.wasm': 'application/wasm'
 };
+
+let isRunning = false;
 
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
@@ -147,6 +150,44 @@ function handleApiRequest(req, res, parsedUrl) {
           res.end(JSON.stringify({ error: 'Failed to update config: ' + error.message }));
         }
       });
+    }
+  } else if (pathname === '/api/run') {
+    if (req.method === 'POST') {
+      // 运行主程序
+      if (isRunning) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: '程序已在运行中' }));
+        return;
+      }
+      
+      isRunning = true;
+      
+      // 异步执行主程序
+      setImmediate(async () => {
+        try {
+          await processAllCustomers();
+        } catch (error) {
+          console.error('运行主程序出错:', error);
+        } finally {
+          isRunning = false;
+        }
+      });
+      
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, message: '程序开始运行' }));
+    }
+  } else if (pathname === '/api/stop') {
+    if (req.method === 'POST') {
+      // 停止运行
+      isRunning = false;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, message: '程序已停止' }));
+    }
+  } else if (pathname === '/api/status') {
+    if (req.method === 'GET') {
+      // 获取运行状态
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ running: isRunning }));
     }
   } else {
     res.writeHead(404, { 'Content-Type': 'application/json' });

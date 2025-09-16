@@ -103,13 +103,25 @@ async function processAllCustomers() {
     }
     */
   } catch (error) {
-    console.error('✗ 处理客户数据时发生错误:', error);
+    console.error('处理客户数据时发生错误:', error);
   }
 }
 
-// 直接执行主函数
-processAllCustomers();
+// 程序入口点
+async function main() {
+  await processAllCustomers();
+}
 
+// 只有在直接运行此脚本时才执行main函数
+if (require.main === module) {
+  main().catch(error => {
+    console.error('程序执行出错:', error);
+    process.exit(1);
+  });
+}
+
+// 导出函数供其他模块使用
 module.exports = {
-  processAllCustomers
+  processAllCustomers,
+  getCustomerDirectoryName
 };
