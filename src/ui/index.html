@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>客户数据打包管理系统</title>
@@ -10,7 +11,7 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
-        
+
         .header {
             background-color: #3498db;
             color: white;
@@ -19,22 +20,22 @@
             margin-bottom: 20px;
             text-align: center;
         }
-        
+
         .control-panel {
             background-color: white;
             padding: 20px;
             border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
-        
+
         .button-group {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             margin-bottom: 15px;
         }
-        
+
         button {
             background-color: #3498db;
             color: white;
@@ -44,32 +45,32 @@
             cursor: pointer;
             font-size: 14px;
         }
-        
+
         button:hover {
             background-color: #2980b9;
         }
-        
+
         button:disabled {
             background-color: #bdc3c7;
             cursor: not-allowed;
         }
-        
+
         .run-button {
             background-color: #27ae60;
         }
-        
+
         .run-button:hover {
             background-color: #229954;
         }
-        
+
         .stop-button {
             background-color: #e74c3c;
         }
-        
+
         .stop-button:hover {
             background-color: #c0392b;
         }
-        
+
         .path-config {
             background-color: #f8f9fa;
             padding: 15px;
@@ -77,83 +78,84 @@
             margin-top: 15px;
             border: 1px solid #eee;
         }
-        
+
         .path-row {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
             gap: 10px;
         }
-        
+
         .path-label {
             width: 120px;
             font-weight: bold;
         }
-        
+
         .path-input {
             flex: 1;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 3px;
         }
-        
+
         .customers-table {
             background-color: white;
             border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
-        
-        th, td {
+
+        th,
+        td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #eee;
         }
-        
+
         th {
             background-color: #34495e;
             color: white;
             font-weight: bold;
         }
-        
+
         tr:hover {
             background-color: #f8f9fa;
         }
-        
+
         .status-processing {
             color: #f39c12;
             font-weight: bold;
         }
-        
+
         .status-completed {
             color: #27ae60;
             font-weight: bold;
         }
-        
+
         .status-error {
             color: #e74c3c;
             font-weight: bold;
         }
-        
+
         .path-cell {
             max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        
+
         .footer {
             margin-top: 20px;
             text-align: center;
             color: #7f8c8d;
             font-size: 12px;
         }
-        
+
         .notification {
             position: fixed;
             top: 20px;
@@ -162,11 +164,11 @@
             border-radius: 5px;
             color: white;
             background-color: #27ae60;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             display: none;
             z-index: 1000;
         }
-        
+
         .status-indicator {
             display: inline-block;
             width: 12px;
@@ -174,38 +176,119 @@
             border-radius: 50%;
             margin-right: 5px;
         }
-        
+
         .status-running {
             background-color: #27ae60;
         }
-        
+
         .status-stopped {
             background-color: #e74c3c;
         }
-        
+
         .refresh-interval {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-top: 10px;
         }
-        
+
         .refresh-interval label {
             font-weight: bold;
         }
-        
+
         .refresh-interval select {
             padding: 5px;
             border-radius: 3px;
             border: 1px solid #ddd;
         }
+
+        /* 配置区域样式 */
+        .config-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .config-section:last-child {
+            border-bottom: none;
+        }
+        
+        .config-section h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #34495e;
+        }
+        
+        /* 模态框按钮区域 */
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        /* 配置按钮样式 */
+        .config-button {
+            background-color: #9b59b6;
+        }
+        
+        .config-button:hover {
+            background-color: #8e44ad;
+        }
+        
+        /* 选择路径按钮样式 */
+        .path-row button {
+            background-color: #f39c12;
+            white-space: nowrap;
+        }
+        
+        .path-row button:hover {
+            background-color: #e67e22;
+        }
+        
+        .modal {
+
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
+
 <body>
     <div class="header">
         <h1>客户数据打包管理系统</h1>
     </div>
-    
+
     <div class="control-panel">
         <h2>操作面板</h2>
         <div class="button-group">
@@ -216,7 +299,7 @@
             <button id="viewDataBtn">查看自动保存的数据</button>
             <button id="refreshBtn">刷新数据</button>
         </div>
-        
+
         <div class="button-group">
             <button id="runBtn" class="run-button">运行</button>
             <button id="stopBtn" class="stop-button" disabled>停止运行</button>
@@ -225,7 +308,7 @@
                 <span>已停止</span>
             </span>
         </div>
-        
+
         <div class="refresh-interval">
             <label for="refreshInterval">自动刷新间隔:</label>
             <select id="refreshInterval">
@@ -236,25 +319,12 @@
                 <option value="60000">1分钟</option>
             </select>
         </div>
-        
-        <div class="path-config">
-            <h3>路径配置</h3>
-            <div class="path-row">
-                <span class="path-label">源地址:</span>
-                <input type="text" class="path-input" id="sourcePath" placeholder="请选择源地址">
-            </div>
-            <div class="path-row">
-                <span class="path-label">输出地址:</span>
-                <input type="text" class="path-input" id="outputPath" placeholder="请选择输出地址">
-            </div>
-            <div class="path-row">
-                <span class="path-label">网络路径:</span>
-                <input type="text" class="path-input" id="networkPath" placeholder="网络同步路径（可选）">
-            </div>
-            <button id="saveConfigBtn">保存配置</button>
+
+        <div>
+            <button id="configBtn" class="config-button">打开路径配置</button>
         </div>
     </div>
-    
+
     <div class="customers-table">
         <h2 style="padding: 20px 20px 0 20px;">客户信息和打包状态</h2>
         <table id="customersTable">
@@ -272,9 +342,52 @@
             </tbody>
         </table>
     </div>
-    
+    <!-- 配置弹出层 -->
+        <div id="configModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>路径配置</h2>
+                <form id="configForm">
+                    <div class="config-section">
+                        <h3>基本路径配置</h3>
+                        <div class="path-row">
+                            <span class="path-label">源地址:</span>
+                            <input type="text" id="sourcePathModal" class="path-input" placeholder="请选择源地址">
+                            <button type="button" id="selectSourcePathBtnModal">选择路径</button>
+                        </div>
+                        <div class="path-row">
+                            <span class="path-label">输出地址:</span>
+                            <input type="text" id="outputPathModal" class="path-input" placeholder="请选择输出地址">
+                            <button type="button" id="selectOutputPathBtnModal">选择路径</button>
+                        </div>
+                        <div class="path-row">
+                            <span class="path-label">网络路径:</span>
+                            <input type="text" id="networkPathModal" class="path-input" placeholder="网络同步路径（可选）">
+                            <button type="button" id="selectNetworkPathBtnModal">选择路径</button>
+                        </div>
+                    </div>
+                    <div class="config-section">
+                        <h3>打包数据路径</h3>
+                        <div class="path-row">
+                            <span class="path-label">客户已打包数据:</span>
+                            <input type="text" id="customerPackedPathModal" class="path-input" placeholder="客户已打包数据路径">
+                            <button type="button" id="selectCustomerPackedPathBtnModal">选择路径</button>
+                        </div>
+                        <div class="path-row">
+                            <span class="path-label">工人打包数据:</span>
+                            <input type="text" id="workerPackagesPathModal" class="path-input" placeholder="工人打包数据路径">
+                            <button type="button" id="selectWorkerPackagesPathBtnModal">选择路径</button>
+                        </div>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="submit" id="saveModalConfigBtn">保存配置</button>
+                        <button type="button" id="cancelModalBtn">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     <div class="notification" id="notification"></div>
-    
+
     <div class="footer">
         <p>客户数据打包管理系统 v1.0</p>
     </div>
@@ -284,58 +397,102 @@
         let isRunning = false;
         let config = {};
         let refreshIntervalId = null;
-        
+
         // 显示通知
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             notification.textContent = message;
             notification.style.display = 'block';
             notification.style.backgroundColor = type === 'success' ? '#27ae60' : '#e74c3c';
-            
+
             setTimeout(() => {
                 notification.style.display = 'none';
             }, 3000);
         }
-        
-        // 更新运行状态显示
-        function updateRunStatus(running) {
-            isRunning = running;
-            const runBtn = document.getElementById('runBtn');
-            const stopBtn = document.getElementById('stopBtn');
-            const statusIndicator = document.getElementById('statusIndicator');
-            
-            runBtn.disabled = isRunning;
-            stopBtn.disabled = !isRunning;
-            
-            if (isRunning) {
-                statusIndicator.innerHTML = '<span class="status-indicator status-running"></span><span>运行中</span>';
-            } else {
-                statusIndicator.innerHTML = '<span class="status-indicator status-stopped"></span><span>已停止</span>';
+
+        // ... existing code ...
+
+        // 弹出层相关逻辑
+        document.getElementById('configBtn').addEventListener('click', function () {
+            // 打开弹出层前，先加载当前配置到弹出层表单
+            loadConfigToModal();
+            document.getElementById('configModal').style.display = 'block';
+        });
+
+        document.querySelector('.close').addEventListener('click', function () {
+            document.getElementById('configModal').style.display = 'none';
+        });
+
+        // 取消按钮事件
+        document.getElementById('cancelModalBtn').addEventListener('click', function () {
+            document.getElementById('configModal').style.display = 'none';
+        });
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('configModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
             }
-        }
-        
-        // 检查路径配置
-        function checkPaths() {
-            const sourcePath = document.getElementById('sourcePath').value.trim();
-            const outputPath = document.getElementById('outputPath').value.trim();
-            
-            if (!sourcePath || !outputPath) {
-                showNotification('请先配置源地址和输出地址', 'error');
-                return false;
-            }
-            
-            return true;
-        }
-        
-        // 保存配置到服务器
-        async function saveConfig() {
+        };
+
+        // 配置弹出层相关事件
+        document.getElementById('selectSourcePathBtnModal').addEventListener('click', function () {
+            selectDirectory(function (path) {
+                if (path) {
+                    document.getElementById('sourcePathModal').value = path;
+                }
+            });
+        });
+
+        document.getElementById('selectOutputPathBtnModal').addEventListener('click', function () {
+            selectDirectory(function (path) {
+                if (path) {
+                    document.getElementById('outputPathModal').value = path;
+                }
+            });
+        });
+
+        document.getElementById('selectNetworkPathBtnModal').addEventListener('click', function () {
+            selectDirectory(function (path) {
+                if (path) {
+                    document.getElementById('networkPathModal').value = path;
+                }
+            });
+        });
+
+        document.getElementById('selectCustomerPackedPathBtnModal').addEventListener('click', function () {
+            selectDirectory(function (path) {
+                if (path) {
+                    document.getElementById('customerPackedPathModal').value = path;
+                }
+            });
+        });
+
+        document.getElementById('selectWorkerPackagesPathBtnModal').addEventListener('click', function () {
+            selectDirectory(function (path) {
+                if (path) {
+                    document.getElementById('workerPackagesPathModal').value = path;
+                }
+            });
+        });
+
+        // 配置表单提交事件
+        document.getElementById('configForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            saveModalConfig();
+        });
+
+        // 保存弹出层中的配置
+        async function saveModalConfig() {
             try {
                 const newConfig = {
-                    sourcePath: document.getElementById('sourcePath').value.trim(),
-                    localPath: document.getElementById('outputPath').value.trim(),
-                    networkPath: document.getElementById('networkPath').value.trim()
+                    sourcePath: document.getElementById('sourcePathModal').value.trim(),
+                    localPath: document.getElementById('outputPathModal').value.trim(),
+                    networkPath: document.getElementById('networkPathModal').value.trim(),
+                    customerPackedPath: document.getElementById('customerPackedPathModal').value.trim(),
+                    workerPackagesPath: document.getElementById('workerPackagesPathModal').value.trim()
                 };
-                
+
                 const response = await fetch('/api/config', {
                     method: 'POST',
                     headers: {
@@ -343,10 +500,10 @@
                     },
                     body: JSON.stringify(newConfig)
                 });
-                
+
                 if (response.ok) {
                     showNotification('配置已保存');
-                    loadConfig(); // 重新加载配置
+                    document.getElementById('configModal').style.display = 'none';
                 } else {
                     const result = await response.json();
                     showNotification('保存配置失败: ' + (result.error || '未知错误'), 'error');
@@ -356,16 +513,49 @@
                 showNotification('保存配置出错: ' + error.message, 'error');
             }
         }
-        
-        // 加载配置
-        async function loadConfig() {
+
+        // ... existing code ...
+        // 更新运行状态显示
+        function updateRunStatus(running) {
+            isRunning = running;
+            const runBtn = document.getElementById('runBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const statusIndicator = document.getElementById('statusIndicator');
+
+            runBtn.disabled = isRunning;
+            stopBtn.disabled = !isRunning;
+
+            if (isRunning) {
+                statusIndicator.innerHTML = '<span class="status-indicator status-running"></span><span>运行中</span>';
+            } else {
+                statusIndicator.innerHTML = '<span class="status-indicator status-stopped"></span><span>已停止</span>';
+            }
+        }
+
+        // 检查路径配置
+        function checkPaths() {
+            const sourcePath = document.getElementById('sourcePath').value.trim();
+            const outputPath = document.getElementById('outputPath').value.trim();
+
+            if (!sourcePath || !outputPath) {
+                showNotification('请先配置源地址和输出地址', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        // 加载配置到弹出层表单
+        async function loadConfigToModal() {
             try {
                 const response = await fetch('/api/config');
                 if (response.ok) {
                     config = await response.json();
-                    document.getElementById('sourcePath').value = config.sourcePath || '';
-                    document.getElementById('outputPath').value = config.localPath || '';
-                    document.getElementById('networkPath').value = config.networkPath || '';
+                    document.getElementById('sourcePathModal').value = config.sourcePath || '';
+                    document.getElementById('outputPathModal').value = config.localPath || '';
+                    document.getElementById('networkPathModal').value = config.networkPath || '';
+                    document.getElementById('customerPackedPathModal').value = config.customerPackedPath || '';
+                    document.getElementById('workerPackagesPathModal').value = config.workerPackagesPath || '';
                 } else {
                     showNotification('加载配置失败', 'error');
                 }
@@ -374,7 +564,9 @@
                 showNotification('加载配置出错: ' + error.message, 'error');
             }
         }
-        
+
+        // 保存配置按钮事件已在表单提交中处理
+
         // 获取运行状态
         async function getRunStatus() {
             try {
@@ -387,18 +579,18 @@
                 console.error('获取运行状态出错:', error);
             }
         }
-        
+
         // 开始运行主程序
         async function startRun() {
             if (!checkPaths()) {
                 return;
             }
-            
+
             try {
                 const response = await fetch('/api/run', {
                     method: 'POST'
                 });
-                
+
                 if (response.ok) {
                     const result = await response.json();
                     showNotification(result.message || '程序开始运行');
@@ -412,14 +604,14 @@
                 showNotification('启动程序出错: ' + error.message, 'error');
             }
         }
-        
+
         // 停止运行主程序
         async function stopRun() {
             try {
                 const response = await fetch('/api/stop', {
                     method: 'POST'
                 });
-                
+
                 if (response.ok) {
                     const result = await response.json();
                     showNotification(result.message || '程序已停止');
@@ -433,18 +625,18 @@
                 showNotification('停止程序出错: ' + error.message, 'error');
             }
         }
-        
+
         // 页面加载完成后获取客户数据
         document.addEventListener('DOMContentLoaded', async () => {
             await loadCustomers();
-            await loadConfig();
+            await loadConfigToModal();
             await getRunStatus();
-            
+
             // 设置定时刷新
             document.getElementById('refreshInterval').addEventListener('change', setupAutoRefresh);
             setupAutoRefresh();
         });
-        
+
         // 设置自动刷新
         function setupAutoRefresh() {
             // 清除现有的定时器
@@ -452,31 +644,30 @@
                 clearInterval(refreshIntervalId);
                 refreshIntervalId = null;
             }
-            
+
             // 获取选择的刷新间隔
             const interval = parseInt(document.getElementById('refreshInterval').value);
-            
+
             // 如果选择了自动刷新，则设置定时器
             if (interval > 0) {
                 refreshIntervalId = setInterval(loadCustomers, interval);
             }
         }
-        
+
         // 刷新按钮事件
         document.getElementById('refreshBtn').addEventListener('click', async () => {
             await loadCustomers();
             showNotification('数据已刷新');
         });
-        
+
         // 运行按钮事件
         document.getElementById('runBtn').addEventListener('click', startRun);
-        
+
         // 停止按钮事件
         document.getElementById('stopBtn').addEventListener('click', stopRun);
-        
-        // 保存配置按钮事件
-        document.getElementById('saveConfigBtn').addEventListener('click', saveConfig);
-        
+
+
+
         // 加载客户数据
         async function loadCustomers() {
             try {
@@ -484,7 +675,7 @@
                 const customers = await response.json();
                 const tbody = document.querySelector('#customersTable tbody');
                 tbody.innerHTML = '';
-                
+
                 if (customers.length === 0) {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -495,13 +686,13 @@
                     tbody.appendChild(row);
                     return;
                 }
-                
+
                 customers.forEach(customer => {
                     const row = document.createElement('tr');
-                    const lastUpdate = customer.lastUpdate 
-                        ? new Date(customer.lastUpdate).toLocaleDateString() 
+                    const lastUpdate = customer.lastUpdate
+                        ? new Date(customer.lastUpdate).toLocaleDateString()
                         : '未知';
-                    
+
                     // 状态样式处理
                     let statusClass = '';
                     switch (customer.status) {
@@ -518,7 +709,7 @@
                             statusClass = 'status-error';
                             break;
                     }
-                    
+
                     row.innerHTML = `
                         <td>${customer.name || ''}</td>
                         <td class="path-cell" title="${customer.sourcePath || ''}">${abbreviatePath(customer.sourcePath) || ''}</td>
@@ -533,11 +724,11 @@
                 showNotification('加载数据失败: ' + error.message, 'error');
             }
         }
-        
+
         // 缩短路径显示
         function abbreviatePath(fullPath) {
             if (!fullPath) return '';
-            
+
             // 只显示路径的最后两个部分
             const parts = fullPath.split(/[/\\]/);
             if (parts.length <= 2) {
@@ -545,27 +736,28 @@
             }
             return `...${parts[parts.length - 2]}${window.location.sep || '\\'}${parts[parts.length - 1]}`;
         }
-        
+
         // 按钮事件处理
         document.getElementById('selectSourceBtn').addEventListener('click', () => {
             showNotification('选择源地址功能已触发');
         });
-        
+
         document.getElementById('selectOutputBtn').addEventListener('click', () => {
             showNotification('选择输出地址功能已触发');
         });
-        
+
         document.getElementById('autoSaveCustomerBtn').addEventListener('click', () => {
             showNotification('自动保存客户打包数据功能已启动');
         });
-        
+
         document.getElementById('autoSaveWorkerBtn').addEventListener('click', () => {
             showNotification('自动保存工人打包数据功能已启动');
         });
-        
+
         document.getElementById('viewDataBtn').addEventListener('click', () => {
             showNotification('查看自动保存的数据功能已触发');
         });
     </script>
 </body>
+
 </html>
