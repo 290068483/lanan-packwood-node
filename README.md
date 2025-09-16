@@ -51,6 +51,7 @@ src/
 │   ├── functional.test.js            # 功能测试
 │   └── ...                           # 其他单元测试
 ├── local/                            # 本地输出目录
+├── database.json                     # 客户数据存储文件
 └── utils/                            # 工具函数
 
 ```
@@ -148,6 +149,8 @@ MIT
 - `networkPath`: 网络同步路径（暂未使用）
 - `targetFileName`: 生成的Excel文件名模板
 - `enableNetworkSync`: 是否启用网络同步（暂未使用）
+
+此外，项目还使用 [src/database.json](file:///C:/Users/Administrator/Desktop/pack-node-1.0/src/database.json) 文件来存储客户处理状态和历史记录。
 
 ## 已安装的工具
 
