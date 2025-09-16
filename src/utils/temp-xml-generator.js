@@ -36,26 +36,76 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir) {
     
     // 创建虚拟 Cabinet 结构以匹配 temp-pack 目录中的 XML 格式
     const virtualCabinet = {
-      '@_ID': '1',
-      '@_Name': 'Cabinet1',
-      '@_Description': 'Virtual Cabinet',
+      '@_Address': '',
+      '@_AlongSys': '',
+      '@_BasicMaterial': '亿维雅',
+      '@_BatchNo': 'PC018341992508290004',
+      '@_BatchNoRemark': customerName,
+      '@_CabinetNo': '1',
+      '@_CabinetType': 'group',
+      '@_ClassType': 'wardrobe',
+      '@_Comment': '',
+      '@_ContactAddress': '',
+      '@_ContactRealName': customerName,
+      '@_ContactWay': '',
+      '@_CraftMark': '',
+      '@_CustomAddress': '',
+      '@_CustomId': '',
+      '@_Customer': customerName,
+      '@_DealerName': '',
+      '@_DeliveryDate': '',
+      '@_Designer': '',
+      '@_DisOrderNickName': '',
+      '@_DiyOrderNo': '',
+      '@_GroupName': 'Virtual Cabinet',
+      '@_Height': '0.00',
+      '@_HouseType': '',
+      '@_Id': '',
+      '@_IsUrgent': '0',
+      '@_ItemNo': '',
+      '@_Length': '0.00',
+      '@_Material': 'LR-19',
+      '@_Model': '',
+      '@_Name': 'Virtual Cabinet',
+      '@_OrderCount': '1',
+      '@_OrderDate': new Date().toISOString().slice(0, 19).replace('T', ' '),
+      '@_OrderName': 'Virtual Cabinet',
+      '@_OrderNo': 'F' + new Date().toISOString().slice(2, 10).replace(/-/g, ''),
+      '@_OrderSortingNo': '0',
+      '@_OrderType': '衣柜',
+      '@_OriginalUid': 'VIRTUALCABINET',
+      '@_OutsideOrderNo': '',
+      '@_PartNumber': 'group-001',
+      '@_RoomId': '0',
+      '@_RoomName': 'Virtual Room',
+      '@_SchemeId': '',
+      '@_Series': '',
+      '@_ShopName': 'Virtual Shop',
+      '@_SignUserNickName': '',
+      '@_SubType': '',
+      '@_TaskID': '',
+      '@_TaskNO': '',
+      '@_Tel': '',
+      '@_ThickEdgeValue': '1.00',
+      '@_ThinEdgeValue': '1.00',
+      '@_Uid': 'VIRTUALCABINET',
+      '@_Uid2': 'virtualcabinet',
+      '@_Width': '0.00',
+      '@_bomUserRealName': 'Virtual User',
+      '@_cityName': '',
+      '@_contractNo': '',
+      '@_designerMobile': '',
+      '@_designerName': 'Virtual Designer',
+      '@_designerUserRealName': 'Virtual Designer',
+      '@_districtName': '',
+      '@_placeTypeD': '零售单',
+      '@_provinceName': '',
+      '@_shopOrderCode': 'S' + new Date().toISOString().slice(2, 10).replace(/-/g, '') + '0001',
+      '@_shopOrderName': customerName,
+      '@_shopOrderSubmitTime': new Date().toISOString(),
+      '@_submitName': 'Virtual User',
       Panels: {
-        Panel: panels.map((panel, index) => {
-          // 保留原始Panel的所有属性，只确保有ID属性
-          if (panel['@_'] && panel['@_'].ID !== undefined) {
-            // 已经有正确格式的 @_ 结构
-            return panel;
-          } else if (panel['@_ID'] !== undefined) {
-            // 直接具有 @_ID 属性的Panel
-            return panel;
-          } else {
-            // 为没有ID的Panel添加ID，但保留所有其他属性
-            return {
-              ...panel,
-              '@_ID': panel['@_ID'] || panel['@_']?.ID || `P${index + 1}`,
-            };
-          }
-        })
+        Panel: panels
       }
     };
     
@@ -67,7 +117,7 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir) {
       textNodeName: '#text',
       suppressEmptyNode: true,
       format: true,
-      indentBy: '  ',
+      indentBy: '\t',
       encoding: 'utf-8'
     });
 
@@ -92,7 +142,7 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir) {
         headless: false,
         renderOpts: {
           pretty: true,
-          indent: '  '
+          indent: '\t'
         },
         xmldec: {
           version: '1.0',
