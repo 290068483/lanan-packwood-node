@@ -126,7 +126,7 @@ class CustomerPackageUtils {
       return null;
     }
 
-    // 获取保存模式
+    // 获取保存模式和相关配置
     const saveMode = config.autoSave.saveMode || 'onChange';
     const intervalMinutes = config.autoSave.intervalMinutes || 5;
     
@@ -138,7 +138,7 @@ class CustomerPackageUtils {
       try {
         await this.saveCustomerPackageData(
           filePath,
-          config.customerPackedPath,
+          config.customerPackedPath.trim(), // 保持路径处理一致
           config.autoSave && config.autoSave.compress
         );
       } catch (error) {

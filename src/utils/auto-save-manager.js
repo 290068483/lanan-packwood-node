@@ -55,27 +55,43 @@ class AutoSaveManager {
         // 使用压缩工具保存数据
         const filePaths = files
           .map(file => path.join(this.workerPackagesPath, file))
-          .filter(filePath => fs.statSync(filePath).isFile());
+          .filter(filePath => {
+            try {
+              return fs.statSync(filePath).isFile();
+            } catch (error) {
+              console.warn(`检查文件状态时出错 ${filePath}:`, error.message);
+              return false;
+            }
+          });
 
         if (filePaths.length > 0) {
           const zipPath = path.join(saveDir, `worker-packages-${timestamp}.zip`);
-          await FileCompressor.compressFilesToZip(filePaths, zipPath);
-          console.log(`工人打包数据已压缩保存到: ${zipPath}`);
+          try {
+            await FileCompressor.compressFilesToZip(filePaths, zipPath);
+            console.log(`工人打包数据已压缩保存到: ${zipPath}`);
+          } catch (error) {
+            console.error(`压缩工人打包数据时出错: ${error.message}`);
+          }
         }
       } else {
         // 不使用压缩直接复制文件
         for (const file of files) {
-          const srcPath = path.join(this.workerPackagesPath, file);
-          const destPath = path.join(saveDir, file);
-
-          if (fs.statSync(srcPath).isFile()) {
-            fs.copyFileSync(srcPath, destPath);
+          try {
+            const srcPath = path.join(this.workerPackagesPath, file);
+            const destPath = path.join(saveDir, file);
+            
+            if (fs.statSync(srcPath).isFile()) {
+              fs.copyFileSync(srcPath, destPath);
+            }
+          } catch (error) {
+            console.warn(`复制文件时出错 ${file}:`, error.message);
           }
         }
         console.log(`工人打包数据已保存到: ${saveDir}`);
       }
     } catch (error) {
       console.error('保存工人打包数据时出错:', error.message);
+      // 可以在这里添加更完善的错误通知机制
     }
   }
 
@@ -114,27 +130,43 @@ class AutoSaveManager {
         // 使用压缩工具保存数据
         const filePaths = files
           .map(file => path.join(this.customerPackedPath, file))
-          .filter(filePath => fs.statSync(filePath).isFile());
+          .filter(filePath => {
+            try {
+              return fs.statSync(filePath).isFile();
+            } catch (error) {
+              console.warn(`检查文件状态时出错 ${filePath}:`, error.message);
+              return false;
+            }
+          });
         
         if (filePaths.length > 0) {
           const zipPath = path.join(saveDir, `customer-packed-${timestamp}.zip`);
-          await FileCompressor.compressFilesToZip(filePaths, zipPath);
-          console.log(`客户已打包数据已压缩保存到: ${zipPath}`);
+          try {
+            await FileCompressor.compressFilesToZip(filePaths, zipPath);
+            console.log(`客户已打包数据已压缩保存到: ${zipPath}`);
+          } catch (error) {
+            console.error(`压缩客户已打包数据时出错: ${error.message}`);
+          }
         }
       } else {
         // 不使用压缩直接复制文件
         for (const file of files) {
-          const srcPath = path.join(this.customerPackedPath, file);
-          const destPath = path.join(saveDir, file);
-          
-          if (fs.statSync(srcPath).isFile()) {
-            fs.copyFileSync(srcPath, destPath);
+          try {
+            const srcPath = path.join(this.customerPackedPath, file);
+            const destPath = path.join(saveDir, file);
+            
+            if (fs.statSync(srcPath).isFile()) {
+              fs.copyFileSync(srcPath, destPath);
+            }
+          } catch (error) {
+            console.warn(`复制文件时出错 ${file}:`, error.message);
           }
         }
         console.log(`客户已打包数据已保存到: ${saveDir}`);
       }
     } catch (error) {
       console.error('保存客户已打包数据时出错:', error.message);
+      // 可以在这里添加更完善的错误通知机制
     }
   }
 

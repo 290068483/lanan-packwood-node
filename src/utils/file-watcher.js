@@ -13,7 +13,7 @@ class FileWatcher {
    */
   constructor(config) {
     this.config = config;
-    this.workerPackagesPath = config.workerPackagesPath;
+    this.workerPackagesPath = config.workerPackagesPath.trim(); // 保持与AutoSaveManager一致
     this.callbacks = [];
     this.watchers = []; // 存储多个文件监视器
     this.intervalTimers = []; // 存储多个定时器
@@ -51,25 +51,25 @@ class FileWatcher {
       return null;
     }
     
-    // 检查是否有packages.json文件
-    const packagesPath = path.join(this.workerPackagesPath, 'packages.json');
-    if (fs.existsSync(packagesPath)) {
-      console.log('直接监控文件:', packagesPath);
+    // 检查是否有顶层packages.json文件
+    const topLevelPackagesPath = path.join(this.workerPackagesPath, 'packages.json');
+    if (fs.existsSync(topLevelPackagesPath)) {
+      console.log('直接监控顶层文件:', topLevelPackagesPath);
       
       // 保存当前文件内容
-      let lastContent = fs.readFileSync(packagesPath, 'utf8');
+      let lastContent = fs.readFileSync(topLevelPackagesPath, 'utf8');
       
       // 启动文件监控
-      const watcher = fs.watch(packagesPath, (eventType) => {
+      const watcher = fs.watch(topLevelPackagesPath, (eventType) => {
         if (eventType === 'change') {
           try {
             // 检查文件是否仍然存在
-            if (!fs.existsSync(packagesPath)) {
+            if (!fs.existsSync(topLevelPackagesPath)) {
               return;
             }
             
             // 读取新内容
-            const newContent = fs.readFileSync(packagesPath, 'utf8');
+            const newContent = fs.readFileSync(topLevelPackagesPath, 'utf8');
             
             // 如果内容发生变化
             if (newContent !== lastContent) {
@@ -77,7 +77,7 @@ class FileWatcher {
               // 更新最后内容
               lastContent = newContent;
               // 触发回调
-              this.triggerCallbacks(packagesPath);
+              this.triggerCallbacks(topLevelPackagesPath);
             }
           } catch (error) {
             console.error('监控文件变化时发生错误:', error);
@@ -87,7 +87,7 @@ class FileWatcher {
       
       this.watchers.push(watcher);
     } else {
-      // 读取目录中的所有子目录
+      // 如果没有顶层packages.json文件，则监控子目录中的文件
       let customerDirs = [];
       try {
         customerDirs = fs.readdirSync(this.workerPackagesPath)

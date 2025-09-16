@@ -1,0 +1,53 @@
+{
+  "totalCabinets": 12,
+  "cabinets": [
+    {
+      "name": "_3",
+      "panelCount": 71
+    },
+    {
+      "name": "_10",
+      "panelCount": 71
+    },
+    {
+      "name": "_6",
+      "panelCount": 71
+    },
+    {
+      "name": "_4",
+      "panelCount": 71
+    },
+    {
+      "name": "_7",
+      "panelCount": 71
+    },
+    {
+      "name": "_8",
+      "panelCount": 70
+    },
+    {
+      "name": "_2",
+      "panelCount": 71
+    },
+    {
+      "name": "_11",
+      "panelCount": 71
+    },
+    {
+      "name": "_1",
+      "panelCount": 71
+    },
+    {
+      "name": "_5",
+      "panelCount": 71
+    },
+    {
+      "name": "_9",
+      "panelCount": 71
+    },
+    {
+      "name": "_12",
+      "panelCount": 70
+    }
+  ]
+}

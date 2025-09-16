@@ -1,7 +1,8 @@
-const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const http = require('http'); // 移到最前面
+const { exec } = require('child_process'); // 添加child_process模块导入
 const DataManager = require('../utils/data-manager');
 const { processAllCustomers } = require('../main');
 
@@ -23,6 +24,27 @@ const mimeTypes = {
   '.otf': 'application/font-of',
   '.wasm': 'application/wasm'
 };
+
+// 在server定义之前添加打开文件夹的函数
+function openFolderInWindows(folderPath, callback) {
+  // 确保路径存在
+  fs.stat(folderPath, (err, stats) => {
+    if (err || !stats.isDirectory()) {
+      callback(err || new Error('指定的路径不存在或不是一个文件夹'));
+      return;
+    }
+
+    // 在Windows上使用PowerShell命令打开文件夹
+    const command = `powershell.exe -Command "Invoke-Item \"${folderPath}\""`;
+    exec(command, (error) => {
+      if (error) {
+        callback(error);
+        return;
+      }
+      callback(null);
+    });
+  });
+}
 
 let isRunning = false;
 
@@ -84,31 +106,20 @@ function handleApiRequest(req, res, parsedUrl) {
           const newConfigData = JSON.parse(body);
 
           // 读取现有配置
-          const configContent = fs.readFileSync(configPath, 'utf8');
-          const config = JSON.parse(configContent);
-
-          // 更新路径配置
-          if (newConfigData.sourcePath !== undefined) {
-            config.sourcePath = newConfigData.sourcePath;
+          let existingConfig = {};
+          if (fs.existsSync(configPath)) {
+            const existingConfigContent = fs.readFileSync(configPath, 'utf8');
+            existingConfig = JSON.parse(existingConfigContent);
           }
-          if (newConfigData.localPath !== undefined) {
-            config.localPath = newConfigData.localPath;
-          }
-          if (newConfigData.networkPath !== undefined) {
-            config.networkPath = newConfigData.networkPath;
-          }
-          if (newConfigData.customerPackedPath !== undefined) {
-            config.customerPackedPath = newConfigData.customerPackedPath;
-          }
-          if (newConfigData.workerPackagesPath !== undefined) {
-            config.workerPackagesPath = newConfigData.workerPackagesPath;
-          }
-
+          
+          // 合并配置，保留未更改的字段
+          const updatedConfig = { ...existingConfig, ...JSON.parse(body) };
+          
           // 保存配置
-          fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf8');
+          fs.writeFileSync(configPath, JSON.stringify(updatedConfig, null, 2), 'utf8');
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: true }));
+          res.end(JSON.stringify({ success: true, message: '配置已更新' }));
         } catch (error) {
           res.writeHead(500, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'Failed to update config: ' + error.message }));
@@ -205,6 +216,27 @@ function handleApiRequest(req, res, parsedUrl) {
       // 获取运行状态
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ running: isRunning }));
+    }
+  }
+  // 打开文件夹
+  else if (pathname === '/open-folder') {
+    if (req.method === 'GET') {
+      const folderPath = parsedUrl.query.path;
+      if (!folderPath) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('请提供有效的文件夹路径');
+        return;
+      }
+      
+      openFolderInWindows(folderPath, (err) => {
+        if (err) {
+          res.writeHead(500, { 'Content-Type': 'text/plain' });
+          res.end('打开文件夹失败: ' + err.message);
+        } else {
+          res.writeHead(200, { 'Content-Type': 'text/plain' });
+          res.end('已成功打开文件夹: ' + folderPath);
+        }
+      });
     }
   }
   // 未找到的API

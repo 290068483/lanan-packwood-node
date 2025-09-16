@@ -1,0 +1,25 @@
+{
+  "appId": "com.example.xml-parser-optimizer",
+  "productName": "XML Parser Optimizer",
+  "directories": {
+    "output": "dist-electron"
+  },
+  "files": [
+    "src/**/*",
+    "package.json",
+    "!node_modules/**/*",
+    "!dist/**/*",
+    "!**/*.map"
+  ],
+  "win": {
+    "target": [
+      "nsis",
+      "zip"
+    ],
+    "icon": "src/ui/icons/icon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true
+  }
+}

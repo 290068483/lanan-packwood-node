@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const { logInfo, logError, logWarning } = require('./logger');
+const { logInfo, logError, logWarning, logSuccess } = require('./logger');
 const {
   parseXmlWithFallback,
   extractPanelsWithRegex,
@@ -28,9 +28,19 @@ function extractPanelsFromData(data) {
         if (obj['@_'] && obj['@_'].ID !== undefined) {
           panels.push(obj);
         }
-        
+
         // 同时检查直接具有 @_ID 属性的对象（兼容不同解析器的结果）
         if (obj['@_ID'] !== undefined) {
+          panels.push(obj);
+        }
+
+        // 检查是否是Panel节点（通过节点名称判断）
+        if (obj['@_'] && obj['@_'].name && obj['@_'].name.includes('Panel')) {
+          panels.push(obj);
+        }
+
+        // 检查是否是Panel节点（通过其他常见属性判断）
+        if (obj['@_'] && (obj['@_'].width || obj['@_'].height || obj['@_'].thickness)) {
           panels.push(obj);
         }
 
@@ -109,26 +119,98 @@ async function processLineData(
     console.log(`  📊 使用${parseResult.parser}解析器解析成功`);
     logInfo(customerName, lineDir, `使用${parseResult.parser}解析器解析成功`);
 
-    // 提取Panel节点
-    let panels = extractPanelsFromData(parseResult.data);
+    // 处理不同的XML结构，提取Cabinet信息
+    let cabinets = [];
 
-    // 如果没有提取到Panel，尝试使用正则表达式
-    if (panels.length === 0) {
-      console.log('  ⚠ 未通过解析器提取到Panel，尝试使用正则表达式提取');
-      logWarning(
-        customerName,
-        lineDir,
-        '未通过解析器提取到Panel，尝试使用正则表达式提取'
-      );
-      panels = extractPanelsWithRegex(xmlData);
+    // 结构1: Root.Cabinets.Cabinet (旧结构)
+    if (
+      parseResult.data.Root.Cabinets &&
+      parseResult.data.Root.Cabinets.Cabinet
+    ) {
+      cabinets = Array.isArray(parseResult.data.Root.Cabinets.Cabinet)
+        ? parseResult.data.Root.Cabinets.Cabinet
+        : [parseResult.data.Root.Cabinets.Cabinet];
+      console.log(`  📦 提取到 ${cabinets.length} 个Cabinet数据 (结构1)`);
+    }
+    // 结构2: Root.Cabinet (新结构)
+    else if (parseResult.data.Root.Cabinet) {
+      cabinets = Array.isArray(parseResult.data.Root.Cabinet)
+        ? parseResult.data.Root.Cabinet
+        : [parseResult.data.Root.Cabinet];
+      console.log(`  📦 提取到 ${cabinets.length} 个Cabinet数据 (结构2)`);
+    }
+    // 结构3: Panel节点不在Cabinet内，直接在Root.Panels下
+    else if (
+      parseResult.data.Root.Panels &&
+      parseResult.data.Root.Panels.Panel
+    ) {
+      // 创建一个虚拟的Cabinet来包含这些Panel
+      const panels = Array.isArray(parseResult.data.Root.Panels.Panel)
+        ? parseResult.data.Root.Panels.Panel
+        : [parseResult.data.Root.Panels.Panel];
+
+      const virtualCabinet = {
+        '@_ID': 'virtual_cabinet',
+        '@_Name': 'Virtual Cabinet',
+        Panels: {
+          Panel: panels,
+        },
+      };
+
+      cabinets = [virtualCabinet];
+      console.log(`  📦 提取到 ${panels.length} 个Panel数据 (结构3)`);
+    }
+    // 结构4: Panel节点直接在Root下
+    else if (parseResult.data.Root.Panel) {
+      // 创建一个虚拟的Cabinet来包含这些Panel
+      const panels = Array.isArray(parseResult.data.Root.Panel)
+        ? parseResult.data.Root.Panel
+        : [parseResult.data.Root.Panel];
+
+      const virtualCabinet = {
+        '@_ID': 'virtual_cabinet',
+        '@_Name': 'Virtual Cabinet',
+        Panels: {
+          Panel: panels,
+        },
+      };
+
+      cabinets = [virtualCabinet];
+      console.log(`  📦 提取到 ${panels.length} 个Panel数据 (结构4)`);
+    }
+    // 其他结构：尝试直接提取Panel节点
+    else {
+      const panels = extractPanelsFromData(parseResult.data);
+      if (panels.length === 0) {
+        // 尝试使用正则表达式
+        const regexPanels = extractPanelsWithRegex(xmlData);
+        if (regexPanels.length > 0) {
+          const virtualCabinet = {
+            '@_ID': 'virtual_cabinet',
+            '@_Name': 'Virtual Cabinet',
+            Panels: {
+              Panel: regexPanels,
+            },
+          };
+          cabinets = [virtualCabinet];
+          console.log(`  📦 提取到 ${regexPanels.length} 个Panel数据 (正则表达式)`);
+        }
+      } else {
+        const virtualCabinet = {
+          '@_ID': 'virtual_cabinet',
+          '@_Name': 'Virtual Cabinet',
+          Panels: {
+            Panel: panels,
+          },
+        };
+        cabinets = [virtualCabinet];
+        console.log(`  📦 提取到 ${panels.length} 个Panel数据 (直接提取)`);
+      }
     }
 
-    console.log(`  📦 提取到 ${panels.length} 个Panel节点`);
-    logInfo(customerName, lineDir, `提取到 ${panels.length} 个Panel节点`);
-
-    if (panels.length === 0) {
-      console.log(`  ⚠ 未找到任何Panel节点: ${lineDir}`);
-      logWarning(customerName, lineDir, '未找到任何Panel节点');
+    if (cabinets.length === 0) {
+      console.log(`  ⚠ 未找到任何Cabinet或Panel节点: ${lineDir}`);
+      logWarning(customerName, lineDir, '未找到任何Cabinet或Panel节点');
       return false;
     }
 
@@ -137,13 +219,33 @@ async function processLineData(
     if (!fs.existsSync(srcFilesDir)) {
       fs.mkdirSync(srcFilesDir, { recursive: true });
     }
-    
+
+    // 从所有Cabinet中提取所有Panel数据
+    const allPanels = [];
+    cabinets.forEach(cabinet => {
+      if (cabinet.Panels && cabinet.Panels.Panel) {
+        if (Array.isArray(cabinet.Panels.Panel)) {
+          allPanels.push(...cabinet.Panels.Panel);
+        } else {
+          allPanels.push(cabinet.Panels.Panel);
+        }
+      }
+    });
+
     // 保护性复制Panel数据，确保不丢失任何信息
-    const preservedPanels = panels.map(panel => preservePanelData(panel));
-    
-    // 生成temp.xml文件到srcFiles目录
-    const tempXmlPath = path.join(srcFilesDir, 'temp.xml');
-    generateTempXml(preservedPanels, tempXmlPath, customerName, lineDir);
+    const preservedPanels = allPanels.map(panel => preservePanelData(panel));
+
+    // 生成XML文件到srcFiles目录（使用配置中的文件名格式）
+    let xmlFileName = config.outputXmlName || 'temp.xml';
+    console.log(`DEBUG: 配置中的outputXmlName: ${config.outputXmlName}`);
+    console.log(`DEBUG: 替换前的xmlFileName: ${xmlFileName}`);
+    // 替换占位符为实际的客户名称
+    xmlFileName = xmlFileName.replace(/{customerName}/g, customerName);
+    console.log(`DEBUG: 替换后的xmlFileName: ${xmlFileName}`);
+    const tempXmlFilePath = path.join(srcFilesDir, xmlFileName);
+    console.log(`DEBUG: 最终的tempXmlFilePath: ${tempXmlFilePath}`);
+    // 传递原始的Cabinet数据给generateTempXml，确保能正确创建多个<cabinets>标签
+    generateTempXml(preservedPanels, tempXmlFilePath, customerName, lineDir, cabinets);
 
     // 读取并处理包裹数据
     const packageResult = await syncPackageAndData(
@@ -162,19 +264,9 @@ async function processLineData(
       return false;
     }
 
-    // 构建虚拟 Cabinet 结构以匹配 Excel 生成器期望的格式
-    const virtualCabinet = {
-      '@_ID': '1',
-      '@_Name': 'Cabinet1',
-      '@_GroupName': 'Virtual Cabinet',
-      Panels: {
-        Panel: preservedPanels
-      }
-    };
-
-    // 生成Excel文件
+    // 生成Excel文件，使用完整的cabinets数组
     const excelResult = await generateExcel(
-      [virtualCabinet], // Cabinet数据数组
+      cabinets, // 完整的Cabinet数据数组
       customerName,
       customerOutputDir,
       packageResult.packageChanged
@@ -264,7 +356,7 @@ async function processCustomerData(
       // 尝试另一种路径结构
       deviceDir = path.join(customerSourcePath, '设备文件', 'N1产线', '0、排版文件');
     }
-    
+
     if (!fs.existsSync(deviceDir)) {
       console.log(`⚠ 未找到设备文件目录: ${customerName}`);
       logWarning(customerName, 'PROCESS', '未找到设备文件目录');
