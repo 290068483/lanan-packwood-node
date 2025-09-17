@@ -21,11 +21,11 @@
   "autoSaveWorkerPath": "D:/backup_data/backup/worker",
   "customFileNameFomat": "250901 {customerName}#",
   "enableNetworkSync": false,
-  "outputXmlName": "250901 {customerName}#.xml",
-  "outputXmlPath": "${basePath.projectStorage}/250901 {customerName}#.xml",
+  "outputXmlName": "250901 {customerName}.xml",
+  "outputXmlPath": "${basePath.projectStorage}/{customerName}/srcFiles/250901 {customerName}.xml",
   "xmlStructureTemplate": {
     "Root": {
-      "cabinets": "{cabinets}"
+      "Cabinet": "{cabinets}"
     }
   }
 }
