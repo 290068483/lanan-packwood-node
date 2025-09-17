@@ -132,17 +132,22 @@ ipcMain.handle('get-config', async () => {
 
 ipcMain.handle('save-config', async (event, config) => {
   try {
-    // 确保配置对象存在且有合理的默认值
-    if (!config.autoSavePath) {
-      config.autoSavePath = path.join(app.getPath('documents'), 'PackNodeAutoSaves');
-    }
+    // 导入增量更新配置功能
+    const { saveConfigWithMerge } = require('../utils/config-manager');
 
-    const configPath = path.join(__dirname, '../../config.json');
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-    return { success: true };
+    // 使用增量更新功能保存配置
+    const result = await saveConfigWithMerge(config);
+
+    if (result.success) {
+      console.log('✅ 配置保存成功（增量更新）');
+      return result;
+    } else {
+      console.error('✗ 配置保存失败:', result.error);
+      return result;
+    }
   } catch (error) {
-    console.error('保存配置文件失败:', error);
-    return { error: error.message };
+    console.error('✗ 保存配置时出错:', error);
+    return { success: false, error: `保存配置时出错: ${error.message}` };
   }
 });
 
@@ -159,21 +164,32 @@ ipcMain.handle('select-directory', async (event, title) => {
   return null;
 });
 
-// 修复后的 open-directory 处理程序
 ipcMain.handle('open-directory', async (event, dirPath) => {
   return new Promise((resolve) => {
-    if (!fs.existsSync(dirPath)) {
-      return resolve({ success: false, error: '目录不存在' });
-    }
+    // 检查路径是否存在，如果不存在则创建
+    try {
+      // 检查目录是否存在
+      if (!fs.existsSync(dirPath)) {
+        console.log(`目录不存在，尝试创建: ${dirPath}`);
 
-    // 在 Windows 上打开目录
-    exec(`start "" "${dirPath}"`, (error) => {
-      if (error) {
-        console.error('打开目录失败:', error);
-        return resolve({ success: false, error: error.message });
+        // 创建目录（包括所有必要的父目录）
+        fs.mkdirSync(dirPath, { recursive: true });
+        console.log(`✅ 已创建目录: ${dirPath}`);
       }
-      resolve({ success: true });
-    });
+
+      // 在 Windows 上打开目录
+      exec(`start "" "${dirPath}"`, (error) => {
+        if (error) {
+          console.error('打开目录失败:', error);
+          return resolve({ success: false, error: error.message });
+        }
+        console.log(`✅ 已打开目录: ${dirPath}`);
+        resolve({ success: true });
+      });
+    } catch (error) {
+      console.error('处理目录时出错:', error);
+      resolve({ success: false, error: error.message });
+    }
   });
 });
 
@@ -223,17 +239,72 @@ ipcMain.handle('stop-processing', async () => {
 });
 
 // 自动保存相关处理程序
-ipcMain.handle('start-auto-save-customer', async () => {
-  // 这里应该实现客户数据自动保存逻辑
-  return { success: true, message: '已启动客户数据自动保存' };
+ipcMain.handle('start-auto-save-customer', async (event, customerName) => {
+  try {
+    // 导入自动保存管理器
+    const AutoSaveManager = require('../utils/auto-save-manager');
+
+    // 创建自动保存管理器实例
+    const autoSaveManager = new AutoSaveManager(config);
+
+    // 启动客户数据自动保存
+    autoSaveManager.startAutoSave(customerName);
+
+    console.log(`✅ 已启动客户数据自动保存: ${customerName}`);
+    return { success: true, message: `已启动客户数据自动保存: ${customerName}` };
+  } catch (error) {
+    console.error('启动客户数据自动保存失败:', error);
+    return { success: false, error: `启动客户数据自动保存失败: ${error.message}` };
+  }
 });
 
-ipcMain.handle('start-auto-save-worker', async () => {
-  // 这里应该实现工人数据自动保存逻辑
-  return { success: true, message: '已启动工人数据自动保存' };
+ipcMain.handle('start-auto-save-worker', async (event, customerName) => {
+  try {
+    // 导入自动保存管理器
+    const AutoSaveManager = require('../utils/auto-save-manager');
+
+    // 创建自动保存管理器实例
+    const autoSaveManager = new AutoSaveManager(config);
+
+    // 启动工人数据自动保存
+    autoSaveManager.startAutoSave(customerName);
+
+    console.log(`✅ 已启动工人数据自动保存: ${customerName}`);
+    return { success: true, message: `已启动工人数据自动保存: ${customerName}` };
+  } catch (error) {
+    console.error('启动工人数据自动保存失败:', error);
+    return { success: false, error: `启动工人数据自动保存失败: ${error.message}` };
+  }
 });
 
-ipcMain.handle('view-auto-save-data', async () => {
-  // 这里应该实现查看自动保存数据的逻辑
-  return { success: true, message: '查看自动保存数据' };
+ipcMain.handle('view-auto-save-data', async (event, customerName, dataType) => {
+  try {
+    // 导入自动保存管理器
+    const AutoSaveManager = require('../utils/auto-save-manager');
+
+    // 创建自动保存管理器实例
+    const autoSaveManager = new AutoSaveManager(config);
+
+    // 根据数据类型确定基础路径
+    let basePath;
+    if (dataType === 'worker') {
+      basePath = config.autoSaveWorkerPath;
+    } else {
+      basePath = config.autoSaveCustomerPath;
+    }
+
+    // 查看自动保存数据
+    const result = await autoSaveManager.viewAutoSaveData(basePath, customerName);
+
+    if (result.success) {
+      console.log(`✅ 已打开自动保存数据目录: ${result.path}`);
+      return result;
+    } else {
+      console.error('查看自动保存数据失败:', result.error);
+      return result;
+    }
+  } catch (error) {
+    console.error('查看自动保存数据失败:', error);
+    return { success: false, error: `查看自动保存数据失败: ${error.message}` };
+  }
 });

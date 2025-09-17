@@ -1,0 +1,12 @@
+{
+  "name": "xml-parser-optimizer-dev",
+  "version": "1.0.0",
+  "description": "开发环境热更新脚本",
+  "scripts": {
+    "dev:hot": "node src/ui/hot-reload-server.js"
+  },
+  "devDependencies": {
+    "chokidar": "^3.5.3",
+    "ws": "^8.13.0"
+  }
+}

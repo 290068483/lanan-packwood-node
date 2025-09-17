@@ -49,8 +49,9 @@ class AutoSaveManager {
 
   /**
    * 保存工人打包数据
+   * @param {string} customerName - 客户名称
    */
-  async saveWorkerPackagesData() {
+  async saveWorkerPackagesData(customerName = '未知客户') {
     try {
       // 检查是否启用了自动保存
       if (!this.autoSaveConfig.enabled) {
@@ -71,12 +72,8 @@ class AutoSaveManager {
         return;
       }
 
-      // 构建保存路径
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const saveDir = path.join(this.workerPackagesPath, '..', 'backup', 'worker', timestamp);
-
-      // 确保保存目录存在
-      fs.mkdirSync(saveDir, { recursive: true });
+      // 构建保存路径 - 使用按日期和客户名称组织的路径
+      const saveDir = this.getAutoSavePath(this.autoSaveWorkerPath, customerName);
 
       if (this.autoSaveConfig.compress) {
         // 使用压缩工具保存数据
@@ -92,12 +89,13 @@ class AutoSaveManager {
           });
 
         if (filePaths.length > 0) {
-          const zipPath = path.join(saveDir, `worker-packages-${timestamp}.zip`);
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const zipPath = path.join(saveDir, `worker-packages-${customerName}-${timestamp}.zip`);
           try {
             await FileCompressor.compressFilesToZip(filePaths, zipPath);
-            console.log(`工人打包数据已压缩保存到: ${zipPath}`);
+            console.log(`✅ 工人打包数据已压缩保存到: ${zipPath}`);
           } catch (error) {
-            console.error(`压缩工人打包数据时出错: ${error.message}`);
+            console.error(`✗ 压缩工人打包数据时出错: ${error.message}`);
           }
         }
       } else {
@@ -106,26 +104,26 @@ class AutoSaveManager {
           try {
             const srcPath = path.join(this.workerPackagesPath, file);
             const destPath = path.join(saveDir, file);
-            
+
             if (fs.statSync(srcPath).isFile()) {
               fs.copyFileSync(srcPath, destPath);
             }
           } catch (error) {
-            console.warn(`复制文件时出错 ${file}:`, error.message);
+            console.warn(`✗ 复制文件时出错 ${file}:`, error.message);
           }
         }
-        console.log(`工人打包数据已保存到: ${saveDir}`);
+        console.log(`✅ 工人打包数据已保存到: ${saveDir}`);
       }
     } catch (error) {
-      console.error('保存工人打包数据时出错:', error.message);
-      // 可以在这里添加更完善的错误通知机制
+      console.error('✗ 保存工人打包数据时出错:', error.message);
     }
   }
 
   /**
    * 保存客户已打包数据
+   * @param {string} customerName - 客户名称
    */
-  async saveCustomerPackedData() {
+  async saveCustomerPackedData(customerName = '未知客户') {
     try {
       // 检查是否启用了自动保存
       if (!this.autoSaveConfig.enabled) {
@@ -146,12 +144,8 @@ class AutoSaveManager {
         return;
       }
 
-      // 构建保存路径
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const saveDir = path.join(this.customerPackedPath, '..', 'backup', 'customer', timestamp);
-      
-      // 确保保存目录存在
-      fs.mkdirSync(saveDir, { recursive: true });
+      // 构建保存路径 - 使用按日期和客户名称组织的路径
+      const saveDir = this.getAutoSavePath(this.autoSaveCustomerPath, customerName);
 
       if (this.autoSaveConfig.compress) {
         // 使用压缩工具保存数据
@@ -165,14 +159,15 @@ class AutoSaveManager {
               return false;
             }
           });
-        
+
         if (filePaths.length > 0) {
-          const zipPath = path.join(saveDir, `customer-packed-${timestamp}.zip`);
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const zipPath = path.join(saveDir, `customer-packed-${customerName}-${timestamp}.zip`);
           try {
             await FileCompressor.compressFilesToZip(filePaths, zipPath);
-            console.log(`客户已打包数据已压缩保存到: ${zipPath}`);
+            console.log(`✅ 客户已打包数据已压缩保存到: ${zipPath}`);
           } catch (error) {
-            console.error(`压缩客户已打包数据时出错: ${error.message}`);
+            console.error(`✗ 压缩客户已打包数据时出错: ${error.message}`);
           }
         }
       } else {
@@ -181,26 +176,26 @@ class AutoSaveManager {
           try {
             const srcPath = path.join(this.customerPackedPath, file);
             const destPath = path.join(saveDir, file);
-            
+
             if (fs.statSync(srcPath).isFile()) {
               fs.copyFileSync(srcPath, destPath);
             }
           } catch (error) {
-            console.warn(`复制文件时出错 ${file}:`, error.message);
+            console.warn(`✗ 复制文件时出错 ${file}:`, error.message);
           }
         }
-        console.log(`客户已打包数据已保存到: ${saveDir}`);
+        console.log(`✅ 客户已打包数据已保存到: ${saveDir}`);
       }
     } catch (error) {
-      console.error('保存客户已打包数据时出错:', error.message);
-      // 可以在这里添加更完善的错误通知机制
+      console.error('✗ 保存客户已打包数据时出错:', error.message);
     }
   }
 
   /**
    * 启动自动保存监控
+   * @param {string} customerName - 客户名称
    */
-  startAutoSave() {
+  startAutoSave(customerName = '未知客户') {
     if (!this.autoSaveConfig.enabled) {
       console.log('自动保存未启用');
       return;
@@ -208,15 +203,15 @@ class AutoSaveManager {
 
     // 首次启动时立即执行一次保存操作
     console.log('执行初始保存操作...');
-    this.saveWorkerPackagesData();
-    this.saveCustomerPackedData();
+    this.saveWorkerPackagesData(customerName);
+    this.saveCustomerPackedData(customerName);
 
     // 启动客户打包数据自动保存
-    this.watcher = CustomerPackageUtils.startAutoSave(this.config);
+    this.watcher = CustomerPackageUtils.startAutoSave(this.config, customerName);
 
-    console.log(`自动保存监控已启动，模式: ${this.autoSaveConfig.saveMode}`);
+    console.log(`✅ 自动保存监控已启动，模式: ${this.autoSaveConfig.saveMode || '定时'}`);
   }
-  
+
   /**
    * 停止自动保存监控
    */
@@ -230,7 +225,61 @@ class AutoSaveManager {
         clearInterval(this.watcher);
       }
       this.watcher = null;
-      console.log('自动保存监控已停止');
+      console.log('✅ 自动保存监控已停止');
+    }
+  }
+
+  /**
+   * 查看自动保存数据
+   * @param {string} basePath - 基础保存路径
+   * @param {string} customerName - 客户名称 (可选)
+   * @returns {Promise<Object>} 查看结果
+   */
+  async viewAutoSaveData(basePath, customerName) {
+    try {
+      let targetPath = basePath;
+
+      // 如果指定了客户名称，查找最近的日期文件夹
+      if (customerName) {
+        // 获取所有日期文件夹
+        const dateDirs = fs.readdirSync(basePath)
+          .filter(dir => /^\d{4}-\d{2}-\d{2}$/.test(dir))
+          .map(dir => path.join(basePath, dir))
+          .filter(dir => fs.statSync(dir).isDirectory());
+
+        if (dateDirs.length === 0) {
+          return { success: false, error: '未找到任何日期文件夹' };
+        }
+
+        // 按修改时间排序，最新的在前
+        dateDirs.sort((a, b) => {
+          return fs.statSync(b).mtime - fs.statSync(a).mtime;
+        });
+
+        // 获取最新的日期文件夹
+        const latestDateDir = path.basename(dateDirs[0]);
+        targetPath = path.join(basePath, latestDateDir, customerName);
+      }
+
+      // 检查路径是否存在
+      if (!fs.existsSync(targetPath)) {
+        return { success: false, error: '路径不存在: ' + targetPath };
+      }
+
+      // 打开该路径
+      const { exec } = require('child_process');
+      exec(`start "" "${targetPath}"`, (error) => {
+        if (error) {
+          console.error('打开目录失败:', error);
+          return { success: false, error: error.message };
+        }
+        console.log(`✅ 已打开目录: ${targetPath}`);
+      });
+
+      return { success: true, path: targetPath };
+    } catch (error) {
+      console.error(`✗ 查看自动保存数据失败: ${error.message}`);
+      return { success: false, error: error.message };
     }
   }
 }
@@ -240,13 +289,13 @@ if (require.main === module) {
   // 加载配置文件
   const configPath = path.join(__dirname, '..', '..', 'config.json');
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  
+
   // 创建自动保存管理器
   const autoSaveManager = new AutoSaveManager(config);
-  
+
   // 启动自动保存
   autoSaveManager.startAutoSave();
-  
+
   // 监听退出信号，确保正确清理资源
   process.on('SIGINT', () => {
     console.log('接收到退出信号，正在停止自动保存监控...');

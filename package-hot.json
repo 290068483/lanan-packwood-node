@@ -12,7 +12,8 @@
     "electron-start-url": "cross-env ELECTRON_START_URL=http://localhost:3000 electron src/ui/electron-main.js",
     "electron-pack": "electron-builder --win",
     "electron-dist": "electron-builder --win --publish never",
-    "ui": "node src/ui/server.js"
+    "ui": "node src/ui/server.js",
+    "dev-hot": "node src/ui/start-dev-hot.js"
   },
   "engines": {
     "node": ">=18.0.0 <20.0.0"
