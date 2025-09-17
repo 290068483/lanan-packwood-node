@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { generateTempXml } = require('../utils/temp-xml-generator');
+const { generateTempXml } = require('../utils/xml-generator');
 
 // Mock fs模块
 jest.mock('fs');
@@ -52,16 +52,16 @@ describe('Temp XML Generator Tests', () => {
   it('should generate temp.xml file successfully', async () => {
     // 模拟fs函数
     fs.existsSync.mockImplementation(() => false);
-    fs.mkdirSync.mockImplementation(() => {});
-    fs.writeFileSync.mockImplementation(() => {});
+    fs.mkdirSync.mockImplementation(() => { });
+    fs.writeFileSync.mockImplementation(() => { });
 
     // 执行函数
     await generateTempXml(mockCabinetData, customerOutputDir, '测试客户');
-    
+
     // 验证目录创建函数被调用
     expect(fs.mkdirSync).toHaveBeenCalledWith(customerOutputDir, { recursive: true });
     expect(fs.mkdirSync).toHaveBeenCalledWith(path.join(customerOutputDir, 'srcFiles'), { recursive: true });
-    
+
     // 验证文件写入函数被调用
     expect(fs.writeFileSync).toHaveBeenCalled();
   });
@@ -72,12 +72,12 @@ describe('Temp XML Generator Tests', () => {
     fs.existsSync.mockImplementation((path) => {
       return true;
     });
-    
-    fs.mkdirSync.mockImplementation(() => {});
-    fs.writeFileSync.mockImplementation(() => {});
+
+    fs.mkdirSync.mockImplementation(() => { });
+    fs.writeFileSync.mockImplementation(() => { });
 
     await generateTempXml(mockCabinetData, customerOutputDir, '测试客户');
-    
+
     // 验证没有尝试创建已存在的目录
     expect(fs.mkdirSync).not.toHaveBeenCalledWith(customerOutputDir, { recursive: true });
     expect(fs.writeFileSync).toHaveBeenCalled();
@@ -86,9 +86,9 @@ describe('Temp XML Generator Tests', () => {
   // 测试用例：应该处理空的cabinets数据
   it('should handle empty cabinets data', async () => {
     fs.existsSync.mockImplementation(() => false);
-    fs.mkdirSync.mockImplementation(() => {});
-    fs.writeFileSync.mockImplementation(() => {});
-    
+    fs.mkdirSync.mockImplementation(() => { });
+    fs.writeFileSync.mockImplementation(() => { });
+
     await generateTempXml([], customerOutputDir, '测试客户');
     expect(fs.writeFileSync).toHaveBeenCalled();
   });

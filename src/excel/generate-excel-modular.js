@@ -19,33 +19,7 @@ const {
   syncPackageAndData,
   checkPackageChanged,
 } = require('../utils/data-sync');
-const { generateTempXml } = require('../utils/temp-xml-generator');
-const {
-  incrementalSyncToNetwork,
-  startNetworkMonitoring,
-} = require('../network/network-sync');
-const { checkCustomerDataIntegrity } = require('../utils/data-integrity-check');
-
-/**
- * @deprecated 此文件已废弃，请使用 src/main.js 作为主入口
- * 该文件保留仅用于向后兼容
- */
-
-// 导出所有函数，使其可以被其他模块使用
-module.exports = {
-  // 这里可以导出需要的函数，但现在它们都已移到其他模块中
-};
-
-// 读取配置文件
-const configPath = path.join(__dirname, '..', '..', 'config.json');
-
-// 导入工具函数
-const { generateExcel } = require('./excel-generator');
-const {
-  syncPackageAndData,
-  checkPackageChanged,
-} = require('../utils/data-sync');
-const { generateTempXml } = require('../utils/temp-xml-generator');
+const { generateTempXml } = require('../utils/xml-generator');
 const {
   incrementalSyncToNetwork,
   startNetworkMonitoring,
@@ -695,7 +669,7 @@ async function processCustomerData(
     if (!dataChanged) {
       console.log(`ℹ 客户 "${customerName}" 数据未发生变化，跳过生成文件`);
       logInfo(customerName, 'MAIN', '数据未发生变化，跳过生成文件');
-      
+
       // 即使数据未变化，也生成temp.xml文件用于数据完整性检查
       try {
         await generateTempXml(allCabinets, customerOutputDir, customerName);
@@ -748,7 +722,7 @@ async function processCustomerData(
       if (!fs.existsSync(customerOutputDir)) {
         fs.mkdirSync(customerOutputDir, { recursive: true });
       }
-      
+
       // 创建XML构建器
       const { XMLBuilder } = require('fast-xml-parser');
       const builder = new XMLBuilder({
@@ -780,7 +754,7 @@ async function processCustomerData(
 
       // 构建XML
       let simplifiedXml = builder.build(simplifiedData);
-      
+
       // 如果构建失败，尝试使用xml2js
       if (!simplifiedXml) {
         const xml2js = require('xml2js');
@@ -796,7 +770,7 @@ async function processCustomerData(
 
       // 生成输出文件名
       const simplifiedXmlPath = path.join(customerOutputDir, 'temp.xml');
-      
+
       // 保存为XML文件
       if (simplifiedXml) {
         fs.writeFileSync(simplifiedXmlPath, simplifiedXml, 'utf8');
@@ -832,11 +806,11 @@ async function processCustomerData(
         customerOutputDir,
         packageChanged
       );
-      
+
       if (result && result.success) {
         console.log('✓ Excel文件生成成功');
         logSuccess(customerName, 'EXCEL_GENERATION', 'Excel文件生成成功');
-        
+
         // 生成temp.xml文件
         try {
           await generateTempXml(allCabinets, customerOutputDir, customerName);
@@ -849,10 +823,10 @@ async function processCustomerData(
             error.stack
           );
         }
-        
+
         // 检查数据完整性
         await checkDataIntegrityAfterProcessing(customerName, config);
-        
+
         // 调用网络同步功能
         if (config.enableNetworkSync) {
           try {
@@ -865,7 +839,7 @@ async function processCustomerData(
               },
               config
             );
-            
+
             if (!syncResult.success) {
               console.warn('⚠ 网络同步失败:', syncResult.message);
               logWarning(
@@ -883,7 +857,7 @@ async function processCustomerData(
             );
           }
         }
-        
+
         return true;
       } else {
         console.error('✗ Excel文件生成失败');
@@ -933,24 +907,24 @@ async function checkDataIntegrityAfterProcessing(customerName, config) {
 
     // 检查数据完整性
     const result = checkCustomerDataIntegrity(
-      customerName, 
-      customerPaths, 
+      customerName,
+      customerPaths,
       console
     );
-    
+
     if (result) {
       // 记录完整性检查结果到日志
       logInfo(
-        customerName, 
-        'DATA_INTEGRITY', 
+        customerName,
+        'DATA_INTEGRITY',
         `数据完整性检查完成: 保留率 ${result.retentionRate.toFixed(2)}%`
       );
-      
+
       // 如果数据不完整，记录警告
       if (!result.integrity) {
         logWarning(
-          customerName, 
-          'DATA_INTEGRITY', 
+          customerName,
+          'DATA_INTEGRITY',
           `数据不完整，丢失 ${result.lostPanelIds.length} 个Panel`
         );
       }
@@ -972,7 +946,7 @@ async function checkDataIntegrityAfterProcessing(customerName, config) {
 async function processCustomer(customerDir) {
   const customerName = customerDir.replace(/^\d{6}\s+/, '').replace(/#$/, '');
   const customerPath = path.dirname(customerDir); // 假设customerDir是完整路径
-  
+
   try {
     console.log(`\n📋 正在处理客户: ${customerName}`);
     // 这里可以添加实际的客户数据处理逻辑
@@ -988,19 +962,19 @@ async function processCustomer(customerDir) {
 async function main() {
   try {
     console.log('🚀 开始处理客户数据...');
-    
+
     // 初始化统计数据
     let successCount = 0;
-    
+
     // 获取所有客户目录
     const customerDirs = fs.readdirSync(config.localPath)
-      .filter(item => 
+      .filter(item =>
         fs.statSync(path.join(config.localPath, item)).isDirectory() &&
         /^\d{6}\s+.+#$/.test(item)  // 匹配 "YYMMDD 客户名称#" 格式
       );
-    
+
     console.log(`🔍 发现 ${customerDirs.length} 个客户目录`);
-    
+
     // 处理每个客户
     for (const customerDir of customerDirs) {
       try {
@@ -1015,7 +989,7 @@ async function main() {
     }
 
     console.log(`\n✅ 处理完成，成功处理 ${successCount} 个客户数据`);
-    
+
     // 保存工人打包数据
     try {
       const autoSaveManager = new AutoSaveManager(config);

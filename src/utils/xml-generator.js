@@ -57,6 +57,36 @@ function sanitizeXmlName(name) {
 }
 
 /**
+ * 保存解析后的XML数据到文件
+ * @param {Object} data - 解析后的XML数据
+ * @param {string} outputPath - 输出文件路径
+ * @param {string} customerName - 客户名称
+ */
+function saveParsedXmlData(data, outputPath, customerName) {
+  try {
+    // 确保输出目录存在
+    const outputDir = path.dirname(outputPath);
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+      console.log(`✓ 创建输出目录: ${outputDir}`);
+      logSuccess(
+        customerName,
+        'DIRECTORY_CREATED',
+        `创建输出目录: ${outputDir}`
+      );
+    }
+
+    // 将数据保存为JSON格式（便于调试和后续处理）
+    fs.writeFileSync(outputPath, JSON.stringify(data, null, 2), 'utf8');
+    console.log(`✓ 解析后的XML数据已保存到: ${outputPath}`);
+    logSuccess(customerName, 'DATA_SAVE', `解析后的XML数据已保存到: ${outputPath}`);
+  } catch (error) {
+    console.error(`✗ 保存解析后的XML数据失败: ${error.message}`);
+    logError(customerName, 'DATA_SAVE', `保存解析后的XML数据失败: ${error.message}`, error.stack);
+  }
+}
+
+/**
  * 生成符合temp-pack目录中XML格式的XML文件
  * @param {Array} panels - Panel数据数组
  * @param {string} tempXmlPath - XML文件路径
@@ -255,8 +285,16 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCab
           // 确保Panel元素使用属性格式而不是子元素格式（与老版本VBA程序完全一致）
           const panelWithAttributes = {};
           for (const key in panelCopy) {
-            // 对所有属性名进行清理
-            const sanitizedKey = sanitizeXmlName(key);
+            // 对于Panel下的属性，我们需要正确处理@_前缀
+            // 如果键名以@_开头，我们去掉@_前缀，而不是使用sanitizeXmlName
+            let finalKey;
+            if (key.startsWith('@_')) {
+              // 去掉@_前缀，保留剩下的部分
+              finalKey = key.substring(2);
+            } else {
+              // 对于其他键名，使用原有的清理逻辑
+              finalKey = sanitizeXmlName(key);
+            }
 
             if (typeof panelCopy[key] === 'object' && panelCopy[key] !== null && !Array.isArray(panelCopy[key])) {
               // 处理嵌套对象（如LabelInfo、EdgeGroup、Machines等）
@@ -265,16 +303,22 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCab
                 const nestedObj = panelCopy[key];
                 for (const nestedKey in nestedObj) {
                   if (nestedObj[nestedKey] !== null && nestedObj[nestedKey] !== undefined) {
-                    const sanitizedNestedKey = sanitizeXmlName(nestedKey);
-                    panelWithAttributes[sanitizedNestedKey] = nestedObj[nestedKey];
+                    // 同样处理嵌套对象中的@_前缀
+                    let finalNestedKey;
+                    if (nestedKey.startsWith('@_')) {
+                      finalNestedKey = nestedKey.substring(2);
+                    } else {
+                      finalNestedKey = sanitizeXmlName(nestedKey);
+                    }
+                    panelWithAttributes[finalNestedKey] = nestedObj[nestedKey];
                   }
                 }
               } else {
-                panelWithAttributes[sanitizedKey] = panelCopy[key];
+                panelWithAttributes[finalKey] = panelCopy[key];
               }
             } else {
               // 简单属性直接作为XML属性
-              panelWithAttributes[sanitizedKey] = panelCopy[key];
+              panelWithAttributes[finalKey] = panelCopy[key];
             }
           }
 
@@ -385,8 +429,16 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCab
           // 确保Panel元素使用属性格式而不是子元素格式（与老版本VBA程序完全一致）
           const panelWithAttributes = {};
           for (const key in panelCopy) {
-            // 对所有属性名进行清理
-            const sanitizedKey = sanitizeXmlName(key);
+            // 对于Panel下的属性，我们需要正确处理@_前缀
+            // 如果键名以@_开头，我们去掉@_前缀，而不是使用sanitizeXmlName
+            let finalKey;
+            if (key.startsWith('@_')) {
+              // 去掉@_前缀，保留剩下的部分
+              finalKey = key.substring(2);
+            } else {
+              // 对于其他键名，使用原有的清理逻辑
+              finalKey = sanitizeXmlName(key);
+            }
 
             if (typeof panelCopy[key] === 'object' && panelCopy[key] !== null && !Array.isArray(panelCopy[key])) {
               // 处理嵌套对象（如LabelInfo、EdgeGroup、Machines等）
@@ -395,16 +447,22 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCab
                 const nestedObj = panelCopy[key];
                 for (const nestedKey in nestedObj) {
                   if (nestedObj[nestedKey] !== null && nestedObj[nestedKey] !== undefined) {
-                    const sanitizedNestedKey = sanitizeXmlName(nestedKey);
-                    panelWithAttributes[sanitizedNestedKey] = nestedObj[nestedKey];
+                    // 同样处理嵌套对象中的@_前缀
+                    let finalNestedKey;
+                    if (nestedKey.startsWith('@_')) {
+                      finalNestedKey = nestedKey.substring(2);
+                    } else {
+                      finalNestedKey = sanitizeXmlName(nestedKey);
+                    }
+                    panelWithAttributes[finalNestedKey] = nestedObj[nestedKey];
                   }
                 }
               } else {
-                panelWithAttributes[sanitizedKey] = panelCopy[key];
+                panelWithAttributes[finalKey] = panelCopy[key];
               }
             } else {
               // 简单属性直接作为XML属性
-              panelWithAttributes[sanitizedKey] = panelCopy[key];
+              panelWithAttributes[finalKey] = panelCopy[key];
             }
           }
           cabinetMap.get(cabinetName)['Panels']['Panel'].push(panelWithAttributes);
@@ -509,10 +567,10 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCab
                   nestedValue.forEach(item => {
                     xml += '\t\t\t<' + sanitizedNestedKey + '>' + '\n';
                     for (const itemKey in item) {
-                      const sanitizedItemKey = sanitizeXmlName(itemKey);
+                      // Panel下的子元素已经去掉了@_前缀，直接使用原键名
                       const itemValue = item[itemKey];
                       if (itemValue !== null && itemValue !== undefined && itemValue !== '') {
-                        xml += '\t\t\t\t<' + sanitizedItemKey + '>' + escapeXml(itemValue) + '</' + sanitizedItemKey + '>' + '\n';
+                        xml += '\t\t\t\t<' + itemKey + '>' + escapeXml(itemValue) + '</' + itemKey + '>' + '\n';
                       }
                     }
                     xml += '\t\t\t</' + sanitizedNestedKey + '>' + '\n';
@@ -588,7 +646,7 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCab
         'XML_GENERATION',
         `简化版XML文件已生成到 ${finalXmlPath}`
       );
-      return finalXmlPath;
+      return finalXmlPath;  // 返回生成的文件路径
     } else {
       console.warn('⚠ 无法生成简化版XML文件');
       logWarning(
@@ -596,7 +654,7 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCab
         'XML_GENERATION',
         '无法生成简化版XML文件'
       );
-      return null;
+      return null;  // 返回null表示生成失败
     }
   } catch (error) {
     console.error('✗ 生成简化版XML文件时出错:', error.message);
@@ -611,5 +669,6 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCab
 }
 
 module.exports = {
-  generateTempXml
+  generateTempXml,
+  saveParsedXmlData
 };
