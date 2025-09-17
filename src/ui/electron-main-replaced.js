@@ -136,7 +136,7 @@ ipcMain.handle('save-config', async (event, config) => {
     if (!config.autoSavePath) {
       config.autoSavePath = path.join(app.getPath('documents'), 'PackNodeAutoSaves');
     }
-    
+
     const configPath = path.join(__dirname, '../../config.json');
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
     return { success: true };
@@ -152,7 +152,7 @@ ipcMain.handle('select-directory', async (event, title) => {
     title: title || '选择目录',
     properties: ['openDirectory']
   });
-  
+
   if (!result.canceled && result.filePaths.length > 0) {
     return result.filePaths[0];
   }
@@ -160,19 +160,22 @@ ipcMain.handle('select-directory', async (event, title) => {
 });
 
 ipcMain.handle('open-directory', async (event, dirPath) => {
-  if (!fs.existsSync(dirPath)) {
-    return { success: false, error: '目录不存在' };
-  }
-  
-  // 在 Windows 上打开目录
-  exec(`start "" "${dirPath}"`, (error) => {
-    if (error) {
-      console.error('打开目录失败:', error);
-      return { success: false, error: error.message };
+  return new Promise((resolve) => {
+    if (!fs.existsSync(dirPath)) {
+      return resolve({ success: false, error: '目录不存在' });
     }
-    return { success: true };
+
+    // 在 Windows 上打开目录
+    exec(`start "" "${dirPath}"`, (error) => {
+      if (error) {
+        console.error('打开目录失败:', error);
+        return resolve({ success: false, error: error.message });
+      }
+      resolve({ success: true });
+    });
   });
-  
+});
+
   return { success: true };
 });
 
@@ -182,20 +185,20 @@ ipcMain.handle('start-processing', async () => {
     if (isProcessing) {
       return { success: false, message: '处理已在进行中' };
     }
-    
+
     isProcessing = true;
     if (mainWindow) {
       mainWindow.webContents.send('processing-status', { status: 'started' });
     }
-    
+
     // 调用主程序的处理函数
     const result = await processAllCustomers();
-    
+
     isProcessing = false;
     if (mainWindow) {
       mainWindow.webContents.send('processing-status', { status: 'completed', result });
     }
-    
+
     return { success: true, message: '处理完成', result };
   } catch (error) {
     console.error('启动处理失败:', error);

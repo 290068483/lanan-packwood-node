@@ -2,9 +2,6 @@
 // 在渲染进程和主进程之间建立安全通信桥梁
 
 const { contextBridge, ipcRenderer } = require('electron');
-const { dialog } = require('electron').remote;
-const fs = require('fs');
-const path = require('path');
 
 // 暴露安全的 API 给渲染进程
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -28,7 +25,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 自动保存相关
   startAutoSaveCustomer: () => ipcRenderer.invoke('start-auto-save-customer'),
   startAutoSaveWorker: () => ipcRenderer.invoke('start-auto-save-worker'),
-  viewAutoSaveData: () => ipcRenderer.invoke('view-auto-save-data')
+  viewAutoSaveData: () => ipcRenderer.invoke('view-auto-save-data'),
+  
+  // 监听主进程发送的事件
+  onProcessingStatus: (callback) => ipcRenderer.on('processing-status', (event, data) => callback(data)),
+  onUncaughtError: (callback) => ipcRenderer.on('uncaught-error', (event, data) => callback(data)),
+  onUnhandledRejection: (callback) => ipcRenderer.on('unhandled-rejection', (event, data) => callback(data))
 });
 
 // 添加 DOM 加载完成事件监听

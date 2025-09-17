@@ -9,6 +9,18 @@ const { checkDataIntegrity } = require('./utils/data-integrity-check');
 const CleanupTask = require('./utils/cleanup-task');
 const DataManager = require('./utils/data-manager');
 
+// 添加Electron支持
+let isElectron = false;
+
+try {
+  // 尝试检测Electron环境
+  if (process.versions && process.versions.electron) {
+    isElectron = true;
+  }
+} catch (e) {
+  // Electron环境不可用
+}
+
 // 读取配置文件
 const configPath = path.join(__dirname, '../config.json');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
@@ -49,7 +61,7 @@ async function processAllCustomers() {
     const sourceBaseDir = config.sourcePath;
     if (!fs.existsSync(sourceBaseDir)) {
       console.log(`❌ 源基础目录不存在: ${sourceBaseDir}`);
-      return;
+      return { successCount: 0, totalCustomers: 0 };
     }
 
     // 读取所有客户目录
@@ -102,13 +114,24 @@ async function processAllCustomers() {
       }
     }
     */
+    
+    return { successCount, totalCustomers };
   } catch (error) {
     console.error('处理客户数据时发生错误:', error);
+    throw error;
   }
 }
 
 // 程序入口点
 async function main() {
+  // 如果在Electron环境中，不要立即执行，而是等待UI触发
+  if (isElectron) {
+    console.log(' Electron环境中，等待UI触发处理...');
+    // 在Electron环境中，我们导出函数供UI调用
+    return;
+  }
+  
+  // 在非Electron环境中，直接执行
   await processAllCustomers();
 }
 
