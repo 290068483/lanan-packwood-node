@@ -58,6 +58,19 @@ class DataManager {
     return db.customers.find(c => c.name === name);
   }
 
+  // 根据名称删除客户信息
+  static removeCustomer(name) {
+    const db = this.readDB();
+    const customerIndex = db.customers.findIndex(c => c.name === name);
+
+    if (customerIndex >= 0) {
+      db.customers.splice(customerIndex, 1);
+      this.writeDB(db);
+      return true;
+    }
+    return false;
+  }
+
   // getCustomer的别名方法
   static getCustomer(name) {
     return this.getCustomerByName(name);
@@ -85,7 +98,7 @@ class DataManager {
     });
     this.writeDB(db);
   }
- 
+
 
 
   // 获取历史记录
@@ -95,19 +108,7 @@ class DataManager {
     return db.history.slice(-limit);
   }
 
-  // 定时清理旧数据（保留最近30天）
-  static cleanupOldData(daysToKeep = 30) {
-    const db = this.readDB();
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    // 清理旧的历史记录
-    db.history = db.history.filter(record => new Date(record.timestamp) >= cutoffDate);
-
-    this.writeDB(db);
-
-    // 注意：这里不清理客户信息，因为您提到前期不会删除客户数据
-  }
 
   // 保存设置
   static saveSettings(settings) {

@@ -7,8 +7,8 @@
   "localPath": "C:/Program Files (x86)/MPM/temp/local",
   "networkPath": "//c1/mpm/temp/local/test",
   "targetFileName": "打包明细.xlsx",
-  "workerPackagesPath": "D:/backup_data/backup/worker",
-  "customerPackedPath": "D:/backup_data/backup/customer",
+  "workerPackagesPath": "D:/backup_data/backup",
+  "customerPackedPath": "D:/backup_data/backup",
   "autoSave": {
     "enabled": true,
     "changeDetection": "当packages.json数据发生变化时，自动保存已打包的数据",
@@ -17,8 +17,8 @@
     "keepTime": 0,
     "compress": false
   },
-  "autoSaveCustomerPath": "D:/backup_data/backup/customer",
-  "autoSaveWorkerPath": "D:/backup_data/backup/worker",
+  "autoSaveCustomerPath": "D:/backup_data/backup",
+  "autoSaveWorkerPath": "D:/backup_data/backup",
   "customFileNameFomat": "250901 {customerName}#",
   "enableNetworkSync": false,
   "outputXmlName": "250901 {customerName}.xml",

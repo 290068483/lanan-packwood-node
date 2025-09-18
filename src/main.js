@@ -7,7 +7,7 @@ const { processCustomerData } = require('./utils/customer-data-processor');
 const { checkDataIntegrity } = require('./utils/data-integrity-check');
 // 注释掉不存在的模块引用
 // const { networkMonitor } = require('./network/network-monitor');
-const CleanupTask = require('./utils/cleanup-task');
+
 const DataManager = require('./utils/data-manager');
 const EnhancedFileWatcher = require('./utils/enhanced-file-watcher');
 
@@ -49,8 +49,7 @@ function getCustomerDirectoryName(customerName) {
   return `${dateStr}_${customerName}`;
 }
 
-// 启动定时清理任务
-CleanupTask.start();
+
 
 // 初始化并启动增强的文件监控器
 let fileWatcher = null;
@@ -60,7 +59,15 @@ function initFileWatcher() {
   }
 
   fileWatcher = new EnhancedFileWatcher({
-    workerPackagesPath: config.localPath
+    workerPackagesPath: config.localPath,
+    sourcePath: config.sourcePath
+  });
+
+  // 添加UI更新回调函数
+  fileWatcher.addUIUpdateCallback((eventType, data) => {
+    console.log(`UI更新事件: ${eventType}`, data);
+    // 这里可以添加WebSocket或HTTP通知逻辑
+    // 目前先记录日志，后续可以扩展为实时通知
   });
 
   // 添加回调函数，当检测到packages.json变化时更新客户状态
@@ -98,8 +105,10 @@ function initFileWatcher() {
 
   // 启动文件监控
   try {
-    fileWatcher.start('onChange', 5);
-    logInfo('SYSTEM', 'FILE_WATCHER', '文件监控已启动');
+    fileWatcher.start('onChange');
+    fileWatcher.watchSourceDirectory();
+    logInfo('SYSTEM', 'FILE_WATCHER', '文件监控已启动（实时模式）');
+    logInfo('SYSTEM', 'FILE_WATCHER', '源目录监控已启动（实时检测新增/删除客户）');
   } catch (error) {
     logError('SYSTEM', 'FILE_WATCHER', `启动文件监控失败: ${error.message}`);
   }

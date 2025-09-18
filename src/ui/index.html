@@ -748,6 +748,9 @@
         await loadCustomers();
         await loadConfigToModal();
 
+        // 启动定时刷新（每30秒刷新一次客户数据）
+        startAutoRefresh();
+
         // 在Electron环境中注册事件监听器
         if (isElectron) {
           // 监听处理状态更新
@@ -786,6 +789,29 @@
           });
         }
       });
+
+      // 自动刷新定时器
+      let autoRefreshTimer = null;
+
+      // 启动自动刷新
+      function startAutoRefresh() {
+        if (autoRefreshTimer) {
+          clearInterval(autoRefreshTimer);
+        }
+        // 每30秒刷新一次客户数据
+        autoRefreshTimer = setInterval(async () => {
+          await loadCustomers();
+          console.log('自动刷新客户数据完成');
+        }, 30000); // 30秒
+      }
+
+      // 停止自动刷新
+      function stopAutoRefresh() {
+        if (autoRefreshTimer) {
+          clearInterval(autoRefreshTimer);
+          autoRefreshTimer = null;
+        }
+      }
 
       // 刷新按钮事件
       document

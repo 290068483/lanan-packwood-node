@@ -5,6 +5,7 @@ const { logInfo, logError, logWarning, logSuccess } = require('./logger');
 const customerStatusManager = require('./customer-status-manager');
 const PackageDataExtractor = require('./package-data-extractor');
 const DataManager = require('./data-manager');
+const { processCustomerData } = require('../main');
 
 /**
  * 增强的文件监控器类
@@ -18,6 +19,7 @@ class EnhancedFileWatcher {
   constructor(config) {
     this.config = config;
     this.workerPackagesPath = config.workerPackagesPath.trim();
+    this.sourcePath = config.sourcePath.trim();
     this.callbacks = [];
     this.watchers = [];
     this.intervalTimers = [];
@@ -55,6 +57,160 @@ class EnhancedFileWatcher {
         console.error('执行回调函数时出错:', error);
       }
     });
+  }
+
+  /**
+   * 添加UI更新回调函数
+   * @param {Function} callback - UI更新回调函数
+   */
+  addUIUpdateCallback(callback) {
+    this.uiUpdateCallback = callback;
+  }
+
+  /**
+   * 触发UI更新回调
+   * @param {string} eventType - 事件类型（customerAdded/customerRemoved/customerUpdated）
+   * @param {Object} data - 事件数据
+   */
+  triggerUIUpdate(eventType, data) {
+    if (this.uiUpdateCallback) {
+      try {
+        this.uiUpdateCallback(eventType, data);
+      } catch (error) {
+        console.error('执行UI更新回调时出错:', error);
+      }
+    }
+  }
+
+  /**
+   * 监控源数据目录变化 - 实时检测新增/删除客户
+   */
+  watchSourceDirectory() {
+    // 检查源目录是否存在
+    if (!fs.existsSync(this.sourcePath)) {
+      console.log(`源目录不存在: ${this.sourcePath}`);
+      return null;
+    }
+
+    // 保存当前目录状态
+    let lastDirs = new Set();
+    try {
+      const dirs = fs.readdirSync(this.sourcePath).filter(dir => {
+        const fullPath = path.join(this.sourcePath, dir);
+        return fs.statSync(fullPath).isDirectory();
+      });
+      lastDirs = new Set(dirs);
+    } catch (error) {
+      console.log('读取源目录出错:', error.message);
+      return null;
+    }
+
+    console.log(`开始监控源目录: ${this.sourcePath}`);
+
+    // 启动目录监控
+    const watcher = fs.watch(this.sourcePath, async (eventType, filename) => {
+      if (eventType === 'rename') {
+        try {
+          // 检查目录是否仍然存在
+          if (!fs.existsSync(this.sourcePath)) {
+            return;
+          }
+
+          // 读取当前目录状态
+          const currentDirs = new Set(fs.readdirSync(this.sourcePath).filter(dir => {
+            const fullPath = path.join(this.sourcePath, dir);
+            return fs.statSync(fullPath).isDirectory();
+          }));
+
+          // 检测新增的目录
+          const addedDirs = [...currentDirs].filter(dir => !lastDirs.has(dir));
+          // 检测删除的目录
+          const removedDirs = [...lastDirs].filter(dir => !currentDirs.has(dir));
+
+          // 处理新增的客户目录
+          for (const dir of addedDirs) {
+            console.log(`检测到新增客户目录: ${dir}`);
+            await this.processNewCustomer(dir);
+          }
+
+          // 处理删除的客户目录
+          for (const dir of removedDirs) {
+            console.log(`检测到删除客户目录: ${dir}`);
+            await this.processRemovedCustomer(dir);
+          }
+
+          // 更新目录状态
+          lastDirs = currentDirs;
+        } catch (error) {
+          console.error('监控源目录变化时发生错误:', error);
+        }
+      }
+    });
+
+    this.watchers.push(watcher);
+    console.log('源目录监控已启动');
+    return watcher;
+  }
+
+  /**
+   * 处理新增客户
+   * @param {string} customerDir - 客户目录名称
+   */
+  async processNewCustomer(customerDir) {
+    try {
+      const customerPath = path.join(this.sourcePath, customerDir);
+
+      // 生成输出目录名称
+      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      const customerOutputName = `${dateStr}_${customerDir}`;
+      const customerOutputDir = path.join(this.workerPackagesPath, customerOutputName);
+
+      // 处理客户数据
+      const result = await processCustomerData(customerPath, customerOutputDir, customerDir, this.config);
+
+      // 更新客户状态到数据管理器
+      const customerData = {
+        name: customerDir,
+        sourcePath: customerPath,
+        outputPath: customerOutputDir,
+        status: result !== undefined ? '已处理' : '无数据',
+        lastUpdate: new Date().toISOString(),
+        success: result !== undefined ? result : true
+      };
+      DataManager.upsertCustomer(customerData);
+
+      // 触发UI更新回调
+      this.triggerUIUpdate('customerAdded', customerData);
+
+      console.log(`✅ 新增客户 ${customerDir} 已处理完成`);
+    } catch (error) {
+      console.error(`处理新增客户 ${customerDir} 时出错:`, error.message);
+      DataManager.upsertCustomer({
+        name: customerDir,
+        status: '处理失败',
+        remark: error.message,
+        lastUpdate: new Date().toISOString(),
+        success: false
+      });
+    }
+  }
+
+  /**
+   * 处理删除客户
+   * @param {string} customerDir - 客户目录名称
+   */
+  async processRemovedCustomer(customerDir) {
+    try {
+      // 从数据管理器中移除客户
+      DataManager.removeCustomer(customerDir);
+
+      // 触发UI更新回调
+      this.triggerUIUpdate('customerRemoved', { name: customerDir });
+
+      console.log(`🗑️ 客户 ${customerDir} 已从数据库中移除`);
+    } catch (error) {
+      console.error(`处理删除客户 ${customerDir} 时出错:`, error.message);
+    }
   }
 
   /**

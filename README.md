@@ -40,7 +40,6 @@ Pack Node 1.0 是一个专业的家具制造行业数据处理工具，主要用
 
 - 支持网络路径数据同步
 - 自动备份功能
-- 定时清理过期数据
 - 支持增量同步以提高效率
 
 ### 6. 容错处理与日志记录
@@ -55,14 +54,15 @@ Pack Node 1.0 是一个专业的家具制造行业数据处理工具，主要用
 ### 架构设计
 
 本系统采用混合架构，结合文件系统和数据库：
+
 ```
 源XML文件 → 后台服务 → 数据库 → API → 前端界面
 ```
 
-- **文件系统层**：存储原始XML文件和数据
-- **后台服务层**：从源系统读取，解析XML，更新数据库，提供高效查询
+- **文件系统层**：存储原始 XML 文件和数据
+- **后台服务层**：从源系统读取，解析 XML，更新数据库，提供高效查询
 - **数据库层**：存储客户状态和进度信息，支持复杂查询
-- **API层**：提供REST API接口处理前端请求
+- **API 层**：提供 REST API 接口处理前端请求
 - **前端界面层**：显示状态和进度，处理状态变更
 
 ### 核心依赖
@@ -170,24 +170,24 @@ npm run electron
 - `autoSave`: 自动保存配置
 - `enableNetworkSync`: 网络同步开关
 
-## API接口
+## API 接口
 
-系统提供以下REST API接口：
+系统提供以下 REST API 接口：
 
-### 客户数据API
+### 客户数据 API
 
 - `GET /api/customers` - 获取所有客户数据
 - `GET /api/customers/{name}/details` - 获取客户详细信息
 - `GET /api/customers/status/{status}` - 按状态筛选客户
 
-### 客户状态管理API
+### 客户状态管理 API
 
 - `POST /api/customers/{name}/check-status` - 检查客户状态
 - `POST /api/customers/{name}/archive` - 归档客户
 - `POST /api/customers/{name}/ship` - 出货
 - `POST /api/customers/{name}/mark-not-shipped` - 标记为未出货
 
-### 数据同步API
+### 数据同步 API
 
 - `GET /api/sync/status` - 获取数据同步服务状态
 
@@ -196,6 +196,7 @@ npm run electron
 系统生成的文件包含以下结构：
 
 ### XML 文件
+
 - Root 根元素
 - Cabinet 节点（包含客户和订单属性）
 - Panels 集合
@@ -203,8 +204,9 @@ npm run electron
 - LabelInfo、EdgeGroup、Machines 等子元素
 
 ### Excel 文件
+
 - 客户信息标题行
-- 表头行（标签号、ID号、方案板号、基材和颜色等19列）
+- 表头行（标签号、ID 号、方案板号、基材和颜色等 19 列）
 - 数据行（每个板件一行）
 - 自动计算的面积列
 - 已打包数据的灰色背景标记
@@ -221,6 +223,7 @@ npm run electron
 项目包含完整的单元测试，覆盖主要功能模块：
 
 ### 运行测试
+
 ```bash
 # 运行所有测试
 npm test
@@ -233,8 +236,9 @@ npm run test:coverage
 ```
 
 ### 测试覆盖范围
+
 - **状态管理测试** (`tests/status-manager.test.js`): 测试客户状态管理功能
-- **API测试** (`tests/server-api.test.js`): 测试服务器API接口
+- **API 测试** (`tests/server-api.test.js`): 测试服务器 API 接口
 - **前端测试** (`tests/frontend.test.js`): 测试前端界面功能
 
 ## 开发说明
@@ -242,11 +246,13 @@ npm run test:coverage
 项目使用 Git 进行版本控制，包含完整的提交历史。主要功能模块都经过测试，能够稳定运行。
 
 ### 开发环境要求
+
 - Node.js >= 18.0.0
 - npm 或 pnpm 包管理器
 - SQLite3 数据库支持
 
 ### 项目启动
+
 ```bash
 # 开发模式运行
 npm run dev
