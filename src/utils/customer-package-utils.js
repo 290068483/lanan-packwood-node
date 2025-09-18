@@ -19,6 +19,15 @@ class CustomerPackageUtils {
   }
 
   /**
+   * 从文件路径提取客户名称
+   * @param {string} filePath - 文件路径
+   * @returns {string} 客户名称
+   */
+  static extractCustomerName(filePath) {
+    return PackageDataExtractor.extractCustomerName(filePath);
+  }
+
+  /**
    * 保存客户打包数据到指定路径
    * @param {string} sourcePath - 源路径（packages.json路径）
    * @param {string} targetPath - 目标路径（客户已打包数据存储路径）
@@ -34,7 +43,7 @@ class CustomerPackageUtils {
 
       // 生成时间戳
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      
+
       // 构建保存路径
       const customerName = path.basename(path.dirname(sourcePath));
       const saveDir = path.join(targetPath, customerName, timestamp);
@@ -53,7 +62,7 @@ class CustomerPackageUtils {
       const savePath = path.join(saveDir, `customer-package-${timestamp}.json`);
       fs.writeFileSync(savePath, JSON.stringify(customerPackages, null, 2), 'utf8');
       console.log(`客户打包数据已保存到: ${savePath}`);
-      
+
       // 如果启用压缩，创建ZIP文件
       let zipPath = null;
       if (compress) {
@@ -61,12 +70,12 @@ class CustomerPackageUtils {
         const filePaths = [savePath];
         await FileCompressor.compressFilesToZip(filePaths, zipPath);
         console.log(`客户打包数据已压缩保存到: ${zipPath}`);
-        
+
         // 删除原始JSON文件
         fs.unlinkSync(savePath);
         return [zipPath];
       }
-      
+
       return [savePath];
     } catch (error) {
       console.error(`保存客户打包数据时发生错误: ${error.message}`);
@@ -87,7 +96,7 @@ class CustomerPackageUtils {
     }
 
     const packagesPath = path.join(config.workerPackagesPath, 'packages.json');
-    
+
     // 立即执行一次保存
     this.saveCustomerPackageData(
       packagesPath,
@@ -108,13 +117,14 @@ class CustomerPackageUtils {
     console.log(`客户打包数据自动保存已启动，间隔: ${intervalMinutes} 分钟`);
     return timer;
   }
-  
+
   /**
    * 根据配置启动自动保存（支持保存模式切换）
    * @param {Object} config - 配置对象
+   * @param {string} customerName - 客户名称（可选）
    * @returns {NodeJS.Timeout|fs.FSWatcher} 定时器对象或文件监视器
    */
-  static startAutoSave(config) {
+  static startAutoSave(config, customerName = null) {
     // 验证配置
     if (!config || !config.workerPackagesPath || !config.customerPackedPath) {
       throw new Error('配置对象必须包含workerPackagesPath和customerPackedPath');
@@ -129,13 +139,22 @@ class CustomerPackageUtils {
     // 获取保存模式和相关配置
     const saveMode = config.autoSave.saveMode || 'onChange';
     const intervalMinutes = config.autoSave.intervalMinutes || 5;
-    
+
     // 创建文件监控器
     const fileWatcher = new FileWatcher(config);
-    
+
     // 添加回调函数
     fileWatcher.addCallback(async (filePath) => {
       try {
+        // 如果指定了客户名称，检查文件路径是否匹配
+        if (customerName) {
+          const fileCustomerName = this.extractCustomerName(filePath);
+          if (fileCustomerName !== customerName) {
+            // 如果不匹配，跳过处理
+            return;
+          }
+        }
+
         await this.saveCustomerPackageData(
           filePath,
           config.customerPackedPath.trim(), // 保持路径处理一致
@@ -145,11 +164,11 @@ class CustomerPackageUtils {
         console.error('保存客户打包数据时发生错误:', error);
       }
     });
-    
-    // 启动监控
-    return fileWatcher.start(saveMode, intervalMinutes);
+
+    // 启动监控，传递客户名称参数
+    return fileWatcher.start(saveMode, intervalMinutes, customerName);
   }
-  
+
   /**
    * 扫描并处理所有客户目录
    * @param {Object} config - 配置对象
@@ -157,13 +176,13 @@ class CustomerPackageUtils {
   static scanAndProcessAllCustomers(config) {
     try {
       const workerPackagesPath = config.workerPackagesPath;
-      
+
       // 检查目录是否存在
       if (!fs.existsSync(workerPackagesPath)) {
         console.log(`工人打包数据目录不存在: ${workerPackagesPath}`);
         return;
       }
-      
+
       // 检查是否有直接的packages.json文件
       const packagesPath = path.join(workerPackagesPath, 'packages.json');
       if (fs.existsSync(packagesPath)) {
@@ -177,7 +196,7 @@ class CustomerPackageUtils {
         });
         return;
       }
-      
+
       // 读取目录中的所有子目录
       let customerDirs = [];
       try {
@@ -190,9 +209,9 @@ class CustomerPackageUtils {
         console.log('读取客户目录时出错:', error.message);
         return;
       }
-      
+
       console.log(`发现 ${customerDirs.length} 个客户目录`);
-      
+
       // 处理每个客户目录
       customerDirs.forEach(dir => {
         const packagesPath = path.join(workerPackagesPath, dir, 'packages.json');
@@ -220,7 +239,7 @@ if (require.main === module) {
   // 加载配置文件
   const configPath = path.join(__dirname, '..', '..', 'config.json');
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  
+
   // 启动自动保存
   CustomerPackageUtils.startAutoSave(config);
 }

@@ -43,22 +43,23 @@ class FileWatcher {
 
   /**
    * onChange模式 - 实时文件监控
+   * @param {string} customerName - 客户名称（可选）
    */
-  watchOnChange() {
+  watchOnChange(customerName = null) {
     // 检查目录是否存在
     if (!fs.existsSync(this.workerPackagesPath)) {
       console.log(`目录不存在: ${this.workerPackagesPath}`);
       return null;
     }
-    
+
     // 检查是否有顶层packages.json文件
     const topLevelPackagesPath = path.join(this.workerPackagesPath, 'packages.json');
     if (fs.existsSync(topLevelPackagesPath)) {
       console.log('直接监控顶层文件:', topLevelPackagesPath);
-      
+
       // 保存当前文件内容
       let lastContent = fs.readFileSync(topLevelPackagesPath, 'utf8');
-      
+
       // 启动文件监控
       const watcher = fs.watch(topLevelPackagesPath, (eventType) => {
         if (eventType === 'change') {
@@ -67,10 +68,10 @@ class FileWatcher {
             if (!fs.existsSync(topLevelPackagesPath)) {
               return;
             }
-            
+
             // 读取新内容
             const newContent = fs.readFileSync(topLevelPackagesPath, 'utf8');
-            
+
             // 如果内容发生变化
             if (newContent !== lastContent) {
               console.log(`检测到 packages.json 内容变化`);
@@ -84,7 +85,7 @@ class FileWatcher {
           }
         }
       });
-      
+
       this.watchers.push(watcher);
     } else {
       // 如果没有顶层packages.json文件，则监控子目录中的文件
@@ -99,22 +100,28 @@ class FileWatcher {
         console.log('读取客户目录出错:', error.message);
         return null;
       }
-      
-      console.log(`监控 ${customerDirs.length} 个客户目录`);
-      
+
+      // 如果指定了客户名称，过滤客户目录
+      if (customerName) {
+        customerDirs = customerDirs.filter(dir => dir.includes(customerName));
+        console.log(`监控 ${customerDirs.length} 个匹配的客户目录`);
+      } else {
+        console.log(`监控 ${customerDirs.length} 个客户目录`);
+      }
+
       // 为每个客户目录创建文件监视器
       customerDirs.forEach(dir => {
         const packagesPath = path.join(this.workerPackagesPath, dir, 'packages.json');
-        
+
         // 检查文件是否存在
         if (!fs.existsSync(packagesPath)) {
           console.log(`文件不存在: ${packagesPath}`);
           return;
         }
-        
+
         // 保存当前文件内容
         let lastContent = fs.readFileSync(packagesPath, 'utf8');
-        
+
         // 启动文件监控
         const watcher = fs.watch(packagesPath, (eventType) => {
           if (eventType === 'change') {
@@ -123,10 +130,10 @@ class FileWatcher {
               if (!fs.existsSync(packagesPath)) {
                 return;
               }
-              
+
               // 读取新内容
               const newContent = fs.readFileSync(packagesPath, 'utf8');
-              
+
               // 如果内容发生变化
               if (newContent !== lastContent) {
                 console.log(`检测到 ${dir} 的packages.json内容变化`);
@@ -140,11 +147,11 @@ class FileWatcher {
             }
           }
         });
-        
+
         this.watchers.push(watcher);
       });
     }
-    
+
     console.log('文件监控已启动（onChange模式）');
     return this.watchers;
   }
@@ -152,22 +159,23 @@ class FileWatcher {
   /**
    * onInterval模式 - 定时检查
    * @param {number} intervalMinutes - 检查间隔（分钟）
+   * @param {string} customerName - 客户名称（可选）
    */
-  watchOnInterval(intervalMinutes = 5) {
+  watchOnInterval(intervalMinutes = 5, customerName = null) {
     // 检查目录是否存在
     if (!fs.existsSync(this.workerPackagesPath)) {
       console.log(`目录不存在: ${this.workerPackagesPath}`);
       return null;
     }
-    
+
     const packagesPath = path.join(this.workerPackagesPath, 'packages.json');
     let customerDirs = [];
-    
+
     // 如果有直接的packages.json文件
     if (fs.existsSync(packagesPath)) {
       // 立即执行一次检查
       this.triggerCallbacks(packagesPath);
-      
+
       customerDirs = ['.']; // 虚拟目录
       console.log('监控单个 packages.json 文件');
     } else {
@@ -182,7 +190,13 @@ class FileWatcher {
         console.log('读取客户目录出错:', error.message);
         return null;
       }
-      
+
+      // 如果指定了客户名称，过滤客户目录
+      if (customerName) {
+        customerDirs = customerDirs.filter(dir => dir.includes(customerName));
+        console.log(`监控 ${customerDirs.length} 个匹配的客户目录`);
+      }
+
       // 立即执行一次检查
       customerDirs.forEach(dir => {
         const packagesPath = path.join(this.workerPackagesPath, dir, 'packages.json');
@@ -191,7 +205,7 @@ class FileWatcher {
         }
       });
     }
-    
+
     // 设置定时器
     const interval = intervalMinutes * 60 * 1000; // 转换为毫秒
     const intervalTimer = setInterval(() => {
@@ -210,9 +224,9 @@ class FileWatcher {
         });
       }
     }, interval);
-    
+
     this.intervalTimers.push(intervalTimer);
-    
+
     console.log(`文件监控已启动（onInterval模式），间隔: ${intervalMinutes} 分钟`);
     return this.intervalTimers;
   }
@@ -221,13 +235,14 @@ class FileWatcher {
    * 启动文件监控
    * @param {string} mode - 监控模式（onChange/onInterval）
    * @param {number} intervalMinutes - 检查间隔（分钟，仅在onInterval模式下使用）
+   * @param {string} customerName - 客户名称（可选）
    */
-  start(mode = 'onChange', intervalMinutes = 5) {
+  start(mode = 'onChange', intervalMinutes = 5, customerName = null) {
     switch (mode) {
       case 'onChange':
-        return this.watchOnChange();
+        return this.watchOnChange(customerName);
       case 'onInterval':
-        return this.watchOnInterval(intervalMinutes);
+        return this.watchOnInterval(intervalMinutes, customerName);
       default:
         throw new Error('无效的监控模式，支持的模式: onChange, onInterval');
     }
@@ -244,7 +259,7 @@ class FileWatcher {
       }
     });
     this.watchers = [];
-    
+
     // 清除所有定时器
     this.intervalTimers.forEach(timer => {
       if (timer && typeof timer.unref === 'function') {
@@ -252,7 +267,7 @@ class FileWatcher {
       }
     });
     this.intervalTimers = [];
-    
+
     console.log('文件监控已停止');
   }
 }
