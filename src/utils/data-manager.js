@@ -58,6 +58,11 @@ class DataManager {
     return db.customers.find(c => c.name === name);
   }
 
+  // getCustomer的别名方法
+  static getCustomer(name) {
+    return this.getCustomerByName(name);
+  }
+
   // 更新客户打包状态
   static updateCustomerStatus(name, status, remark = '') {
     const db = this.readDB();

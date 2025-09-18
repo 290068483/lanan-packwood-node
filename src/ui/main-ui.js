@@ -17,7 +17,9 @@ class MainUI {
 
   // 加载客户数据
   loadCustomers() {
-    this.customers = DataManager.getAllCustomers();
+    const customersData = DataManager.getAllCustomers();
+    // 确保返回的是数组
+    this.customers = Array.isArray(customersData) ? customersData : [];
     console.log(`已加载 ${this.customers.length} 个客户数据`);
   }
 
@@ -48,6 +50,12 @@ class MainUI {
     console.log(
       '---------------------------------------------------------------------'
     );
+
+    // 确保customers是数组
+    if (!Array.isArray(this.customers)) {
+      console.log('数据格式错误：customers不是数组');
+      this.customers = [];
+    }
 
     if (this.customers.length === 0) {
       console.log('暂无客户数据');
@@ -85,9 +93,8 @@ class MainUI {
     if (parts.length <= 2) {
       return fullPath;
     }
-    return `...${path.sep}${parts[parts.length - 2]}${path.sep}${
-      parts[parts.length - 1]
-    }`;
+    return `...${path.sep}${parts[parts.length - 2]}${path.sep}${parts[parts.length - 1]
+      }`;
   }
 
   // 选择源地址

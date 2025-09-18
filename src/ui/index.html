@@ -349,20 +349,6 @@
         background-color: #e74c3c;
       }
 
-      .auto-save-toggle {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-weight: bold;
-        margin-left: auto;
-      }
-
-      .auto-save-toggle input[type='checkbox'] {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-      }
-
       /* 配置区域样式 */
       .config-section {
         margin-bottom: 20px;
@@ -468,10 +454,6 @@
           查看自动保存路径
         </button>
         <button id="refreshBtn">刷新数据</button>
-        <label class="auto-save-toggle">
-          自动保存:
-          <input type="checkbox" id="autoSaveToggle" checked />
-        </label>
         <button id="configBtn" class="config-button">打开路径配置</button>
       </div>
 
@@ -982,13 +964,30 @@
       async function loadCustomers() {
         try {
           // 从数据库获取客户数据
-          const response = await fetch('/api/customers');
-          const customers = await response.json();
+          let customers;
+          if (isElectron) {
+            // 在Electron环境中，通过IPC获取客户数据
+            customers = await window.electronAPI.getCustomers();
+          } else {
+            // 在Web环境中，通过API获取客户数据
+            const response = await fetch('/api/customers');
+            customers = await response.json();
+          }
+
+          // 如果是Electron环境且返回的是对象（包含success属性），提取customers数组
+          if (
+            isElectron &&
+            customers &&
+            typeof customers === 'object' &&
+            customers.success
+          ) {
+            customers = customers.customers || [];
+          }
 
           const tbody = document.querySelector('#customersTable tbody');
           tbody.innerHTML = '';
 
-          if (customers.length === 0) {
+          if (!customers || customers.length === 0) {
             const row = document.createElement('tr');
             row.innerHTML = `
                         <td colspan="6" style="text-align: center; font-style: italic; color: #7f8c8d;">
@@ -1180,24 +1179,6 @@
           showNotification('保存配置出错: ' + error.message, 'error');
         }
       }
-
-      // 自动保存开关功能
-      let autoSaveEnabled = true;
-      const autoSaveToggle = document.getElementById('autoSaveToggle');
-
-      // 初始化自动保存状态
-      autoSaveEnabled = autoSaveToggle.checked;
-
-      // 添加自动保存开关事件监听器
-      autoSaveToggle.addEventListener('change', function () {
-        autoSaveEnabled = this.checked;
-        showNotification(
-          autoSaveEnabled ? '自动保存功能已开启' : '自动保存功能已关闭'
-        );
-
-        // 可以在这里添加与自动保存相关的逻辑
-        // 例如，如果关闭自动保存，可以清除相关的定时器等
-      });
 
       // 按钮事件处理
       document

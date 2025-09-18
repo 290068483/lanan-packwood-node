@@ -58,44 +58,44 @@ function initFileWatcher() {
   if (fileWatcher) {
     fileWatcher.stop();
   }
-  
+
   fileWatcher = new EnhancedFileWatcher({
     workerPackagesPath: config.localPath
   });
-  
+
   // 添加回调函数，当检测到packages.json变化时更新客户状态
   fileWatcher.addCallback(async (filePath, changes) => {
     try {
       console.log(`检测到文件变化: ${filePath}`);
-      
+
       // 从文件路径提取客户名称
       const dirName = path.basename(path.dirname(filePath));
       const customerName = dirName.replace(/\d{6}_/, '').replace(/[#.]$/, '');
-      
+
       console.log(`客户名称: ${customerName}`);
-      
+
       // 从数据管理器获取客户数据
-      const customerData = await DataManager.getCustomer(customerName);
+      const customerData = DataManager.getCustomerByName(customerName);
       if (customerData) {
         // 保存更新后的数据
-        await DataManager.upsertCustomer(changes.customerData);
-        
+        DataManager.upsertCustomer(changes.customerData);
+
         logSuccess(
-          customerName, 
-          'FILE_WATCHER', 
+          customerName,
+          'FILE_WATCHER',
           `客户状态已更新: ${changes.status} (${changes.packProgress}%)`
         );
       }
     } catch (error) {
       console.error(`处理文件变化时出错: ${error.message}`);
       logError(
-        'FILE_WATCHER', 
-        'FILE_WATCHER', 
+        'FILE_WATCHER',
+        'FILE_WATCHER',
         `处理文件变化时出错: ${error.message}`
       );
     }
   });
-  
+
   // 启动文件监控
   try {
     fileWatcher.start('onChange', 5);
@@ -154,7 +154,12 @@ async function processAllCustomers() {
         });
       } catch (error) {
         console.error(`✗ 处理客户 ${customerDir} 时出错:`, error.message);
-        DataManager.updateCustomerStatus(customerDir, '处理失败', error.message);
+        DataManager.upsertCustomer({
+          name: customerDir,
+          status: '处理失败',
+          remark: error.message,
+          lastUpdate: new Date().toISOString()
+        });
       }
     }
 

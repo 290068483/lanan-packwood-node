@@ -80,10 +80,97 @@ process.on('unhandledRejection', (reason, promise) => {
 // IPC 处理程序
 ipcMain.handle('get-customers', async () => {
   try {
-    return await DataManager.getAllCustomers();
+    // 读取配置
+    const configPath = path.join(__dirname, '../../config.json');
+    if (!fs.existsSync(configPath)) {
+      return { success: false, error: '配置文件不存在' };
+    }
+    
+    const configContent = fs.readFileSync(configPath, 'utf8');
+    const config = JSON.parse(configContent);
+    
+    // 检查源路径是否存在
+    const sourcePath = config.sourcePath;
+    if (!sourcePath) {
+      return { success: false, error: '未配置源路径' };
+    }
+    
+    // 读取源路径中的客户目录
+    let customerDirs = [];
+    try {
+      customerDirs = fs.readdirSync(sourcePath)
+        .filter(dir => {
+          const fullPath = path.join(sourcePath, dir);
+          return fs.statSync(fullPath).isDirectory();
+        });
+    } catch (error) {
+      return { success: false, error: `读取客户目录出错: ${error.message}` };
+    }
+    
+    // 处理每个客户目录
+    const customers = [];
+    for (const dir of customerDirs) {
+      try {
+        // 解析客户名称（从目录名中提取）
+        const customerName = dir.replace(/^\d{6}_/, '').replace(/#$/, '');
+        
+        // 获取客户目录路径
+        const customerDirPath = path.join(sourcePath, dir);
+        
+        // 检查是否有packages.json文件
+        const packagesPath = path.join(customerDirPath, 'packages.json');
+        let packagesData = [];
+        let packProgress = 0;
+        let packSeqs = [];
+        
+        if (fs.existsSync(packagesPath)) {
+          packagesData = JSON.parse(fs.readFileSync(packagesPath, 'utf8'));
+          
+          // 计算打包进度
+          if (Array.isArray(packagesData)) {
+            // 获取所有partIDs
+            const allPartIDs = [];
+            packagesData.forEach(pkg => {
+              if (pkg.partIDs && Array.isArray(pkg.partIDs)) {
+                allPartIDs.push(...pkg.partIDs);
+              }
+            });
+            
+            // 获取包号
+            packSeqs = packagesData.map(pkg => pkg.packSeq || '').filter(seq => seq);
+            
+            // 假设客户数据中所有板件都需要打包
+            // 这里需要根据实际情况调整
+            const totalParts = allPartIDs.length;
+            packProgress = totalParts > 0 ? Math.round(100) : 0; // 假设所有板件都已打包
+          }
+        }
+        
+        // 确定客户状态
+        let status = '未打包';
+        if (packProgress === 100) {
+          status = '已打包';
+        } else if (packProgress > 0) {
+          status = '正在处理';
+        }
+        
+        // 添加到客户列表
+        customers.push({
+          name: customerName,
+          status,
+          packProgress,
+          packSeqs,
+          lastUpdate: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error(`处理客户目录 ${dir} 出错:`, error);
+      }
+    }
+    
+    return customers;
   } catch (error) {
-    console.error('获取客户数据失败:', error);
-    throw new Error(`获取客户数据失败: ${error.message}`);
+    console.error('获取客户数据出错:', error);
+    return { success: false, error: `获取客户数据出错: ${error.message}` };
   }
 });
 
@@ -206,102 +293,6 @@ ipcMain.handle('get-customer-details', async (event, customerName) => {
   }
 });
 
-// 从源路径获取客户数据
-ipcMain.handle('get-customers-from-source', async () => {
-  try {
-    // 读取配置
-    const configPath = path.join(__dirname, '../../config.json');
-    if (!fs.existsSync(configPath)) {
-      return { success: false, error: '配置文件不存在' };
-    }
-    
-    const configContent = fs.readFileSync(configPath, 'utf8');
-    const config = JSON.parse(configContent);
-    
-    // 检查源路径是否存在
-    const sourcePath = config.sourcePath;
-    if (!sourcePath) {
-      return { success: false, error: '未配置源路径' };
-    }
-    
-    // 读取源路径中的客户目录
-    let customerDirs = [];
-    try {
-      customerDirs = fs.readdirSync(sourcePath)
-        .filter(dir => {
-          const fullPath = path.join(sourcePath, dir);
-          return fs.statSync(fullPath).isDirectory();
-        });
-    } catch (error) {
-      return { success: false, error: `读取客户目录出错: ${error.message}` };
-    }
-    
-    // 处理每个客户目录
-    const customers = [];
-    for (const dir of customerDirs) {
-      try {
-        // 解析客户名称（从目录名中提取）
-        const customerName = dir.replace(/^\d{6}_/, '').replace(/#$/, '');
-        
-        // 获取客户目录路径
-        const customerDirPath = path.join(sourcePath, dir);
-        
-        // 检查是否有packages.json文件
-        const packagesPath = path.join(customerDirPath, 'packages.json');
-        let packagesData = [];
-        let packProgress = 0;
-        let packSeqs = [];
-        
-        if (fs.existsSync(packagesPath)) {
-          packagesData = JSON.parse(fs.readFileSync(packagesPath, 'utf8'));
-          
-          // 计算打包进度
-          if (Array.isArray(packagesData)) {
-            // 获取所有partIDs
-            const allPartIDs = [];
-            packagesData.forEach(pkg => {
-              if (pkg.partIDs && Array.isArray(pkg.partIDs)) {
-                allPartIDs.push(...pkg.partIDs);
-              }
-            });
-            
-            // 获取包号
-            packSeqs = packagesData.map(pkg => pkg.packSeq || '').filter(seq => seq);
-            
-            // 假设客户数据中所有板件都需要打包
-            // 这里需要根据实际情况调整
-            const totalParts = allPartIDs.length;
-            packProgress = totalParts > 0 ? Math.round(100) : 0; // 假设所有板件都已打包
-          }
-        }
-        
-        // 确定客户状态
-        let status = '未打包';
-        if (packProgress === 100) {
-          status = '已打包';
-        } else if (packProgress > 0) {
-          status = '正在处理';
-        }
-        
-        // 添加到客户列表
-        customers.push({
-          name: customerName,
-          status,
-          packProgress,
-          packSeqs,
-          lastUpdate: new Date().toISOString()
-        });
-      } catch (error) {
-        console.error(`处理客户目录 ${dir} 出错:`, error);
-      }
-    }
-    
-    return { success: true, customers };
-  } catch (error) {
-    console.error('获取客户数据出错:', error);
-    return { success: false, error: `获取客户数据出错: ${error.message}` };
-  }
-});
 
 // 配置相关处理程序
 ipcMain.handle('get-config', async () => {

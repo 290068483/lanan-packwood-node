@@ -3,6 +3,7 @@ const path = require('path');
 const FileCompressor = require('./file-compressor');
 const FileWatcher = require('./file-watcher');
 const PackageDataExtractor = require('./package-data-extractor');
+const DataManager = require('./data-manager');
 
 /**
  * 客户打包数据工具类
@@ -28,13 +29,54 @@ class CustomerPackageUtils {
   }
 
   /**
-   * 保存客户打包数据到指定路径
+   * 保存客户打包数据到数据库
+   * @param {string} sourcePath - 源路径（packages.json路径）
+   * @returns {Promise<boolean>} 保存是否成功
+   */
+  static async saveCustomerPackageDataToDB(sourcePath) {
+    try {
+      // 读取packages.json数据
+      const customerPackages = this.extractCustomerPackageData(sourcePath);
+      if (customerPackages.length === 0) {
+        console.log(`没有可保存的客户打包数据: ${sourcePath}`);
+        return false;
+      }
+
+      // 保存到数据库
+      for (const packageData of customerPackages) {
+        const customerData = {
+          name: packageData.customerName,
+          packageInfo: packageData.packageInfo,
+          partIDs: packageData.partIDs,
+          status: packageData.packState === 1 ? '已打包' : '未打包',
+          isReplacement: packageData.isReplacement,
+          replacementStatus: packageData.replacementStatus,
+          lastUpdate: packageData.timestamp
+        };
+
+        DataManager.upsertCustomer(customerData);
+      }
+
+      console.log(`客户打包数据已保存到数据库: ${sourcePath}`);
+      return true;
+    } catch (error) {
+      console.error(`保存客户打包数据到数据库时发生错误: ${error.message}`);
+      return false;
+    }
+  }
+
+  /**
+   * 保存客户打包数据到指定路径（兼容旧版本）
    * @param {string} sourcePath - 源路径（packages.json路径）
    * @param {string} targetPath - 目标路径（客户已打包数据存储路径）
    * @param {boolean} compress - 是否压缩保存
    * @returns {Promise<Array>} 保存的文件路径数组
    */
   static async saveCustomerPackageData(sourcePath, targetPath, compress = true) {
+    // 首先保存到数据库
+    await this.saveCustomerPackageDataToDB(sourcePath);
+
+    // 保持原有的文件保存逻辑（可选）
     try {
       // 创建目标目录
       if (!fs.existsSync(targetPath)) {
@@ -155,11 +197,8 @@ class CustomerPackageUtils {
           }
         }
 
-        await this.saveCustomerPackageData(
-          filePath,
-          config.customerPackedPath.trim(), // 保持路径处理一致
-          config.autoSave && config.autoSave.compress
-        );
+        // 直接保存到数据库，不再保存到本地文件
+        await this.saveCustomerPackageDataToDB(filePath);
       } catch (error) {
         console.error('保存客户打包数据时发生错误:', error);
       }

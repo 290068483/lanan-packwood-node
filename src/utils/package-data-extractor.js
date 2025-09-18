@@ -26,13 +26,13 @@ class PackageDataExtractor {
       // 如果是数组类型，表示是多个打包记录
       if (Array.isArray(packageJson)) {
         return packageJson.map(item => this.processPackageItem(item, packagesPath));
-      } 
-      
+      }
+
       // 如果是对象类型，转换为数组格式
       if (packageJson && typeof packageJson === 'object') {
         return [this.processPackageItem(packageJson, packagesPath)];
       }
-      
+
       return [];
     } catch (error) {
       console.error(`读取packages.json时发生错误: ${error.message}`);
@@ -49,7 +49,7 @@ class PackageDataExtractor {
   static processPackageItem(item, packagesPath) {
     // 从文件路径提取客户名称
     const customerName = this.extractCustomerName(packagesPath);
-    
+
     return {
       customerName: customerName,
       packDate: item.packDate || '',
@@ -58,8 +58,21 @@ class PackageDataExtractor {
       packUserName: item.packUserName || '',
       packState: item.packState || 0,
       partIDs: item.partIDs || [],
-      partIdList: (item.partIDs || []).map(id => 
-        id.substring(id.length - 5, id.length))
+      partIdList: (item.partIDs || []).map(id =>
+        id.substring(id.length - 5, id.length)),
+      // 添加完整的包信息
+      packageInfo: {
+        id: item.packID || '',
+        quantity: item.packQty || 0,
+        state: item.packState || 0,
+        userName: item.packUserName || '',
+        date: item.packDate || ''
+      },
+      // 添加补件状态信息
+      isReplacement: item.isReplacement || false,
+      replacementStatus: item.replacementStatus || '未出货补件',
+      // 添加时间戳
+      timestamp: new Date().toISOString()
     };
   }
 
@@ -72,13 +85,13 @@ class PackageDataExtractor {
     try {
       // 从路径中提取目录名
       const dirName = path.basename(path.dirname(filePath));
-      
+
       // 处理 "YYMMDD 客户名称#" 格式
       const match = dirName.match(/\d{6}\s+(.+)#/);
       if (match) {
         return match[1];
       }
-      
+
       // 默认返回目录名
       return dirName;
     } catch (error) {

@@ -5,7 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "node start-electron.js",
-    "dev": "concurrently \"node src/main.js\" \"npm run electron\" --names \"MAIN,ELECTRON\" --prefix-colors \"green,cyan\"",
+    "dev": "concurrently \"node src/main.js\" \"npm run electron\" \"node src/ui/server.js\" --names \"MAIN,ELECTRON,SERVER\" --prefix-colors \"green,cyan,yellow\"",
     "test": "jest",
     "electron": "node start-electron.js",
     "electron-dev": "cross-env NODE_ENV=development node start-electron.js",

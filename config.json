@@ -15,7 +15,7 @@
     "saveMode": "onChange",
     "intervalMinutes": 5,
     "keepTime": 0,
-    "compress": true
+    "compress": false
   },
   "autoSaveCustomerPath": "D:/backup_data/backup/customer",
   "autoSaveWorkerPath": "D:/backup_data/backup/worker",
