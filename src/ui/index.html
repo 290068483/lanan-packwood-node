@@ -31,8 +31,9 @@
       .button-group {
         display: flex;
         gap: 10px;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         margin-bottom: 15px;
+        align-items: center;
       }
 
       button {
@@ -462,7 +463,6 @@
     </div>
 
     <div class="control-panel">
-      <h2>打开文件路径</h2>
       <div class="button-group">
         <button id="viewDataBtn" title="查看自动保存数据的存储位置">
           查看自动保存路径
@@ -472,22 +472,10 @@
           自动保存:
           <input type="checkbox" id="autoSaveToggle" checked />
         </label>
-      </div>
-
-      <div class="button-group">
-        <button id="runBtn" class="run-button">运行</button>
-        <button id="stopBtn" class="stop-button" disabled>停止运行</button>
-        <span id="statusIndicator">
-          <span class="status-indicator status-stopped"></span>
-          <span>已停止</span>
-        </span>
+        <button id="configBtn" class="config-button">打开路径配置</button>
       </div>
 
       <div id="processingStatus" class="processing-status"></div>
-
-      <div>
-        <button id="configBtn" class="config-button">打开路径配置</button>
-      </div>
     </div>
 
     <div class="customers-table">
@@ -704,25 +692,6 @@
         showNotification('数据已刷新');
       }
 
-      // 更新运行状态显示
-      function updateRunStatus(running) {
-        isRunning = running;
-        const runBtn = document.getElementById('runBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const statusIndicator = document.getElementById('statusIndicator');
-
-        runBtn.disabled = isRunning;
-        stopBtn.disabled = !isRunning;
-
-        if (isRunning) {
-          statusIndicator.innerHTML =
-            '<span class="status-indicator status-running"></span><span>运行中</span>';
-        } else {
-          statusIndicator.innerHTML =
-            '<span class="status-indicator status-stopped"></span><span>已停止</span>';
-        }
-      }
-
       // 检查路径配置
       function checkPaths() {
         const sourcePath = document
@@ -792,107 +761,10 @@
         }
       }
 
-      // 开始运行主程序
-      async function startRun() {
-        if (!checkPaths()) {
-          return;
-        }
-
-        try {
-          if (isElectron) {
-            // 使用 Electron IPC 启动处理
-            updateRunStatus(true);
-            showProcessingStatus('正在启动处理程序...');
-
-            const result = await window.electronAPI.startProcessing();
-            if (result.success) {
-              showNotification(result.message || '程序开始运行');
-              showProcessingStatus(
-                '处理完成: 成功处理 ' + result.result.successCount + ' 个客户',
-                'success'
-              );
-            } else {
-              showNotification(
-                '启动失败: ' + (result.error || '未知错误'),
-                'error'
-              );
-              showProcessingStatus(
-                '处理失败: ' + (result.error || '未知错误'),
-                'error'
-              );
-              updateRunStatus(false);
-            }
-          } else {
-            const response = await fetch('/api/run', {
-              method: 'POST',
-            });
-
-            if (response.ok) {
-              const result = await response.json();
-              showNotification(result.message || '程序开始运行');
-              updateRunStatus(true);
-            } else {
-              const result = await response.json();
-              showNotification(
-                '启动失败: ' + (result.error || '未知错误'),
-                'error'
-              );
-            }
-          }
-        } catch (error) {
-          console.error('启动程序出错:', error);
-          showNotification('启动程序出错: ' + error.message, 'error');
-          if (isElectron) {
-            showProcessingStatus('启动程序出错: ' + error.message, 'error');
-            updateRunStatus(false);
-          }
-        }
-      }
-
-      // 停止运行主程序
-      async function stopRun() {
-        try {
-          if (isElectron) {
-            // 使用 Electron IPC 停止处理
-            const result = await window.electronAPI.stopProcessing();
-            if (result.success) {
-              showNotification(result.message || '程序已停止');
-              updateRunStatus(false);
-              hideProcessingStatus();
-            } else {
-              showNotification(
-                '停止失败: ' + (result.error || '未知错误'),
-                'error'
-              );
-            }
-          } else {
-            const response = await fetch('/api/stop', {
-              method: 'POST',
-            });
-
-            if (response.ok) {
-              const result = await response.json();
-              showNotification(result.message || '程序已停止');
-              updateRunStatus(false);
-            } else {
-              const result = await response.json();
-              showNotification(
-                '停止失败: ' + (result.error || '未知错误'),
-                'error'
-              );
-            }
-          }
-        } catch (error) {
-          console.error('停止程序出错:', error);
-          showNotification('停止程序出错: ' + error.message, 'error');
-        }
-      }
-
       // 页面加载完成后获取客户数据
       document.addEventListener('DOMContentLoaded', async () => {
         await loadCustomers();
         await loadConfigToModal();
-        await getRunStatus();
 
         // 在Electron环境中注册事件监听器
         if (isElectron) {
@@ -900,11 +772,9 @@
           window.electronAPI.onProcessingStatus(data => {
             switch (data.status) {
               case 'started':
-                updateRunStatus(true);
                 showProcessingStatus('处理程序已启动...');
                 break;
               case 'completed':
-                updateRunStatus(false);
                 showProcessingStatus(
                   '处理完成: 成功处理 ' + data.result.successCount + ' 个客户',
                   'success'
@@ -913,11 +783,9 @@
                 loadCustomers();
                 break;
               case 'error':
-                updateRunStatus(false);
                 showProcessingStatus('处理出错: ' + data.error, 'error');
                 break;
               case 'stopped':
-                updateRunStatus(false);
                 hideProcessingStatus();
                 break;
             }
@@ -944,12 +812,6 @@
           await loadCustomers();
           showNotification('数据已刷新');
         });
-
-      // 运行按钮事件
-      document.getElementById('runBtn').addEventListener('click', startRun);
-
-      // 停止按钮事件
-      document.getElementById('stopBtn').addEventListener('click', stopRun);
 
       // 从源路径加载客户数据
       async function loadCustomersFromSource() {
@@ -1147,7 +1009,7 @@
             let statusClass = '';
             let statusColor = '';
             let statusText = customer.status || '未知';
-            
+
             // 使用客户状态管理器中的状态和颜色
             if (customer.status === '未打包') {
               statusClass = 'status-not-packed';
@@ -1198,7 +1060,11 @@
                             <span class="progress-text">${packProgress}%</span>
                           </div>
                         </td>
-                        <td>${Array.isArray(customer.packSeqs) ? customer.packSeqs.join(', ') : customer.packSeqs || '无'}</td>
+                        <td>${
+                          Array.isArray(customer.packSeqs)
+                            ? customer.packSeqs.join(', ')
+                            : customer.packSeqs || '无'
+                        }</td>
                         <td class="action-cell">${actionButtons}</td>
                         <td>${lastUpdate}</td>
                     `;

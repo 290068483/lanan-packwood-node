@@ -4,17 +4,15 @@
   "description": "优化XML解析和处理流程，提高处理效率和数据准确性",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron src/ui/electron-main.js",
+    "start": "node start-electron.js",
     "dev": "concurrently \"node src/main.js\" \"npm run electron\" --names \"MAIN,ELECTRON\" --prefix-colors \"green,cyan\"",
     "test": "jest",
-    "electron": "electron src/ui/electron-main.js",
-    "electron-dev": "cross-env NODE_ENV=development electron src/ui/electron-main.js",
-    "electron-start-url": "cross-env ELECTRON_START_URL=http://localhost:3000 electron src/ui/electron-main.js",
+    "electron": "node start-electron.js",
+    "electron-dev": "cross-env NODE_ENV=development node start-electron.js",
+    "electron-start-url": "cross-env ELECTRON_START_URL=http://localhost:3000 node start-electron.js",
     "electron-pack": "electron-builder --win",
     "electron-dist": "electron-builder --win --publish never",
-    "ui": "node src/ui/server.js",
-    "sync": "node src/services/main-service.js",
-    "sync-dev": "concurrently \"npm run sync\" \"npm run ui\" --names \"SYNC,UI\" --prefix-colors \"blue,cyan\""
+    "sync": "node src/services/main-service.js"
   },
   "engines": {
     "node": ">=18.0.0 <20.0.0"
@@ -31,6 +29,7 @@
     "chalk": "^4.1.2",
     "cheerio": "^1.0.0-rc.12",
     "chokidar": "^3.5.3",
+    "electron": "38.1.0",
     "exceljs": "^4.4.0",
     "fast-xml-parser": "^4.2.5",
     "libxmljs2": "^0.32.0",
@@ -46,7 +45,6 @@
     "@types/jest": "^30.0.0",
     "concurrently": "^7.6.0",
     "cross-env": "^7.0.3",
-    "electron": "^38.1.0",
     "electron-builder": "^24.9.1",
     "jest": "^30.1.3",
     "ts-jest": "^29.4.2",

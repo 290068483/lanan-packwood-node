@@ -20,6 +20,9 @@ importers:
       chokidar:
         specifier: ^3.5.3
         version: 3.6.0
+      electron:
+        specifier: 38.1.0
+        version: 38.1.0
       exceljs:
         specifier: ^4.4.0
         version: 4.4.0
@@ -60,9 +63,6 @@ importers:
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
-      electron:
-        specifier: ^38.1.0
-        version: 38.1.0
       electron-builder:
         specifier: ^24.9.1
         version: 24.13.3(electron-builder-squirrel-windows@24.13.3)
@@ -505,8 +505,8 @@ packages:
   '@types/node@14.18.63':
     resolution: {integrity: sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ==}
 
-  '@types/node@22.18.4':
-    resolution: {integrity: sha512-UJdblFqXymSBhmZf96BnbisoFIr8ooiiBRMolQgg77Ea+VM37jXw76C2LQr9n8wm9+i/OvlUlW6xSvqwzwqznw==}
+  '@types/node@22.18.6':
+    resolution: {integrity: sha512-r8uszLPpeIWbNKtvWRt/DbVi5zbqZyj1PTmhRMqBMvDnaz1QpmSKujUtJLrqGZeoM8v72MfYggDceY4K1itzWQ==}
 
   '@types/node@24.5.0':
     resolution: {integrity: sha512-y1dMvuvJspJiPSDZUQ+WMBvF7dpnEqN4x9DDC9ie5Fs/HUZJA3wFp7EhHoVaKX/iI0cRoECV8X2jL8zi0xrHCg==}
@@ -3614,7 +3614,7 @@ snapshots:
 
   '@types/node@14.18.63': {}
 
-  '@types/node@22.18.4':
+  '@types/node@22.18.6':
     dependencies:
       undici-types: 6.21.0
 
@@ -4431,7 +4431,7 @@ snapshots:
   electron@38.1.0:
     dependencies:
       '@electron/get': 2.0.3
-      '@types/node': 22.18.4
+      '@types/node': 22.18.6
       extract-zip: 2.0.1
     transitivePeerDependencies:
       - supports-color
