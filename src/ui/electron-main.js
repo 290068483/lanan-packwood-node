@@ -132,17 +132,22 @@ ipcMain.handle('get-config', async () => {
 
 ipcMain.handle('save-config', async (event, config) => {
   try {
-    // 确保配置对象存在且有合理的默认值
-    if (!config.autoSavePath) {
-      config.autoSavePath = path.join(app.getPath('documents'), 'PackNodeAutoSaves');
+    // 导入增量更新配置功能
+    const { saveConfigWithMerge } = require('../utils/config-manager');
+
+    // 使用增量更新功能保存配置
+    const result = await saveConfigWithMerge(config);
+
+    if (result.success) {
+      console.log('✅ 配置保存成功（增量更新）');
+      return result;
+    } else {
+      console.error('✗ 配置保存失败:', result.error);
+      return result;
     }
-    
-    const configPath = path.join(__dirname, '../../config.json');
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-    return { success: true };
   } catch (error) {
-    console.error('保存配置文件失败:', error);
-    return { error: error.message };
+    console.error('✗ 保存配置时出错:', error);
+    return { success: false, error: `保存配置时出错: ${error.message}` };
   }
 });
 
@@ -152,7 +157,7 @@ ipcMain.handle('select-directory', async (event, title) => {
     title: title || '选择目录',
     properties: ['openDirectory']
   });
-  
+
   if (!result.canceled && result.filePaths.length > 0) {
     return result.filePaths[0];
   }
@@ -163,7 +168,7 @@ ipcMain.handle('open-directory', async (event, dirPath) => {
   if (!fs.existsSync(dirPath)) {
     return { success: false, error: '目录不存在' };
   }
-  
+
   // 在 Windows 上打开目录
   exec(`start "" "${dirPath}"`, (error) => {
     if (error) {
@@ -172,7 +177,7 @@ ipcMain.handle('open-directory', async (event, dirPath) => {
     }
     return { success: true };
   });
-  
+
   return { success: true };
 });
 
@@ -182,20 +187,20 @@ ipcMain.handle('start-processing', async () => {
     if (isProcessing) {
       return { success: false, message: '处理已在进行中' };
     }
-    
+
     isProcessing = true;
     if (mainWindow) {
       mainWindow.webContents.send('processing-status', { status: 'started' });
     }
-    
+
     // 调用主程序的处理函数
     const result = await processAllCustomers();
-    
+
     isProcessing = false;
     if (mainWindow) {
       mainWindow.webContents.send('processing-status', { status: 'completed', result });
     }
-    
+
     return { success: true, message: '处理完成', result };
   } catch (error) {
     console.error('启动处理失败:', error);

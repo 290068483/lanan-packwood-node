@@ -27,5 +27,6 @@
     "Root": {
       "Cabinet": "{cabinets}"
     }
-  }
+  },
+  "autoSavePath": "C:\\Users\\Administrator\\Documents\\PackNodeAutoSaves"
 }
