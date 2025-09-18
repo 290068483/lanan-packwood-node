@@ -1,23 +1,29 @@
 {
   "customers": [
     {
+      "name": "测试客户",
+      "status": "完成",
+      "lastUpdate": "2025-09-18T10:52:09.764Z",
+      "remark": "测试完成"
+    },
+    {
       "name": "(退单)赵月（隔断）",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\(退单)赵月（隔断）",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_(退单)赵月（隔断）#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:00.186Z",
+      "lastUpdate": "2025-09-18T11:26:46.640Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:41.354Z",
+          "timestamp": "2025-09-18T11:05:35.487Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:41.354Z",
+          "timestamp": "2025-09-18T11:05:35.487Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -27,7 +33,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:41.726Z",
+          "timestamp": "2025-09-18T11:06:24.936Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -37,7 +43,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:00.184Z",
+          "timestamp": "2025-09-18T11:10:03.533Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:41.998Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:26:46.639Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -45,38 +71,61 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:00.184Z",
+      "lastStatusUpdate": "2025-09-18T11:26:46.639Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:00.184Z"
+      "lastPackCheck": "2025-09-18T11:26:46.639Z"
     },
     {
       "name": "0、废弃",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\0、废弃",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_0、废弃#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:00.188Z",
-      "success": false
+      "lastUpdate": "2025-09-18T11:26:50.595Z",
+      "success": true,
+      "statusHistory": [
+        {
+          "status": "未打包",
+          "timestamp": "2025-09-18T11:26:50.594Z",
+          "operator": "系统",
+          "remark": "初始状态"
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:26:50.594Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        }
+      ],
+      "lastStatusUpdate": "2025-09-18T11:26:50.594Z",
+      "packedParts": 0,
+      "totalParts": 0,
+      "packSeqs": [],
+      "lastPackCheck": "2025-09-18T11:26:50.594Z"
     },
     {
       "name": "GN康桑林",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\GN康桑林",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_GN康桑林#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:01.036Z",
+      "lastUpdate": "2025-09-18T11:26:52.235Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:42.306Z",
+          "timestamp": "2025-09-18T11:05:36.566Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:42.306Z",
+          "timestamp": "2025-09-18T11:05:36.566Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -86,7 +135,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:42.561Z",
+          "timestamp": "2025-09-18T11:06:25.757Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -96,7 +145,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:01.035Z",
+          "timestamp": "2025-09-18T11:10:04.360Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:43.357Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:26:52.235Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -104,30 +173,30 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:01.035Z",
+      "lastStatusUpdate": "2025-09-18T11:26:52.235Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:01.035Z"
+      "lastPackCheck": "2025-09-18T11:26:52.235Z"
     },
     {
       "name": "MS外滩壹号（兰州）",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\MS外滩壹号（兰州）",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_MS外滩壹号（兰州）#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:02.828Z",
+      "lastUpdate": "2025-09-18T11:26:55.803Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:44.297Z",
+          "timestamp": "2025-09-18T11:05:38.973Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:44.297Z",
+          "timestamp": "2025-09-18T11:05:38.973Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -137,7 +206,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:44.450Z",
+          "timestamp": "2025-09-18T11:06:27.597Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -147,7 +216,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:02.827Z",
+          "timestamp": "2025-09-18T11:10:06.171Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:45.835Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:26:55.803Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -155,30 +244,30 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:02.827Z",
+      "lastStatusUpdate": "2025-09-18T11:26:55.803Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:02.827Z"
+      "lastPackCheck": "2025-09-18T11:26:55.803Z"
     },
     {
       "name": "MS孔总补柜",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\MS孔总补柜",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_MS孔总补柜#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:02.885Z",
+      "lastUpdate": "2025-09-18T11:26:55.916Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:44.364Z",
+          "timestamp": "2025-09-18T11:05:39.097Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:44.364Z",
+          "timestamp": "2025-09-18T11:05:39.097Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -188,7 +277,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:44.504Z",
+          "timestamp": "2025-09-18T11:06:27.651Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -198,7 +287,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:02.885Z",
+          "timestamp": "2025-09-18T11:10:06.225Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:45.956Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:26:55.915Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -206,30 +315,30 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:02.885Z",
+      "lastStatusUpdate": "2025-09-18T11:26:55.915Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:02.885Z"
+      "lastPackCheck": "2025-09-18T11:26:55.915Z"
     },
     {
       "name": "WLJ王姐-2",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\WLJ王姐-2",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_WLJ王姐-2#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:04.028Z",
+      "lastUpdate": "2025-09-18T11:26:58.651Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:45.569Z",
+          "timestamp": "2025-09-18T11:05:40.546Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:45.569Z",
+          "timestamp": "2025-09-18T11:05:40.546Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -239,7 +348,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:45.691Z",
+          "timestamp": "2025-09-18T11:06:28.810Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -249,7 +358,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:04.027Z",
+          "timestamp": "2025-09-18T11:10:07.370Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:48.129Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:26:58.650Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -257,30 +386,30 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:04.027Z",
+      "lastStatusUpdate": "2025-09-18T11:26:58.650Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:04.027Z"
+      "lastPackCheck": "2025-09-18T11:26:58.650Z"
     },
     {
       "name": "付序欢",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\付序欢",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_付序欢#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:05.784Z",
+      "lastUpdate": "2025-09-18T11:27:02.508Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:47.423Z",
+          "timestamp": "2025-09-18T11:05:42.572Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:47.422Z",
+          "timestamp": "2025-09-18T11:05:42.572Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -290,7 +419,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:47.467Z",
+          "timestamp": "2025-09-18T11:06:30.534Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -300,7 +429,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:05.784Z",
+          "timestamp": "2025-09-18T11:10:09.178Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:50.653Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:27:02.508Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -308,30 +457,30 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:05.784Z",
+      "lastStatusUpdate": "2025-09-18T11:27:02.508Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:05.784Z"
+      "lastPackCheck": "2025-09-18T11:27:02.508Z"
     },
     {
       "name": "工厂展柜",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\工厂展柜",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_工厂展柜#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:06.029Z",
+      "lastUpdate": "2025-09-18T11:27:03.084Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:47.664Z",
+          "timestamp": "2025-09-18T11:05:42.916Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:47.664Z",
+          "timestamp": "2025-09-18T11:05:42.916Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -341,7 +490,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:47.789Z",
+          "timestamp": "2025-09-18T11:06:30.773Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -351,7 +500,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:06.028Z",
+          "timestamp": "2025-09-18T11:10:09.416Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:50.993Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:27:03.084Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -359,30 +528,30 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:06.028Z",
+      "lastStatusUpdate": "2025-09-18T11:27:03.084Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:06.028Z"
+      "lastPackCheck": "2025-09-18T11:27:03.084Z"
     },
     {
       "name": "熊松琴",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\熊松琴",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_熊松琴#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:06.659Z",
+      "lastUpdate": "2025-09-18T11:27:04.547Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:48.321Z",
+          "timestamp": "2025-09-18T11:05:43.711Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:48.321Z",
+          "timestamp": "2025-09-18T11:05:43.711Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -392,7 +561,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:48.855Z",
+          "timestamp": "2025-09-18T11:06:31.371Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -402,7 +571,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:06.659Z",
+          "timestamp": "2025-09-18T11:10:10.038Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:51.898Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:27:04.546Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -410,30 +599,30 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:06.659Z",
+      "lastStatusUpdate": "2025-09-18T11:27:04.546Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:06.659Z"
+      "lastPackCheck": "2025-09-18T11:27:04.546Z"
     },
     {
       "name": "肖妍柔",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\肖妍柔",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_肖妍柔#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:08.595Z",
+      "lastUpdate": "2025-09-18T11:27:08.031Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:50.037Z",
+          "timestamp": "2025-09-18T11:05:45.678Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:50.037Z",
+          "timestamp": "2025-09-18T11:05:45.678Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -443,7 +632,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:50.888Z",
+          "timestamp": "2025-09-18T11:06:32.964Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -453,7 +642,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:08.594Z",
+          "timestamp": "2025-09-18T11:10:11.645Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:54.199Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:27:08.030Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -461,30 +670,30 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:08.594Z",
+      "lastStatusUpdate": "2025-09-18T11:27:08.030Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:08.594Z"
+      "lastPackCheck": "2025-09-18T11:27:08.030Z"
     },
     {
       "name": "邱海岸",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\邱海岸",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_邱海岸#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:09.400Z",
+      "lastUpdate": "2025-09-18T11:27:09.828Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:50.869Z",
+          "timestamp": "2025-09-18T11:05:46.702Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:50.869Z",
+          "timestamp": "2025-09-18T11:05:46.702Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -494,7 +703,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:51.702Z",
+          "timestamp": "2025-09-18T11:06:33.785Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -504,7 +713,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:09.400Z",
+          "timestamp": "2025-09-18T11:10:12.443Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:55.306Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:27:09.827Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -512,30 +741,30 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:09.400Z",
+      "lastStatusUpdate": "2025-09-18T11:27:09.827Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:09.400Z"
+      "lastPackCheck": "2025-09-18T11:27:09.827Z"
     },
     {
       "name": "魏敏",
       "sourcePath": "\\\\A6\\蓝岸文件\\1、客户总文件\\3、生产\\1、正单\\魏敏",
       "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250918_魏敏#",
       "status": "已处理",
-      "lastUpdate": "2025-09-18T10:16:09.774Z",
+      "lastUpdate": "2025-09-18T11:27:10.594Z",
       "success": true,
       "statusHistory": [
         {
           "status": "未打包",
-          "timestamp": "2025-09-18T10:06:51.219Z",
+          "timestamp": "2025-09-18T11:05:47.149Z",
           "operator": "系统",
           "remark": "初始状态"
         },
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:06:51.219Z",
+          "timestamp": "2025-09-18T11:05:47.149Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -545,7 +774,7 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:15:52.098Z",
+          "timestamp": "2025-09-18T11:06:34.125Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -555,7 +784,27 @@
         {
           "status": "未打包",
           "previousStatus": "已处理",
-          "timestamp": "2025-09-18T10:16:09.773Z",
+          "timestamp": "2025-09-18T11:10:12.776Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:21:55.843Z",
+          "operator": "系统",
+          "remark": "客户数据处理完成",
+          "packProgress": 0,
+          "packedParts": 0,
+          "totalParts": 0
+        },
+        {
+          "status": "未打包",
+          "previousStatus": "已处理",
+          "timestamp": "2025-09-18T11:27:10.593Z",
           "operator": "系统",
           "remark": "客户数据处理完成",
           "packProgress": 0,
@@ -563,11 +812,13 @@
           "totalParts": 0
         }
       ],
-      "lastStatusUpdate": "2025-09-18T10:16:09.773Z",
+      "lastStatusUpdate": "2025-09-18T11:27:10.593Z",
       "packedParts": 0,
       "totalParts": 0,
       "packSeqs": [],
-      "lastPackCheck": "2025-09-18T10:16:09.773Z"
+      "lastPackCheck": "2025-09-18T11:27:10.593Z"
     }
-  ]
+  ],
+  "settings": {},
+  "history": []
 }

@@ -160,18 +160,101 @@ async function processLineData(
     console.log(`  📁 正在处理产线: ${lineDir}`);
     logInfo(customerName, lineDir, '开始处理产线数据');
 
-    // 查找XML文件
-    const xmlFiles = fs
-      .readdirSync(linePath)
-      .filter(file => path.extname(file) === '.xml');
+    // 查找XML文件（支持虚拟产线目录）
+    let xmlFiles = [];
+
+    if (lineDir === '.') {
+      // 虚拟产线目录：直接在当前目录查找XML文件
+      xmlFiles = fs
+        .readdirSync(linePath)
+        .filter(file => path.extname(file) === '.xml');
+    } else {
+      // 正常产线目录：在子目录中查找XML文件
+      xmlFiles = findXmlFilesRecursively(linePath);
+    }
+
+    if (xmlFiles.length === 0) {
+      // 尝试在常见的子目录中查找XML文件
+      const commonSubDirs = ['0、排版文件', '排版文件', 'xml', 'XML'];
+      for (const subDir of commonSubDirs) {
+        const subDirPath = path.join(linePath, subDir);
+        if (fs.existsSync(subDirPath)) {
+          xmlFiles = fs
+            .readdirSync(subDirPath)
+            .filter(file => path.extname(file) === '.xml');
+          if (xmlFiles.length > 0) {
+            console.log(`  📁 在子目录 "${subDir}" 中找到XML文件`);
+            logInfo(customerName, lineDir, `在子目录 "${subDir}" 中找到XML文件`);
+            break;
+          }
+        }
+      }
+    }
+
     if (xmlFiles.length === 0) {
       console.log(`  ⚠ 产线目录中未找到XML文件: ${lineDir}`);
       logWarning(customerName, lineDir, '产线目录中未找到XML文件');
       return false;
     }
 
-    const xmlFile = xmlFiles[0]; // 假设只有一个XML文件
-    const xmlFilePath = path.join(linePath, xmlFile);
+    // 选择XML文件（优先选择优化文件.xml，否则选择最大的文件）
+    let xmlFile = xmlFiles[0];
+    let xmlFilePath = '';
+
+    // 优先选择优化文件.xml
+    const optimizedFile = xmlFiles.find(file =>
+      typeof file === 'string' && file.includes('优化文件')
+    );
+
+    if (optimizedFile) {
+      xmlFile = optimizedFile;
+    } else if (xmlFiles.length > 1) {
+      // 选择最大的XML文件
+      const fileStats = xmlFiles.map(file => {
+        const filePath = typeof file === 'string' ? file : path.join(linePath, file);
+        return {
+          path: filePath,
+          size: fs.statSync(filePath).size
+        };
+      });
+
+      fileStats.sort((a, b) => b.size - a.size);
+      xmlFile = fileStats[0].path;
+    }
+
+    // 确定XML文件的完整路径
+    if (typeof xmlFile === 'string') {
+      // 检查是否已经是完整路径
+      if (path.isAbsolute(xmlFile)) {
+        xmlFilePath = xmlFile;
+      } else {
+        // 检查是否在linePath目录中
+        const fullPath = path.join(linePath, xmlFile);
+        if (fs.existsSync(fullPath)) {
+          xmlFilePath = fullPath;
+        } else {
+          // 检查是否在常见子目录中
+          const commonSubDirs = ['0、排版文件', '排版文件', 'xml', 'XML'];
+          for (const subDir of commonSubDirs) {
+            const subPath = path.join(linePath, subDir, xmlFile);
+            if (fs.existsSync(subPath)) {
+              xmlFilePath = subPath;
+              break;
+            }
+          }
+        }
+      }
+    } else {
+      xmlFilePath = path.join(linePath, xmlFile);
+    }
+
+    // 最后验证文件是否存在
+    if (!fs.existsSync(xmlFilePath)) {
+      console.log(`  ⚠ XML文件不存在: ${xmlFilePath}`);
+      logWarning(customerName, lineDir, `XML文件不存在: ${xmlFilePath}`);
+      return false;
+    }
+
     const xmlData = fs.readFileSync(xmlFilePath, 'utf8');
 
     // 尝试解析XML数据
@@ -187,18 +270,25 @@ async function processLineData(
 
     // 保存解析后的原始数据（优化步骤1：先保存解析数据）
     const parsedDataDir = path.join(customerOutputDir, 'parsedData');
-    const parsedDataPath = path.join(parsedDataDir, `parsed_${xmlFile.replace('.xml', '.json')}`);
+    const parsedDataPath = path.join(parsedDataDir, `parsed_${path.basename(xmlFilePath, '.xml')}.json`);
     saveParsedXmlData(parseResult.data, parsedDataPath);
 
     // 删除不需要的标签结构
     const cleanedData = removeUnnecessaryTags(parseResult.data);
 
     // 保存清理后的数据
-    const cleanedDataPath = path.join(parsedDataDir, `cleaned_${xmlFile.replace('.xml', '.json')}`);
+    const cleanedDataPath = path.join(parsedDataDir, `cleaned_${path.basename(xmlFilePath, '.xml')}.json`);
     saveParsedXmlData(cleanedData, cleanedDataPath);
 
     // 处理不同的XML结构，提取Cabinet信息
     let cabinets = [];
+
+    // 添加对cleanedData.Root的检查，防止访问未定义对象的属性
+    if (!cleanedData.Root) {
+      console.log(`  ⚠ XML数据中未找到Root节点: ${lineDir}`);
+      logWarning(customerName, lineDir, 'XML数据中未找到Root节点');
+      return false;
+    }
 
     // 结构1: Root.Cabinets.Cabinet (旧结构)
     if (
@@ -301,6 +391,7 @@ async function processLineData(
     // 从所有Cabinet中提取所有Panel数据
     const allPanels = [];
     cabinets.forEach(cabinet => {
+      // 添加对cabinet.Panels的检查
       if (cabinet.Panels && cabinet.Panels.Panel) {
         if (Array.isArray(cabinet.Panels.Panel)) {
           allPanels.push(...cabinet.Panels.Panel);
@@ -442,27 +533,102 @@ async function processCustomerData(
     console.log(`📁 正在处理客户路径: ${customerSourcePath}`);
     logInfo(customerName, 'PROCESS', '开始处理客户数据');
 
-    // 检查设备文件目录 (支持两种可能的路径结构)
+    // 检查设备文件目录 (支持多种可能的路径结构)
     let deviceDir = path.join(customerSourcePath, 'N1产线', '0、排版文件');
-    if (!fs.existsSync(deviceDir)) {
-      // 尝试另一种路径结构
-      deviceDir = path.join(customerSourcePath, '设备文件', 'N1产线', '0、排版文件');
+    let foundDeviceDir = false;
+    
+    // 尝试多种路径结构
+    const possiblePaths = [
+      path.join(customerSourcePath, 'N1产线', '0、排版文件'),
+      path.join(customerSourcePath, '设备文件', 'N1产线', '0、排版文件'),
+      path.join(customerSourcePath, '设备文件'),
+      path.join(customerSourcePath, 'N1产线'),
+      customerSourcePath
+    ];
+
+    for (const possiblePath of possiblePaths) {
+      if (fs.existsSync(possiblePath)) {
+        deviceDir = possiblePath;
+        foundDeviceDir = true;
+        console.log(`📁 找到设备文件目录: ${deviceDir}`);
+        logInfo(customerName, 'PROCESS', `找到设备文件目录: ${deviceDir}`);
+        break;
+      }
     }
 
-    if (!fs.existsSync(deviceDir)) {
+    if (!foundDeviceDir) {
       console.log(`⚠ 未找到设备文件目录: ${customerName}`);
       logWarning(customerName, 'PROCESS', '未找到设备文件目录');
       return false;
     }
 
-    // 查找产线目录
-    const lineDirs = fs
+    // 查找产线目录或XML文件（优先查找+递归遍历）
+    const items = fs.readdirSync(deviceDir);
+    let lineDirs = [];
+
+    // 优先查找：先检查当前目录是否有XML文件
+    const currentDirXmlFiles = fs
       .readdirSync(deviceDir)
-      .filter(dir => fs.statSync(path.join(deviceDir, dir)).isDirectory());
+      .filter(file => path.extname(file) === '.xml');
+
+    if (currentDirXmlFiles.length > 0) {
+      // 将当前目录作为虚拟产线目录处理
+      lineDirs.push('.');
+      console.log(`📁 在当前目录找到XML文件，将作为虚拟产线处理: ${customerName}`);
+    }
+
+    // 递归查找：遍历所有子目录查找XML文件
+    const subDirs = items.filter(item => {
+      const itemPath = path.join(deviceDir, item);
+      return fs.statSync(itemPath).isDirectory();
+    });
+
+    for (const subDir of subDirs) {
+      const subDirPath = path.join(deviceDir, subDir);
+      // 检查特定文件名
+      const possibleXmlFileNames = ['优化文件.xml', 'temp.xml', 'nesting_result.xml', 'NestingInputData.xml'];
+      let foundXmlFile = false;
+      
+      for (const fileName of possibleXmlFileNames) {
+        const xmlFilePath = path.join(subDirPath, fileName);
+        if (fs.existsSync(xmlFilePath)) {
+          lineDirs.push(subDir);
+          console.log(`📁 在子目录 ${subDir} 找到XML文件: ${fileName}`);
+          logInfo(customerName, 'PROCESS', `在子目录 ${subDir} 找到XML文件: ${fileName}`);
+          foundXmlFile = true;
+          break;
+        }
+        
+        // 检查子目录中的常见文件夹
+        const commonSubDirs = ['0、排版文件', '排版文件', 'xml', 'XML'];
+        for (const commonSubDir of commonSubDirs) {
+          const nestedXmlFilePath = path.join(subDirPath, commonSubDir, fileName);
+          if (fs.existsSync(nestedXmlFilePath)) {
+            lineDirs.push(subDir);
+            console.log(`📁 在子目录 ${subDir}/${commonSubDir} 找到XML文件: ${fileName}`);
+            logInfo(customerName, 'PROCESS', `在子目录 ${subDir}/${commonSubDir} 找到XML文件: ${fileName}`);
+            foundXmlFile = true;
+            break;
+          }
+        }
+        
+        if (foundXmlFile) break;
+      }
+      
+      // 如果没有找到特定文件名，则查找任何XML文件
+      if (!foundXmlFile) {
+        const xmlFiles = findXmlFilesRecursively(subDirPath);
+        if (xmlFiles.length > 0) {
+          lineDirs.push(subDir);
+          console.log(`📁 在子目录 ${subDir} 找到XML文件`);
+          logInfo(customerName, 'PROCESS', `在子目录 ${subDir} 找到XML文件`);
+        }
+      }
+    }
 
     if (lineDirs.length === 0) {
-      console.log(`⚠ 未找到任何产线目录: ${customerName}`);
-      logWarning(customerName, 'PROCESS', '未找到任何产线目录');
+      console.log(`⚠ 未找到任何包含XML文件的产线目录: ${customerName}`);
+      logWarning(customerName, 'PROCESS', '未找到任何包含XML文件的产线目录');
       return false;
     }
 
@@ -546,6 +712,37 @@ async function processCustomerData(
     );
     return false;
   }
+}
+
+/**
+ * 递归查找XML文件
+ * @param {string} dirPath - 目录路径
+ * @returns {Array} XML文件列表
+ */
+function findXmlFilesRecursively(dirPath) {
+  let xmlFiles = [];
+
+  try {
+    const items = fs.readdirSync(dirPath);
+
+    for (const item of items) {
+      const itemPath = path.join(dirPath, item);
+      const stat = fs.statSync(itemPath);
+
+      if (stat.isDirectory()) {
+        // 递归查找子目录
+        const subDirXmlFiles = findXmlFilesRecursively(itemPath);
+        xmlFiles = xmlFiles.concat(subDirXmlFiles);
+      } else if (stat.isFile() && path.extname(item) === '.xml') {
+        // 找到XML文件
+        xmlFiles.push(itemPath);
+      }
+    }
+  } catch (error) {
+    console.error(`递归查找XML文件时出错: ${dirPath}`, error);
+  }
+
+  return xmlFiles;
 }
 
 module.exports = {

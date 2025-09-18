@@ -375,38 +375,63 @@ async function processCustomerData(
     for (const lineDir of productionLineDirs) {
       const linePath = path.join(customerDevicePath, lineDir);
 
-      // 支持多种XML文件名
-      const possibleXmlFiles = [
-        'temp.xml',
-        '优化文件.xml',
-        'NestingInputData.xml',
-        'nesting_result.xml',
-      ];
-
       let xmlFilePath = null;
       let xmlFileName = '';
 
-      // 查找存在的XML文件
-      for (const fileName of possibleXmlFiles) {
-        const fullPath = path.join(linePath, fileName);
-        if (fs.existsSync(fullPath)) {
-          xmlFilePath = fullPath;
-          xmlFileName = fileName;
-          break;
-        }
+      // 只查找优化文件.xml，然后使用通配符查找其他XML文件
+      const specificXmlFile = '优化文件.xml';
 
-        // 检查特定子目录
-        const subDirs = ['0、排版文件', '排版文件'];
+      // 首先检查优化文件.xml
+      const fullPath = path.join(linePath, specificXmlFile);
+      if (fs.existsSync(fullPath)) {
+        xmlFilePath = fullPath;
+        xmlFileName = specificXmlFile;
+      } else {
+        // 检查特定子目录中的优化文件.xml
+        const subDirs = ['0、排版文件'];
         for (const subDir of subDirs) {
-          const subPath = path.join(linePath, subDir, fileName);
+          const subPath = path.join(linePath, subDir, specificXmlFile);
           if (fs.existsSync(subPath)) {
             xmlFilePath = subPath;
-            xmlFileName = `${subDir}/${fileName}`;
+            xmlFileName = `${subDir}/${specificXmlFile}`;
             break;
           }
         }
+      }
 
-        if (xmlFilePath) break;
+      // 如果没有找到特定文件，使用通配符查找任何XML文件
+      if (!xmlFilePath) {
+        const subDirs = ['', '0、排版文件'];
+
+        for (const subDir of subDirs) {
+          const searchPath = subDir ? path.join(linePath, subDir) : linePath;
+
+          try {
+            const files = fs.readdirSync(searchPath);
+            const xmlFiles = files.filter(file =>
+              file.toLowerCase().endsWith('.xml') &&
+              !file.toLowerCase().includes('config') &&
+              !file.toLowerCase().includes('setting')
+            );
+
+            if (xmlFiles.length > 0) {
+              // 按文件大小排序，优先选择较大的文件（可能是数据文件）
+              xmlFiles.sort((a, b) => {
+                const statA = fs.statSync(path.join(searchPath, a));
+                const statB = fs.statSync(path.join(searchPath, b));
+                return statB.size - statA.size;
+              });
+
+              xmlFilePath = path.join(searchPath, xmlFiles[0]);
+              xmlFileName = subDir ? `${subDir}/${xmlFiles[0]}` : xmlFiles[0];
+              console.log(`ℹ 使用通配符找到XML文件: ${xmlFileName}`);
+              break;
+            }
+          } catch (error) {
+            // 子目录可能不存在，忽略错误继续查找
+            continue;
+          }
+        }
       }
 
       if (xmlFilePath) {
