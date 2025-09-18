@@ -52,15 +52,30 @@ Pack Node 1.0 是一个专业的家具制造行业数据处理工具，主要用
 
 ## 技术架构
 
+### 架构设计
+
+本系统采用混合架构，结合文件系统和数据库：
+```
+源XML文件 → 后台服务 → 数据库 → API → 前端界面
+```
+
+- **文件系统层**：存储原始XML文件和数据
+- **后台服务层**：从源系统读取，解析XML，更新数据库，提供高效查询
+- **数据库层**：存储客户状态和进度信息，支持复杂查询
+- **API层**：提供REST API接口处理前端请求
+- **前端界面层**：显示状态和进度，处理状态变更
+
 ### 核心依赖
 
 - **Node.js**: 运行环境
 - **Electron**: 桌面应用支持
+- **SQLite**: 数据库支持
 - **ExcelJS**: Excel 文件生成
 - **fast-xml-parser**: 主要 XML 解析库
 - **xml2js**: 备选 XML 解析库
 - **xmldom**: XML DOM 操作
 - **chalk**: 终端彩色输出
+- **chokidar**: 文件监控
 
 ### 项目结构
 
@@ -75,12 +90,28 @@ pack-node-1.0/
 │   │   ├── excel-generator.js  # Excel生成器
 │   │   ├── data-sync.js        # 数据同步
 │   │   ├── logger.js           # 日志记录
+│   │   ├── status-manager.js  # 客户状态管理
 │   │   └── ...                 # 其他工具模块
+│   ├── database/               # 数据库模块
+│   │   ├── connection.js       # 数据库连接
+│   │   ├── models/             # 数据模型
+│   │   │   └── customer.js     # 客户数据模型
+│   │   └── api.js              # 数据库API接口
+│   ├── services/               # 服务模块
+│   │   ├── xml-extractor.js    # XML数据提取服务
+│   │   ├── data-sync-service.js # 数据同步服务
+│   │   └── main-service.js     # 主服务
 │   ├── excel/                  # Excel相关模块
 │   ├── network/                # 网络同步模块
 │   └── ui/                     # 用户界面模块
-├── config.json               # 配置文件
+├── config.json               # 主配置文件
+├── config-sync.json          # 数据同步配置文件
 ├── package.json              # 项目配置
+├── tests/                    # 单元测试
+│   ├── status-manager.test.js # 状态管理测试
+│   ├── server-api.test.js     # API测试
+│   └── frontend.test.js       # 前端测试
+├── data/                     # 数据库文件目录
 └── README.md                 # 项目说明
 ```
 
@@ -97,6 +128,19 @@ pnpm install
 ```
 
 ## 使用方法
+
+### 数据同步服务模式
+
+1. 确保配置文件 `config-sync.json` 已正确设置
+2. 启动数据同步服务：
+   ```bash
+   npm run sync
+   ```
+   或
+   ```bash
+   node src/services/main-service.js
+   ```
+   服务将在后台运行，定期从源路径提取数据并更新数据库。
 
 ### 命令行模式
 
@@ -126,6 +170,27 @@ npm run electron
 - `autoSave`: 自动保存配置
 - `enableNetworkSync`: 网络同步开关
 
+## API接口
+
+系统提供以下REST API接口：
+
+### 客户数据API
+
+- `GET /api/customers` - 获取所有客户数据
+- `GET /api/customers/{name}/details` - 获取客户详细信息
+- `GET /api/customers/status/{status}` - 按状态筛选客户
+
+### 客户状态管理API
+
+- `POST /api/customers/{name}/check-status` - 检查客户状态
+- `POST /api/customers/{name}/archive` - 归档客户
+- `POST /api/customers/{name}/ship` - 出货
+- `POST /api/customers/{name}/mark-not-shipped` - 标记为未出货
+
+### 数据同步API
+
+- `GET /api/sync/status` - 获取数据同步服务状态
+
 ## 输出格式
 
 系统生成的文件包含以下结构：
@@ -151,6 +216,27 @@ npm run electron
 - 支持中文字符和特殊符号的文件命名
 - 日志文件保存在 logs 目录中
 
+## 单元测试
+
+项目包含完整的单元测试，覆盖主要功能模块：
+
+### 运行测试
+```bash
+# 运行所有测试
+npm test
+
+# 运行特定测试文件
+npm test -- --grep "status-manager"
+
+# 生成测试覆盖率报告
+npm run test:coverage
+```
+
+### 测试覆盖范围
+- **状态管理测试** (`tests/status-manager.test.js`): 测试客户状态管理功能
+- **API测试** (`tests/server-api.test.js`): 测试服务器API接口
+- **前端测试** (`tests/frontend.test.js`): 测试前端界面功能
+
 ## 开发说明
 
 项目使用 Git 进行版本控制，包含完整的提交历史。主要功能模块都经过测试，能够稳定运行。
@@ -158,6 +244,7 @@ npm run electron
 ### 开发环境要求
 - Node.js >= 18.0.0
 - npm 或 pnpm 包管理器
+- SQLite3 数据库支持
 
 ### 项目启动
 ```bash
@@ -166,6 +253,9 @@ npm run dev
 
 # 电子应用模式运行
 npm run electron-dev
+
+# 启动数据同步服务
+npm run sync
 ```
 
 ## 贡献

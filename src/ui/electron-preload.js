@@ -6,7 +6,8 @@ const { contextBridge, ipcRenderer } = require('electron');
 // 暴露安全的 API 给渲染进程
 contextBridge.exposeInMainWorld('electronAPI', {
   // 客户数据相关
-  getCustomers: () => ipcRenderer.invoke('get-customers'),
+  getCustomers: () => ipcRenderer.invoke('get-customers-from-source'),
+  getCustomerDetails: (customerName) => ipcRenderer.invoke('get-customer-details', customerName),
   addCustomer: (customer) => ipcRenderer.invoke('add-customer', customer),
   updateCustomerStatus: (name, status, remark) => ipcRenderer.invoke('update-customer-status', name, status, remark),
   

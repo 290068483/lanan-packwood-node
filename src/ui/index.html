@@ -97,6 +97,68 @@
         border-radius: 3px;
       }
 
+      /* 客户状态样式 */
+      .status-not-packed {
+        color: #95a5a6; /* 灰色 */
+      }
+
+      .status-in-progress {
+        color: #3498db; /* 蓝色 */
+      }
+
+      .status-packed {
+        color: #f1c40f; /* 黄色 */
+      }
+
+      .status-archived {
+        color: #9b59b6; /* 紫色 */
+      }
+
+      .status-shipped {
+        color: #2ecc71; /* 绿色 */
+      }
+
+      .status-not-shipped {
+        color: #e67e22; /* 橙色 */
+      }
+
+      /* 操作按钮样式 */
+      .action-btn {
+        padding: 5px 10px;
+        margin-right: 5px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .archive-btn {
+        background-color: #9b59b6;
+        color: white;
+      }
+
+      .archive-btn:hover {
+        background-color: #8e44ad;
+      }
+
+      .ship-btn {
+        background-color: #2ecc71;
+        color: white;
+      }
+
+      .ship-btn:hover {
+        background-color: #27ae60;
+      }
+
+      .not-shipped-btn {
+        background-color: #e67e22;
+        color: white;
+      }
+
+      .not-shipped-btn:hover {
+        background-color: #d35400;
+      }
+
       .customers-table {
         background-color: white;
         border-radius: 5px;
@@ -140,37 +202,37 @@
         color: #e74c3c;
         font-weight: bold;
       }
-      
+
       .status-not-packed {
         color: #888888;
         font-weight: bold;
       }
-      
+
       .status-in-progress {
-        color: #2196F3;
+        color: #2196f3;
         font-weight: bold;
       }
-      
+
       .status-packed {
-        color: #FFC107;
+        color: #ffc107;
         font-weight: bold;
       }
-      
+
       .status-archived {
-        color: #9C27B0;
+        color: #9c27b0;
         font-weight: bold;
       }
-      
+
       .status-shipped {
-        color: #4CAF50;
+        color: #4caf50;
         font-weight: bold;
       }
-      
+
       .status-not-shipped {
-        color: #FF9800;
+        color: #ff9800;
         font-weight: bold;
       }
-      
+
       /* 进度条样式 */
       .progress-container {
         position: relative;
@@ -180,13 +242,13 @@
         border-radius: 10px;
         overflow: hidden;
       }
-      
+
       .progress-bar {
         height: 100%;
         border-radius: 10px;
         transition: width 0.3s ease;
       }
-      
+
       .progress-text {
         position: absolute;
         top: 0;
@@ -200,12 +262,12 @@
         font-weight: bold;
         color: #333;
       }
-      
+
       /* 操作按钮样式 */
       .action-cell {
         white-space: nowrap;
       }
-      
+
       .action-btn {
         margin: 0 3px;
         padding: 5px 10px;
@@ -215,32 +277,32 @@
         cursor: pointer;
         transition: background-color 0.2s;
       }
-      
+
       .archive-btn {
-        background-color: #9C27B0;
+        background-color: #9c27b0;
         color: white;
       }
-      
+
       .archive-btn:hover {
-        background-color: #7B1FA2;
+        background-color: #7b1fa2;
       }
-      
+
       .ship-btn {
-        background-color: #4CAF50;
+        background-color: #4caf50;
         color: white;
       }
-      
+
       .ship-btn:hover {
-        background-color: #388E3C;
+        background-color: #388e3c;
       }
-      
+
       .not-shipped-btn {
-        background-color: #FF9800;
+        background-color: #ff9800;
         color: white;
       }
-      
+
       .not-shipped-btn:hover {
-        background-color: #F57C00;
+        background-color: #f57c00;
       }
 
       .path-cell {
@@ -382,7 +444,7 @@
         text-decoration: none;
         cursor: pointer;
       }
-      
+
       /* 处理状态显示 */
       .processing-status {
         margin-top: 10px;
@@ -402,10 +464,7 @@
     <div class="control-panel">
       <h2>打开文件路径</h2>
       <div class="button-group">
-        <button
-          id="viewDataBtn"
-          title="查看自动保存数据的存储位置"
-        >
+        <button id="viewDataBtn" title="查看自动保存数据的存储位置">
           查看自动保存路径
         </button>
         <button id="refreshBtn">刷新数据</button>
@@ -423,7 +482,7 @@
           <span>已停止</span>
         </span>
       </div>
-      
+
       <div id="processingStatus" class="processing-status"></div>
 
       <div>
@@ -441,6 +500,7 @@
             <th>客户名称</th>
             <th>客户状态</th>
             <th>打包进度</th>
+            <th>包号</th>
             <th>操作</th>
             <th>最后更新时间</th>
           </tr>
@@ -544,7 +604,7 @@
     <script>
       // 检查是否在 Electron 环境中运行
       const isElectron = !!window.electronAPI;
-      
+
       // 全局变量
       let isRunning = false;
       let config = {};
@@ -561,13 +621,13 @@
           notification.style.display = 'none';
         }, 3000);
       }
-      
+
       // 显示处理状态
       function showProcessingStatus(message, type = 'info') {
         const statusElement = document.getElementById('processingStatus');
         statusElement.textContent = message;
         statusElement.style.display = 'block';
-        
+
         // 根据类型设置背景色
         switch (type) {
           case 'error':
@@ -583,7 +643,7 @@
             statusElement.style.color = '#333';
         }
       }
-      
+
       // 隐藏处理状态
       function hideProcessingStatus() {
         const statusElement = document.getElementById('processingStatus');
@@ -597,29 +657,37 @@
           if (!config || Object.keys(config).length === 0) {
             await loadConfigToModal();
           }
-          
+
           const path = config.customerPackedPath;
           if (!path) {
             showNotification('未配置自动保存路径', 'error');
             return;
           }
-          
+
           if (isElectron) {
             // 在 Electron 环境中打开路径
             const result = await window.electronAPI.openDirectory(path);
             if (result.success) {
-              showNotification('已成功打开文件夹: ' + abbreviatePath(path), 'success');
+              showNotification(
+                '已成功打开文件夹: ' + abbreviatePath(path),
+                'success'
+              );
             } else {
               showNotification('打开文件夹失败: ' + result.error, 'error');
             }
           } else {
             // Web 环境中通过服务器打开路径
             showNotification('正在打开路径: ' + abbreviatePath(path));
-            const response = await fetch('/open-folder?path=' + encodeURIComponent(path));
+            const response = await fetch(
+              '/open-folder?path=' + encodeURIComponent(path)
+            );
             const result = await response.text();
-            
+
             if (response.ok) {
-              showNotification('已成功打开文件夹: ' + abbreviatePath(path), 'success');
+              showNotification(
+                '已成功打开文件夹: ' + abbreviatePath(path),
+                'success'
+              );
             } else {
               showNotification('打开文件夹失败: ' + result, 'error');
             }
@@ -686,7 +754,7 @@
               return;
             }
           }
-          
+
           document.getElementById('sourcePathModal').value =
             config.sourcePath || '';
           document.getElementById('outputPathModal').value =
@@ -735,14 +803,23 @@
             // 使用 Electron IPC 启动处理
             updateRunStatus(true);
             showProcessingStatus('正在启动处理程序...');
-            
+
             const result = await window.electronAPI.startProcessing();
             if (result.success) {
               showNotification(result.message || '程序开始运行');
-              showProcessingStatus('处理完成: 成功处理 ' + result.result.successCount + ' 个客户', 'success');
+              showProcessingStatus(
+                '处理完成: 成功处理 ' + result.result.successCount + ' 个客户',
+                'success'
+              );
             } else {
-              showNotification('启动失败: ' + (result.error || '未知错误'), 'error');
-              showProcessingStatus('处理失败: ' + (result.error || '未知错误'), 'error');
+              showNotification(
+                '启动失败: ' + (result.error || '未知错误'),
+                'error'
+              );
+              showProcessingStatus(
+                '处理失败: ' + (result.error || '未知错误'),
+                'error'
+              );
               updateRunStatus(false);
             }
           } else {
@@ -783,7 +860,10 @@
               updateRunStatus(false);
               hideProcessingStatus();
             } else {
-              showNotification('停止失败: ' + (result.error || '未知错误'), 'error');
+              showNotification(
+                '停止失败: ' + (result.error || '未知错误'),
+                'error'
+              );
             }
           } else {
             const response = await fetch('/api/stop', {
@@ -813,11 +893,11 @@
         await loadCustomers();
         await loadConfigToModal();
         await getRunStatus();
-        
+
         // 在Electron环境中注册事件监听器
         if (isElectron) {
           // 监听处理状态更新
-          window.electronAPI.onProcessingStatus((data) => {
+          window.electronAPI.onProcessingStatus(data => {
             switch (data.status) {
               case 'started':
                 updateRunStatus(true);
@@ -825,7 +905,10 @@
                 break;
               case 'completed':
                 updateRunStatus(false);
-                showProcessingStatus('处理完成: 成功处理 ' + data.result.successCount + ' 个客户', 'success');
+                showProcessingStatus(
+                  '处理完成: 成功处理 ' + data.result.successCount + ' 个客户',
+                  'success'
+                );
                 // 刷新客户数据
                 loadCustomers();
                 break;
@@ -839,15 +922,15 @@
                 break;
             }
           });
-          
+
           // 监听未捕获的异常
-          window.electronAPI.onUncaughtError((data) => {
+          window.electronAPI.onUncaughtError(data => {
             console.error('未捕获的异常:', data);
             showNotification('程序出错: ' + data.message, 'error');
           });
-          
+
           // 监听未处理的Promise拒绝
-          window.electronAPI.onUnhandledRejection((data) => {
+          window.electronAPI.onUnhandledRejection(data => {
             console.error('未处理的Promise拒绝:', data);
             showNotification('程序出错: ' + data.reason, 'error');
           });
@@ -868,18 +951,178 @@
       // 停止按钮事件
       document.getElementById('stopBtn').addEventListener('click', stopRun);
 
+      // 从源路径加载客户数据
+      async function loadCustomersFromSource() {
+        try {
+          // 获取配置
+          let config;
+          if (isElectron) {
+            config = await window.electronAPI.getConfig();
+          } else {
+            const response = await fetch('/api/config');
+            config = await response.json();
+          }
+
+          // 检查源路径是否存在
+          const sourcePath = config.sourcePath;
+          if (!sourcePath) {
+            showNotification('未配置源路径', 'error');
+            return [];
+          }
+
+          // 读取源路径中的客户目录
+          let customerDirs = [];
+          try {
+            if (isElectron) {
+              // 在Electron环境中，通过IPC获取客户数据
+              const result = await window.electronAPI.getCustomers();
+              if (result.success) {
+                customerDirs = result.customers.map(customer => customer.name);
+              } else {
+                showNotification('获取客户数据失败: ' + result.error, 'error');
+                return [];
+              }
+            } else {
+              // 在Web环境中，通过API获取客户目录
+              const response = await fetch('/api/customers/source');
+              const customers = await response.json();
+              customerDirs = customers.map(customer => customer.name);
+            }
+          } catch (error) {
+            console.error('读取客户目录出错:', error);
+            showNotification('读取客户目录出错: ' + error.message, 'error');
+            return [];
+          }
+
+          // 处理每个客户目录
+          const customers = [];
+          for (const dir of customerDirs) {
+            try {
+              // 解析客户名称（从目录名中提取）
+              let customerName = dir.replace(/^\d{6}_/, '').replace(/#$/, '');
+
+              // 如果直接使用客户名称找不到目录，尝试使用原始目录名
+              let customerDirName = dir;
+              let customerDirPath = path.join(sourcePath, customerDirName);
+
+              // 如果目录不存在，尝试使用客户名称构建目录名
+              if (
+                !fs.existsSync(customerDirPath) ||
+                !fs.statSync(customerDirPath).isDirectory()
+              ) {
+                customerDirName = `250901_${customerName}#`;
+                customerDirPath = path.join(sourcePath, customerDirName);
+
+                // 如果仍然不存在，尝试查找匹配的目录
+                if (
+                  !fs.existsSync(customerDirPath) ||
+                  !fs.statSync(customerDirPath).isDirectory()
+                ) {
+                  const dirs = fs.readdirSync(sourcePath).filter(d => {
+                    const fullPath = path.join(sourcePath, d);
+                    return (
+                      fs.statSync(fullPath).isDirectory() &&
+                      d.includes(customerName)
+                    );
+                  });
+
+                  if (dirs.length > 0) {
+                    customerDirName = dirs[0];
+                    customerDirPath = path.join(sourcePath, customerDirName);
+                  }
+                }
+              }
+
+              // 在Electron环境中，通过IPC获取客户详细信息
+              let customerInfo = {
+                status: '未打包',
+                packProgress: 0,
+                packSeqs: [],
+                lastUpdate: new Date().toISOString(),
+              };
+
+              if (isElectron) {
+                // 使用客户名称获取详细信息
+                const result = await window.electronAPI.getCustomerDetails(
+                  customerName
+                );
+                if (result.success) {
+                  customerInfo = result.details;
+                } else {
+                  // 如果失败，尝试使用原始目录名
+                  const originalResult =
+                    await window.electronAPI.getCustomerDetails(
+                      customerDirName
+                    );
+                  if (originalResult.success) {
+                    customerInfo = originalResult.details;
+                  }
+                }
+              } else {
+                // 在Web环境中，通过API获取客户详细信息
+                try {
+                  const response = await fetch(
+                    `/api/customers/${encodeURIComponent(customerName)}/details`
+                  );
+                  if (response.ok) {
+                    customerInfo = await response.json();
+                  }
+                } catch (error) {
+                  // 如果失败，尝试使用原始目录名
+                  try {
+                    const response = await fetch(
+                      `/api/customers/${encodeURIComponent(
+                        customerDirName
+                      )}/details`
+                    );
+                    if (response.ok) {
+                      customerInfo = await response.json();
+                    }
+                  } catch (error) {
+                    console.error(
+                      `获取客户 ${customerName} 详细信息出错:`,
+                      error
+                    );
+                  }
+                }
+              }
+
+              // 添加到客户列表
+              customers.push({
+                name: customerName,
+                status: customerInfo.status || '未打包',
+                packProgress: customerInfo.packProgress || 0,
+                packSeqs: customerInfo.packSeqs || [],
+                lastUpdate: customerInfo.lastUpdate || new Date().toISOString(),
+              });
+            } catch (error) {
+              console.error(`处理客户目录 ${dir} 出错:`, error);
+              // 即使出错也添加客户，但使用默认值
+              customers.push({
+                name: customerName,
+                status: '未知',
+                packProgress: 0,
+                packSeqs: [],
+                lastUpdate: new Date().toISOString(),
+              });
+            }
+          }
+
+          return customers;
+        } catch (error) {
+          console.error('加载客户数据出错:', error);
+          showNotification('加载客户数据出错: ' + error.message, 'error');
+          return [];
+        }
+      }
+
       // 加载客户数据
       async function loadCustomers() {
         try {
-          let customers;
-          if (isElectron) {
-            // 使用 Electron IPC 获取客户数据
-            customers = await window.electronAPI.getCustomers();
-          } else {
-            const response = await fetch('/api/customers');
-            customers = await response.json();
-          }
-          
+          // 从数据库获取客户数据
+          const response = await fetch('/api/customers');
+          const customers = await response.json();
+
           const tbody = document.querySelector('#customersTable tbody');
           tbody.innerHTML = '';
 
@@ -902,31 +1145,13 @@
 
             // 状态样式处理
             let statusClass = '';
-            switch (customer.status) {
-              case '已处理':
-              case '已完成':
-                statusClass = 'status-completed';
-                break;
-              case '处理中':
-              case '进行中':
-                statusClass = 'status-processing';
-                break;
-              case '处理失败':
-              case '错误':
-                statusClass = 'status-error';
-                break;
-            }
-
-            // 状态样式处理
-            let statusClass = '';
             let statusColor = '';
             let statusText = customer.status || '未知';
-            let packProgress = customer.packProgress || 0;
             
             // 使用客户状态管理器中的状态和颜色
             if (customer.status === '未打包') {
               statusClass = 'status-not-packed';
-              statusColor = '#888888'; // 灰色
+              statusColor = '#95a5a6'; // 灰色
             } else if (customer.status === '正在处理') {
               statusClass = 'status-in-progress';
               statusColor = '#2196F3'; // 蓝色
@@ -943,7 +1168,10 @@
               statusClass = 'status-not-shipped';
               statusColor = '#FF9800'; // 橙色
             }
-            
+
+            // 状态样式处理（已在上面处理）
+            let packProgress = customer.packProgress || 0;
+
             // 操作按钮
             let actionButtons = '';
             if (customer.status === '已打包') {
@@ -960,7 +1188,7 @@
                 <button class="action-btn ship-btn" data-customer="${customer.name}">出货</button>
               `;
             }
-            
+
             row.innerHTML = `
                         <td>${customer.name || ''}</td>
                         <td class="status-cell ${statusClass}" style="color: ${statusColor};">${statusText}</td>
@@ -970,6 +1198,7 @@
                             <span class="progress-text">${packProgress}%</span>
                           </div>
                         </td>
+                        <td>${Array.isArray(customer.packSeqs) ? customer.packSeqs.join(', ') : customer.packSeqs || '无'}</td>
                         <td class="action-cell">${actionButtons}</td>
                         <td>${lastUpdate}</td>
                     `;
@@ -1054,7 +1283,7 @@
               .value.trim(),
             autoSaveWorkerPath: document
               .getElementById('autoSaveWorkerPathModal')
-              .value.trim()
+              .value.trim(),
           };
 
           let result;
@@ -1105,20 +1334,26 @@
       });
 
       // 按钮事件处理
-      document.getElementById('viewDataBtn').addEventListener('click', async function () {
-        try {
-          // 确保获取最新配置
-          if (!config || Object.keys(config).length === 0) {
-            await loadConfigToModal();
-          }
-          
-          // 从配置中获取保存路径
-          const workerBackupPath = config.workerPackagesPath || 'D:/backup_data/backup/backup/worker';
-          const customerBackupPath = config.customerPackedPath || 'D:/backup_data/backup/backup/customer';
+      document
+        .getElementById('viewDataBtn')
+        .addEventListener('click', async function () {
+          try {
+            // 确保获取最新配置
+            if (!config || Object.keys(config).length === 0) {
+              await loadConfigToModal();
+            }
 
-          // 创建一个简单的选择对话框
-          const dialog = document.createElement('div');
-          dialog.style.cssText = `
+            // 从配置中获取保存路径
+            const workerBackupPath =
+              config.workerPackagesPath ||
+              'D:/backup_data/backup/backup/worker';
+            const customerBackupPath =
+              config.customerPackedPath ||
+              'D:/backup_data/backup/backup/customer';
+
+            // 创建一个简单的选择对话框
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
             position: fixed;
             top: 50%;
             left: 50%;
@@ -1131,9 +1366,9 @@
             min-width: 300px;
             text-align: center;
           `;
-          
-          const overlay = document.createElement('div');
-          overlay.style.cssText = `
+
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -1142,104 +1377,122 @@
             background: rgba(0,0,0,0.5);
             z-index: 999;
           `;
-          
-          const title = document.createElement('h3');
-          title.textContent = '请选择要打开的文件夹';
-          dialog.appendChild(title);
-          
-          const btn1 = document.createElement('button');
-          btn1.textContent = '客户数据文件路径';
-          btn1.style.cssText = 'margin: 10px; padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;';
-          btn1.onclick = async function() {
-            // 在 Electron 环境中打开客户数据文件路径
-            if (isElectron) {
-              const result = await window.electronAPI.openDirectory(customerBackupPath);
-              if (result.success) {
-                showNotification('已成功打开文件夹: ' + abbreviatePath(customerBackupPath), 'success');
-              } else {
-                showNotification('打开文件夹失败: ' + result.error, 'error');
-              }
-              document.body.removeChild(dialog);
-              document.body.removeChild(overlay);
-            } else {
-              // 发送请求到服务器打开客户数据文件路径
-              try {
-                const response = await fetch('/open-folder?path=' + encodeURIComponent(customerBackupPath));
-                const message = await response.text();
-                
-                if (response.ok) {
-                  showNotification(message);
+
+            const title = document.createElement('h3');
+            title.textContent = '请选择要打开的文件夹';
+            dialog.appendChild(title);
+
+            const btn1 = document.createElement('button');
+            btn1.textContent = '客户数据文件路径';
+            btn1.style.cssText =
+              'margin: 10px; padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            btn1.onclick = async function () {
+              // 在 Electron 环境中打开客户数据文件路径
+              if (isElectron) {
+                const result = await window.electronAPI.openDirectory(
+                  customerBackupPath
+                );
+                if (result.success) {
+                  showNotification(
+                    '已成功打开文件夹: ' + abbreviatePath(customerBackupPath),
+                    'success'
+                  );
                 } else {
-                  showNotification('打开文件夹失败: ' + message, 'error');
+                  showNotification('打开文件夹失败: ' + result.error, 'error');
                 }
                 document.body.removeChild(dialog);
                 document.body.removeChild(overlay);
-              } catch (err) {
-                showNotification('无法打开文件夹：' + err.message, 'error');
-                document.body.removeChild(dialog);
-                document.body.removeChild(overlay);
-              }
-            }
-          };
-          dialog.appendChild(btn1);
-          
-          const btn2 = document.createElement('button');
-          btn2.textContent = '工人打包文件路径';
-          btn2.style.cssText = 'margin: 10px; padding: 8px 16px; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer;';
-          btn2.onclick = async function() {
-            // 在 Electron 环境中打开工人打包文件路径
-            if (isElectron) {
-              const result = await window.electronAPI.openDirectory(workerBackupPath);
-              if (result.success) {
-                showNotification('已成功打开文件夹: ' + abbreviatePath(workerBackupPath), 'success');
               } else {
-                showNotification('打开文件夹失败: ' + result.error, 'error');
+                // 发送请求到服务器打开客户数据文件路径
+                try {
+                  const response = await fetch(
+                    '/open-folder?path=' +
+                      encodeURIComponent(customerBackupPath)
+                  );
+                  const message = await response.text();
+
+                  if (response.ok) {
+                    showNotification(message);
+                  } else {
+                    showNotification('打开文件夹失败: ' + message, 'error');
+                  }
+                  document.body.removeChild(dialog);
+                  document.body.removeChild(overlay);
+                } catch (err) {
+                  showNotification('无法打开文件夹：' + err.message, 'error');
+                  document.body.removeChild(dialog);
+                  document.body.removeChild(overlay);
+                }
               }
-              document.body.removeChild(dialog);
-              document.body.removeChild(overlay);
-            } else {
-              // 发送请求到服务器打开工人打包文件路径
-              try {
-                const response = await fetch('/open-folder?path=' + encodeURIComponent(workerBackupPath));
-                const message = await response.text();
-                
-                if (response.ok) {
-                  showNotification(message);
+            };
+            dialog.appendChild(btn1);
+
+            const btn2 = document.createElement('button');
+            btn2.textContent = '工人打包文件路径';
+            btn2.style.cssText =
+              'margin: 10px; padding: 8px 16px; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            btn2.onclick = async function () {
+              // 在 Electron 环境中打开工人打包文件路径
+              if (isElectron) {
+                const result = await window.electronAPI.openDirectory(
+                  workerBackupPath
+                );
+                if (result.success) {
+                  showNotification(
+                    '已成功打开文件夹: ' + abbreviatePath(workerBackupPath),
+                    'success'
+                  );
                 } else {
-                  showNotification('打开文件夹失败: ' + message, 'error');
+                  showNotification('打开文件夹失败: ' + result.error, 'error');
                 }
                 document.body.removeChild(dialog);
                 document.body.removeChild(overlay);
-              } catch (err) {
-                showNotification('无法打开文件夹：' + err.message, 'error');
-                document.body.removeChild(dialog);
-                document.body.removeChild(overlay);
+              } else {
+                // 发送请求到服务器打开工人打包文件路径
+                try {
+                  const response = await fetch(
+                    '/open-folder?path=' + encodeURIComponent(workerBackupPath)
+                  );
+                  const message = await response.text();
+
+                  if (response.ok) {
+                    showNotification(message);
+                  } else {
+                    showNotification('打开文件夹失败: ' + message, 'error');
+                  }
+                  document.body.removeChild(dialog);
+                  document.body.removeChild(overlay);
+                } catch (err) {
+                  showNotification('无法打开文件夹：' + err.message, 'error');
+                  document.body.removeChild(dialog);
+                  document.body.removeChild(overlay);
+                }
               }
-            }
-          };
-          dialog.appendChild(btn2);
-          
-          const cancelBtn = document.createElement('button');
-          cancelBtn.textContent = '取消';
-          cancelBtn.style.cssText = 'margin: 10px; padding: 8px 16px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;';
-          cancelBtn.onclick = function() {
-            document.body.removeChild(dialog);
-            document.body.removeChild(overlay);
-          };
-          dialog.appendChild(cancelBtn);
-          
-          document.body.appendChild(overlay);
-          document.body.appendChild(dialog);
-        } catch (error) {
-          console.error('打开路径出错:', error);
-          showNotification('打开路径出错: ' + error.message, 'error');
-        }
-      });
-      
+            };
+            dialog.appendChild(btn2);
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = '取消';
+            cancelBtn.style.cssText =
+              'margin: 10px; padding: 8px 16px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            cancelBtn.onclick = function () {
+              document.body.removeChild(dialog);
+              document.body.removeChild(overlay);
+            };
+            dialog.appendChild(cancelBtn);
+
+            document.body.appendChild(overlay);
+            document.body.appendChild(dialog);
+          } catch (error) {
+            console.error('打开路径出错:', error);
+            showNotification('打开路径出错: ' + error.message, 'error');
+          }
+        });
+
       // 添加操作按钮的事件处理
       document.addEventListener('DOMContentLoaded', () => {
         // 归档按钮事件
-        document.addEventListener('click', async (event) => {
+        document.addEventListener('click', async event => {
           if (event.target.classList.contains('archive-btn')) {
             const customerName = event.target.getAttribute('data-customer');
             if (confirm(`确定要归档客户 ${customerName} 吗？`)) {
@@ -1247,21 +1500,28 @@
                 let result;
                 if (isElectron) {
                   // Electron环境中调用归档功能
-                  result = await window.electronAPI.archiveCustomer(customerName);
+                  result = await window.electronAPI.archiveCustomer(
+                    customerName
+                  );
                 } else {
                   // Web环境中调用API
-                  const response = await fetch(`/api/customers/${encodeURIComponent(customerName)}/archive`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      remark: '通过界面归档'
-                    }),
-                  });
+                  const response = await fetch(
+                    `/api/customers/${encodeURIComponent(
+                      customerName
+                    )}/archive`,
+                    {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        remark: '通过界面归档',
+                      }),
+                    }
+                  );
                   result = await response.json();
                 }
-                
+
                 if (result.success) {
                   showNotification(`客户 ${customerName} 归档成功`, 'success');
                   // 刷新客户数据
@@ -1276,9 +1536,9 @@
             }
           }
         });
-        
+
         // 出货按钮事件
-        document.addEventListener('click', async (event) => {
+        document.addEventListener('click', async event => {
           if (event.target.classList.contains('ship-btn')) {
             const customerName = event.target.getAttribute('data-customer');
             if (confirm(`确定要出货客户 ${customerName} 吗？`)) {
@@ -1289,18 +1549,21 @@
                   result = await window.electronAPI.shipCustomer(customerName);
                 } else {
                   // Web环境中调用API
-                  const response = await fetch(`/api/customers/${encodeURIComponent(customerName)}/ship`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      remark: '通过界面出货'
-                    }),
-                  });
+                  const response = await fetch(
+                    `/api/customers/${encodeURIComponent(customerName)}/ship`,
+                    {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        remark: '通过界面出货',
+                      }),
+                    }
+                  );
                   result = await response.json();
                 }
-                
+
                 if (result.success) {
                   showNotification(`客户 ${customerName} 出货成功`, 'success');
                   // 刷新客户数据
@@ -1315,9 +1578,9 @@
             }
           }
         });
-        
+
         // 标记为未出货按钮事件
-        document.addEventListener('click', async (event) => {
+        document.addEventListener('click', async event => {
           if (event.target.classList.contains('not-shipped-btn')) {
             const customerName = event.target.getAttribute('data-customer');
             if (confirm(`确定要将客户 ${customerName} 标记为未出货吗？`)) {
@@ -1325,23 +1588,33 @@
                 let result;
                 if (isElectron) {
                   // Electron环境中调用标记功能
-                  result = await window.electronAPI.markCustomerNotShipped(customerName);
+                  result = await window.electronAPI.markCustomerNotShipped(
+                    customerName
+                  );
                 } else {
                   // Web环境中调用API
-                  const response = await fetch(`/api/customers/${encodeURIComponent(customerName)}/mark-not-shipped`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      remark: '通过界面标记为未出货'
-                    }),
-                  });
+                  const response = await fetch(
+                    `/api/customers/${encodeURIComponent(
+                      customerName
+                    )}/mark-not-shipped`,
+                    {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        remark: '通过界面标记为未出货',
+                      }),
+                    }
+                  );
                   result = await response.json();
                 }
-                
+
                 if (result.success) {
-                  showNotification(`客户 ${customerName} 已标记为未出货`, 'success');
+                  showNotification(
+                    `客户 ${customerName} 已标记为未出货`,
+                    'success'
+                  );
                   // 刷新客户数据
                   await loadCustomers();
                 } else {
@@ -1349,35 +1622,45 @@
                 }
               } catch (error) {
                 console.error('标记客户为未出货出错:', error);
-                showNotification(`标记客户为未出货出错: ${error.message}`, 'error');
+                showNotification(
+                  `标记客户为未出货出错: ${error.message}`,
+                  'error'
+                );
               }
             }
           }
         });
-        
+
         // 检查状态按钮事件
-        document.addEventListener('click', async (event) => {
+        document.addEventListener('click', async event => {
           if (event.target.classList.contains('check-status-btn')) {
             const customerName = event.target.getAttribute('data-customer');
             try {
               let result;
               if (isElectron) {
                 // Electron环境中调用检查功能
-                result = await window.electronAPI.checkCustomerStatus(customerName);
+                result = await window.electronAPI.checkCustomerStatus(
+                  customerName
+                );
               } else {
                 // Web环境中调用API
-                const response = await fetch(`/api/customers/${encodeURIComponent(customerName)}/check-status`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                });
+                const response = await fetch(
+                  `/api/customers/${encodeURIComponent(
+                    customerName
+                  )}/check-status`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  }
+                );
                 result = await response.json();
               }
-              
+
               if (result.success) {
                 showNotification(
-                  `客户 ${customerName} 状态: ${result.status}, 打包进度: ${result.packProgress}%`, 
+                  `客户 ${customerName} 状态: ${result.status}, 打包进度: ${result.packProgress}%`,
                   'info'
                 );
                 // 刷新客户数据

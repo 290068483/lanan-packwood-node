@@ -1,0 +1,23 @@
+{
+  "dataSync": {
+    "enabled": true,
+    "syncInterval": 60,
+    "enableFileWatch": false,
+    "sourcePath": "//A6/蓝岸文件/1、客户总文件/3、生产/1、正单",
+    "localPath": "C:/Program Files (x86)/MPM/temp/local",
+    "networkPath": "//c1/mpm/temp/local/test",
+    "databasePath": "./data/customer.db"
+  },
+  "statusManagement": {
+    "enabled": true,
+    "autoUpdateStatus": true,
+    "statusCheckInterval": 30,
+    "enableNotification": true
+  },
+  "logging": {
+    "level": "info",
+    "file": "./logs/data-sync.log",
+    "maxSize": "10m",
+    "maxFiles": 5
+  }
+}
