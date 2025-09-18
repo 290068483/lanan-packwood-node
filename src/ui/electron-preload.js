@@ -22,6 +22,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   startProcessing: () => ipcRenderer.invoke('start-processing'),
   stopProcessing: () => ipcRenderer.invoke('stop-processing'),
   
+  // 客户状态管理相关
+  archiveCustomer: (customerName) => ipcRenderer.invoke('archive-customer', customerName),
+  shipCustomer: (customerName) => ipcRenderer.invoke('ship-customer', customerName),
+  markCustomerNotShipped: (customerName) => ipcRenderer.invoke('mark-customer-not-shipped', customerName),
+  checkCustomerStatus: (customerName) => ipcRenderer.invoke('check-customer-status', customerName),
+  
   // 自动保存相关
   startAutoSaveCustomer: () => ipcRenderer.invoke('start-auto-save-customer'),
   startAutoSaveWorker: () => ipcRenderer.invoke('start-auto-save-worker'),

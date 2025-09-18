@@ -9,6 +9,7 @@ const { checkDataIntegrity } = require('./utils/data-integrity-check');
 // const { networkMonitor } = require('./network/network-monitor');
 const CleanupTask = require('./utils/cleanup-task');
 const DataManager = require('./utils/data-manager');
+const EnhancedFileWatcher = require('./utils/enhanced-file-watcher');
 
 // 添加Electron支持
 let isElectron = false;
@@ -50,6 +51,62 @@ function getCustomerDirectoryName(customerName) {
 
 // 启动定时清理任务
 CleanupTask.start();
+
+// 初始化并启动增强的文件监控器
+let fileWatcher = null;
+function initFileWatcher() {
+  if (fileWatcher) {
+    fileWatcher.stop();
+  }
+  
+  fileWatcher = new EnhancedFileWatcher({
+    workerPackagesPath: config.localPath
+  });
+  
+  // 添加回调函数，当检测到packages.json变化时更新客户状态
+  fileWatcher.addCallback(async (filePath, changes) => {
+    try {
+      console.log(`检测到文件变化: ${filePath}`);
+      
+      // 从文件路径提取客户名称
+      const dirName = path.basename(path.dirname(filePath));
+      const customerName = dirName.replace(/\d{6}_/, '').replace(/[#.]$/, '');
+      
+      console.log(`客户名称: ${customerName}`);
+      
+      // 从数据管理器获取客户数据
+      const customerData = await DataManager.getCustomer(customerName);
+      if (customerData) {
+        // 保存更新后的数据
+        await DataManager.upsertCustomer(changes.customerData);
+        
+        logSuccess(
+          customerName, 
+          'FILE_WATCHER', 
+          `客户状态已更新: ${changes.status} (${changes.packProgress}%)`
+        );
+      }
+    } catch (error) {
+      console.error(`处理文件变化时出错: ${error.message}`);
+      logError(
+        'FILE_WATCHER', 
+        'FILE_WATCHER', 
+        `处理文件变化时出错: ${error.message}`
+      );
+    }
+  });
+  
+  // 启动文件监控
+  try {
+    fileWatcher.start('onChange', 5);
+    logInfo('SYSTEM', 'FILE_WATCHER', '文件监控已启动');
+  } catch (error) {
+    logError('SYSTEM', 'FILE_WATCHER', `启动文件监控失败: ${error.message}`);
+  }
+}
+
+// 初始化文件监控器
+initFileWatcher();
 
 /**
  * 处理所有客户数据
@@ -147,5 +204,7 @@ if (require.main === module) {
 // 导出函数供其他模块使用
 module.exports = {
   processAllCustomers,
-  getCustomerDirectoryName
+  getCustomerDirectoryName,
+  initFileWatcher,
+  fileWatcher
 };

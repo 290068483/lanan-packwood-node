@@ -226,6 +226,123 @@ ipcMain.handle('stop-processing', async () => {
   }
 });
 
+// 客户状态管理相关处理程序
+ipcMain.handle('archive-customer', async (event, customerName) => {
+  try {
+    const customerStatusManager = require('../utils/customer-status-manager');
+    const customerData = await DataManager.getCustomer(customerName);
+    
+    if (!customerData) {
+      return { success: false, message: '客户不存在' };
+    }
+    
+    // 归档客户
+    const updatedData = customerStatusManager.archiveCustomer(customerData, 'Electron', '通过界面归档');
+    
+    // 保存更新后的数据
+    await DataManager.upsertCustomer(updatedData);
+    
+    return { success: true, message: '客户归档成功', status: updatedData.status };
+  } catch (error) {
+    console.error('归档客户失败:', error);
+    return { success: false, message: `归档客户失败: ${error.message}` };
+  }
+});
+
+ipcMain.handle('ship-customer', async (event, customerName) => {
+  try {
+    const customerStatusManager = require('../utils/customer-status-manager');
+    const customerData = await DataManager.getCustomer(customerName);
+    
+    if (!customerData) {
+      return { success: false, message: '客户不存在' };
+    }
+    
+    // 出货客户
+    const updatedData = customerStatusManager.shipCustomer(customerData, 'Electron', '通过界面出货');
+    
+    // 保存更新后的数据
+    await DataManager.upsertCustomer(updatedData);
+    
+    return { success: true, message: '客户出货成功', status: updatedData.status };
+  } catch (error) {
+    console.error('出货客户失败:', error);
+    return { success: false, message: `出货客户失败: ${error.message}` };
+  }
+});
+
+ipcMain.handle('mark-customer-not-shipped', async (event, customerName) => {
+  try {
+    const customerStatusManager = require('../utils/customer-status-manager');
+    const customerData = await DataManager.getCustomer(customerName);
+    
+    if (!customerData) {
+      return { success: false, message: '客户不存在' };
+    }
+    
+    // 标记客户为未出货
+    const updatedData = customerStatusManager.markCustomerNotShipped(customerData, 'Electron', '通过界面标记为未出货');
+    
+    // 保存更新后的数据
+    await DataManager.upsertCustomer(updatedData);
+    
+    return { success: true, message: '客户已标记为未出货', status: updatedData.status };
+  } catch (error) {
+    console.error('标记客户为未出货失败:', error);
+    return { success: false, message: `标记客户为未出货失败: ${error.message}` };
+  }
+});
+
+ipcMain.handle('check-customer-status', async (event, customerName) => {
+  try {
+    const customerStatusManager = require('../utils/customer-status-manager');
+    const PackageDataExtractor = require('../utils/package-data-extractor');
+    
+    // 获取客户数据
+    const customerData = await DataManager.getCustomer(customerName);
+    
+    if (!customerData) {
+      return { success: false, message: '客户不存在' };
+    }
+    
+    // 获取packages.json文件路径
+    const packagesPath = path.join(customerData.outputPath, 'packages.json');
+    
+    // 读取packages.json数据
+    let packagesData = [];
+    if (fs.existsSync(packagesPath)) {
+      packagesData = PackageDataExtractor.extractCustomerPackageData(packagesPath);
+    }
+    
+    // 检查客户状态
+    const statusInfo = customerStatusManager.checkPackStatus(customerData, packagesData);
+    
+    // 更新客户状态
+    const updatedData = customerStatusManager.updateCustomerStatus(
+      customerData, 
+      statusInfo, 
+      'Electron', 
+      'Electron检查状态'
+    );
+    
+    // 保存更新后的数据
+    await DataManager.upsertCustomer(updatedData);
+    
+    return {
+      success: true,
+      status: statusInfo.status,
+      packedCount: statusInfo.packedCount,
+      totalParts: statusInfo.totalParts,
+      packProgress: statusInfo.packProgress,
+      packSeqs: statusInfo.packSeqs,
+      timestamp: statusInfo.timestamp
+    };
+  } catch (error) {
+    console.error('检查客户状态失败:', error);
+    return { success: false, message: `检查客户状态失败: ${error.message}` };
+  }
+});
+
 // 自动保存相关处理程序
 ipcMain.handle('start-auto-save-customer', async () => {
   // 这里应该实现客户数据自动保存逻辑
