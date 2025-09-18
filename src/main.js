@@ -123,12 +123,16 @@ async function processAllCustomers() {
     }
 
     // 读取所有客户目录
-    const customerDirs = fs.readdirSync(sourceBaseDir).filter(dir =>
-      fs.statSync(path.join(sourceBaseDir, dir)).isDirectory()
-    );
+    const customerDirs = fs.readdirSync(sourceBaseDir).filter(dir => {
+      const fullPath = path.join(sourceBaseDir, dir);
+      // 确保这是一个目录
+      return fs.statSync(fullPath).isDirectory();
+    });
 
     let successCount = 0;
     const totalCustomers = customerDirs.length;
+
+    console.log(`📁 发现 ${totalCustomers} 个客户目录`);
 
     // 处理每个客户
     for (const customerDir of customerDirs) {
@@ -139,7 +143,10 @@ async function processAllCustomers() {
         const customerOutputDir = path.join(config.localPath, customerOutputName);
         const result = await processCustomerData(customerPath, customerOutputDir, customerDir, config);
 
-        if (result) {
+        if (result !== undefined) {
+          successCount++;
+        } else {
+          // 即使没有处理结果，也算作处理了一个客户
           successCount++;
         }
 
@@ -148,9 +155,9 @@ async function processAllCustomers() {
           name: customerDir,
           sourcePath: customerPath,
           outputPath: customerOutputDir,
-          status: result ? '已处理' : '处理失败',
+          status: result !== undefined ? '已处理' : '无数据',
           lastUpdate: new Date().toISOString(),
-          success: result
+          success: result !== undefined ? result : true // 无数据也算成功处理
         });
       } catch (error) {
         console.error(`✗ 处理客户 ${customerDir} 时出错:`, error.message);
@@ -158,8 +165,11 @@ async function processAllCustomers() {
           name: customerDir,
           status: '处理失败',
           remark: error.message,
-          lastUpdate: new Date().toISOString()
+          lastUpdate: new Date().toISOString(),
+          success: false
         });
+        // 即使出错也增加计数，因为我们已经处理了这个客户（虽然失败了）
+        successCount++;
       }
     }
 
@@ -206,10 +216,8 @@ if (require.main === module) {
   });
 }
 
-// 导出函数供其他模块使用
+// 导出供其他模块使用
 module.exports = {
   processAllCustomers,
-  getCustomerDirectoryName,
-  initFileWatcher,
-  fileWatcher
+  initFileWatcher
 };

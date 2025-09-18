@@ -39,15 +39,31 @@ class CustomerStatusManager {
    * @returns {Object} - 状态信息
    */
   checkPackStatus(customerData, packagesData) {
-    // 1. 获取客户所有板件的ID
-    const allPartIDs = customerData.panels.map(panel => panel.id);
+    // 确保customerData和packagesData存在
+    if (!customerData || !packagesData) {
+      return {
+        status: this.STATUS.UNKNOWN,
+        packProgress: 0,
+        packedParts: 0,
+        totalParts: 0,
+        packSeqs: []
+      };
+    }
 
+    // 确保customerData.panels存在且为数组
+    const allPartIDs = customerData.panels ? customerData.panels.map(panel => panel.id) : [];
+
+    // 确保packagesData是数组
+    const validPackagesData = Array.isArray(packagesData) ? packagesData : [];
+
+    // 确保customerData.packSeqs存在且为数组
+    const existingPackSeqs = customerData.packSeqs ? customerData.packSeqs : [];
     // 2. 从packages.json中提取所有partIDs
     const allPackedPartIDs = [];
     const packageInfo = [];
 
-    if (packagesData && Array.isArray(packagesData)) {
-      packagesData.forEach(packageItem => {
+    if (validPackagesData && Array.isArray(validPackagesData)) {
+      validPackagesData.forEach(packageItem => {
         if (packageItem.partIDs && Array.isArray(packageItem.partIDs)) {
           allPackedPartIDs.push(...packageItem.partIDs);
           packageInfo.push({
@@ -75,7 +91,7 @@ class CustomerStatusManager {
     });
 
     // 4. 计算打包进度
-    const packProgress = Math.round((packedCount / allPartIDs.length) * 100);
+    const packProgress = allPartIDs.length > 0 ? Math.round((packedCount / allPartIDs.length) * 100) : 0;
 
     // 5. 确定客户状态
     let status = this.STATUS.NOT_PACKED;
@@ -87,8 +103,8 @@ class CustomerStatusManager {
 
     // 6. 获取客户的所有包号
     const customerPackSeqs = [];
-    if (packagesData && Array.isArray(packagesData)) {
-      packagesData.forEach(packageItem => {
+    if (validPackagesData && Array.isArray(validPackagesData)) {
+      validPackagesData.forEach(packageItem => {
         if (packageItem.partIDs && Array.isArray(packageItem.partIDs)) {
           // 检查这个包是否包含客户的板件
           const hasCustomerParts = packageItem.partIDs.some(partID => allPartIDs.includes(partID));

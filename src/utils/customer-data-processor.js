@@ -11,6 +11,8 @@ const { syncPackageAndData } = require('./data-sync');
 const { generateExcel } = require('../excel/excel-generator-enhanced');
 const { incrementalSyncToNetwork } = require('../network/network-sync');
 const customerStatusManager = require('./customer-status-manager');
+const DataManager = require('./data-manager');
+const PackageDataExtractor = require('./package-data-extractor');
 
 /**
  * 从整个数据结构中递归提取Panel节点
@@ -489,7 +491,7 @@ async function processCustomerData(
       'PROCESS',
       `客户处理完成 (${lineSuccessCount}/${lineDirs.length} 产线成功)`
     );
-    
+
     // 更新客户状态
     try {
       // 从数据管理器获取客户数据
@@ -497,38 +499,38 @@ async function processCustomerData(
       if (customerData) {
         // 获取packages.json文件路径
         const packagesPath = path.join(customerData.outputPath, 'packages.json');
-        
+
         // 读取packages.json数据
         let packagesData = [];
         if (fs.existsSync(packagesPath)) {
           packagesData = PackageDataExtractor.extractCustomerPackageData(packagesPath);
         }
-        
+
         // 检查客户状态
         const statusInfo = customerStatusManager.checkPackStatus(customerData, packagesData);
-        
+
         // 更新客户状态
         const updatedData = customerStatusManager.updateCustomerStatus(
-          customerData, 
-          statusInfo, 
-          '系统', 
+          customerData,
+          statusInfo,
+          '系统',
           '客户数据处理完成'
         );
-        
+
         // 保存更新后的数据
         await DataManager.upsertCustomer(updatedData);
-        
+
         logSuccess(
-          customerName, 
-          'PROCESS', 
+          customerName,
+          'PROCESS',
           `客户状态已更新: ${statusInfo.status} (${statusInfo.packProgress}%)`
         );
       }
     } catch (statusError) {
       console.error(`更新客户状态时出错: ${statusError.message}`);
       logError(
-        customerName, 
-        'PROCESS', 
+        customerName,
+        'PROCESS',
         `更新客户状态时出错: ${statusError.message}`
       );
     }

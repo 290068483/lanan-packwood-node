@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { logInfo, logError, logWarning, logSuccess } = require('./logger');
 const customerStatusManager = require('./customer-status-manager');
 const PackageDataExtractor = require('./package-data-extractor');
