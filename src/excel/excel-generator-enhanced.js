@@ -152,8 +152,8 @@ async function generateExcel(
                     totalPanels++;
 
                     // 计算面积（长*宽，转换为平方米）
-                    const length = item['@_Length'] || 0;
-                    const width = item['@_Width'] || 0;
+                    const length = parseFloat(item['@_Length']) || 0;
+                    const width = parseFloat(item['@_Width']) || 0;
                     const area = ((length * width) / 1000000).toFixed(3);
 
                     // 组合基材和颜色
@@ -163,6 +163,24 @@ async function generateExcel(
                         basicMaterial && materialColor
                             ? `${basicMaterial}/${materialColor}`
                             : basicMaterial || materialColor || '';
+
+                    // 处理封边数据 - 老系统从板件明细中复制，现在从XML中提取
+                    let edgeBanding = item['@_EdgeBanding'] || '';
+                    if (edgeBanding && typeof edgeBanding === 'string') {
+                        // 处理可能的分隔符，如逗号、分号等
+                        edgeBanding = edgeBanding.replace(/[,;]+/g, ', ');
+                        // 确保没有多余的空格
+                        edgeBanding = edgeBanding.replace(/\s+/g, ' ').trim();
+                    }
+
+                    // 处理孔数据 - 老系统从板件明细中复制，现在从XML中提取
+                    let hole = item['@_Hole'] || '';
+                    if (hole && typeof hole === 'string') {
+                        // 处理可能的分隔符，如逗号、分号等
+                        hole = hole.replace(/[,;]+/g, ', ');
+                        // 确保没有多余的空格
+                        hole = hole.replace(/\s+/g, ' ').trim();
+                    }
 
                     // 从Uid提取ID号（从右往左数5位）
                     let idNumber = '';
@@ -190,13 +208,15 @@ async function generateExcel(
                         thickness: item['@_Thickness'] || '', // 厚
                         area: area,
                         grain: item['@_Grain'] || '',
-                        edgeBanding: item['@_EdgeBanding'] || '', // 封边
-                        hole: item['@_Hole'] || '', // 孔
+                        edgeBanding: item['@_EdgeBanding'] || '', // 封边 (已优化处理)
+                        hole: item['@_Hole'] || '', // 孔 (已优化处理)
                         slot: item['@_Slot'] || '', // 槽铣
                         straightening: item['@_Straightening'] || '', // 拉直
                         doorDirection: item['@_DoorDirection'] || '',
                         hingeHole: item['@_HingeHole'] || '', // 门铰孔
                         remarks: item['@_Remarks'] || '', // 备注
+                        packSeq: '', // 包号，将在后面填充
+                        packDate: '', // 打包时间，将在后面填充
                         isPackaged: packageChanged && idNumber && packagedIds.has(idNumber)
                     };
 
@@ -209,8 +229,22 @@ async function generateExcel(
                         for (const packageItem of packageArray) {
                             if (packageItem.partIDs && Array.isArray(packageItem.partIDs)) {
                                 if (packageItem.partIDs.includes(item['@_Uid'])) {
-                                    panelData.packSeq = packageItem.packSeq || '';
-                                    panelData.packDate = packageItem.packDate || '';
+                                    // 使用packages.json中的实际值，如果没有则使用默认值
+                                    panelData.packSeq = packageItem.packSeq || `包${String(packageArray.indexOf(packageItem) + 1).padStart(3, "0")}`;
+                                    // 格式化日期时间
+                                    if (packageItem.packDate) {
+                                        const date = new Date(packageItem.packDate);
+                                        panelData.packDate = date.toLocaleString('zh-CN', {
+                                            year: 'numeric',
+                                            month: '2-digit',
+                                            day: '2-digit',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            second: '2-digit'
+                                        });
+                                    } else {
+                                        panelData.packDate = new Date().toLocaleString('zh-CN');
+                                    }
                                     break;
                                 }
                             }
@@ -272,7 +306,7 @@ async function generateExcel(
 
         // 设置列宽（更接近old系统的设置，增加了包号和打包时间列）
         worksheet1.columns = [
-            { width: 4 },  // 标签号
+            { width: 8 },  // 标签号
             { width: 6 },  // ID号
             { width: 7 },  // 方案板号
             { width: 20 }, // 基材和颜色
@@ -290,10 +324,14 @@ async function generateExcel(
             { width: 8 },  // 拉直
             { width: 8 },  // 门向
             { width: 10 }, // 门铰孔
-            { width: 5 },  // 包号
+            { width: 8 },  // 包号 (增加宽度)
             { width: 20 }, // 打包时间
             { width: 20 }, // 备注
         ];
+
+        // 设置封边和孔列的文本换行和自动调整行高
+        worksheet1.getColumn('M').alignment = { wrapText: true, vertical: 'middle' }; // 封边列
+        worksheet1.getColumn('N').alignment = { wrapText: true, vertical: 'middle' }; // 孔列
 
         // 添加"已打包"工作表
         const worksheet2 = workbook.addWorksheet('已打包');
@@ -415,11 +453,32 @@ async function generateExcel(
 
         // 如果有packages.json数据，则添加已打包记录
         if (packagesData) {
-            // 处理打包数据（这里简化处理，实际应用中需要根据packages.json的结构来处理）
+            // 确保packagesData是数组格式
             const packageArray = Array.isArray(packagesData) ? packagesData : [packagesData];
+            // 检查是否有打包数据
+            let hasPackagedData = false;
+            packageArray.forEach(packageItem => {
+                if (packageItem.partIDs && Array.isArray(packageItem.partIDs) && packageItem.partIDs.length > 0) {
+                    hasPackagedData = true;
+                }
+            });
+
+            // 如果没有打包数据，添加提示信息
+            if (!hasPackagedData) {
+                const noDataRow = worksheet2.addRow([
+                    "暂无打包数据", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
+                ]);
+                noDataRow.font = { italic: true };
+                noDataRow.alignment = { vertical: "middle", horizontal: "center" };
+                // 合并单元格
+                worksheet2.mergeCells(4, 1, 4, 15);
+                // 不提前返回，继续执行后续代码
+            }
+            // 处理打包数据（这里简化处理，实际应用中需要根据packages.json的结构来处理）
+            // packageArray已经在上面定义过了，这里不需要重复定义
 
             packageArray.forEach((packageItem, index) => {
-                const packSeq = packageItem.packSeq || `包${index + 1}`;
+                const packSeq = packageItem.packSeq || `包${String(index + 1).padStart(3, "0")}`;
                 const packQty = packageItem.packQty || 1;
                 const packDate = packageItem.packDate || new Date().toLocaleString();
 
@@ -434,7 +493,16 @@ async function generateExcel(
                         }
 
                         // 查找对应的板件数据
-                        const panelData = allPanelData.find(data => data.idNumber === idNumber);
+                        // 先尝试精确匹配
+                        let panelData = allPanelData.find(data => data.idNumber === idNumber);
+                        // 如果找不到，尝试匹配完整UID
+                        if (!panelData && partId) {
+                            panelData = allPanelData.find(data => data.idNumber === partId.substring(partId.length - 5, partId.length));
+                        }
+                        // 如果还找不到，尝试匹配整个UID
+                        if (!panelData && partId) {
+                            panelData = allPanelData.find(data => data.idNumber === partId);
+                        }
 
                         if (panelData) {
                             const dataRow = worksheet2.addRow([
@@ -474,6 +542,15 @@ async function generateExcel(
                     });
                 }
             });
+        } else {
+            // 如果没有packages.json数据，添加提示信息
+            const noDataRow = worksheet2.addRow([
+                "暂无打包数据", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
+            ]);
+            noDataRow.font = { italic: true };
+            noDataRow.alignment = { vertical: "middle", horizontal: "center" };
+            // 合并单元格
+            worksheet2.mergeCells(4, 1, 4, 15);
         }
 
         // 设置第二个工作表的列宽
@@ -494,6 +571,10 @@ async function generateExcel(
             { width: 5 },   // 面积
             { width: 30 }   // 备注
         ];
+
+        // 设置第二个工作表的封边和孔列的文本换行和自动调整行高
+        worksheet2.getColumn('H').alignment = { wrapText: true, vertical: 'middle' }; // 基材和颜色列
+        worksheet2.getColumn('O').alignment = { wrapText: true, vertical: 'middle' }; // 备注列
 
         // 设置第二个工作表的默认行高
         worksheet2.eachRow((row, rowNumber) => {
