@@ -8,7 +8,7 @@ const {
 } = require('./xml-parser');
 const { generateTempXml } = require('./xml-generator');
 const { syncPackageAndData } = require('./data-sync');
-const { generateExcel } = require('../excel/excel-generator');
+const { generateExcel } = require('../excel/excel-generator-enhanced');
 const { incrementalSyncToNetwork } = require('../network/network-sync');
 
 /**
