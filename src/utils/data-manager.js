@@ -20,6 +20,18 @@ if (!fs.existsSync(dbPath)) {
 }
 
 class DataManager {
+  // 检查数据库连接状态
+  static checkConnection() {
+    try {
+      // 尝试读取数据库文件来检查连接状态
+      fs.accessSync(dbPath, fs.constants.R_OK | fs.constants.W_OK);
+      return true;
+    } catch (error) {
+      console.error('数据库连接检查失败:', error.message);
+      return false;
+    }
+  }
+
   // 读取数据库
   static readDB() {
     const data = fs.readFileSync(dbPath, 'utf8');

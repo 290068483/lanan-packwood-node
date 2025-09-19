@@ -1,38 +1,19 @@
-/**
- * 修复后的配置保存功能
- * 先读取现有配置，然后进行增量更新
- */
-async function saveConfigWithMerge(newConfig) {
-  try {
-    // 读取现有配置文件
-    const fs = require('fs');
-    const path = require('path');
-    const configPath = path.join(__dirname, '../../config.json');
+const fs = require('fs');
+const path = require('path');
 
-    // 读取现有配置
-    let existingConfig = {};
+/**
+ * 获取配置
+ * @returns {Object} 配置对象
+ */
+function getConfig() {
+  try {
+    const configPath = path.join(__dirname, '../../config.json');
     if (fs.existsSync(configPath)) {
-      try {
-        const configContent = fs.readFileSync(configPath, 'utf8');
-        existingConfig = JSON.parse(configContent);
-        console.log('✅ 成功读取现有配置文件');
-      } catch (parseError) {
-        console.warn('⚠ 解析现有配置文件失败，将使用默认配置:', parseError.message);
-        existingConfig = {
-          sourcePath: "//A6/蓝岸文件/1、客户总文件/3、生产/1、正单",
-          localPath: "C:/Program Files (x86)/MPM/temp/local",
-          networkPath: "//c1/mpm/temp/local/test",
-          customerPackedPath: "D:/backup_data/backup/customer",
-          workerPackagesPath: "D:/backup_data/backup/worker",
-          autoSaveCustomerPath: "D:/backup_data/backup/customer",
-          autoSaveWorkerPath: "D:/backup_data/backup/worker",
-          autoSavePath: "C:\\Users\\Administrator\\Documents\\PackNodeAutoSaves"
-        };
-      }
+      const configContent = fs.readFileSync(configPath, 'utf8');
+      return JSON.parse(configContent);
     } else {
-      console.log('⚠ 配置文件不存在，将创建新配置');
-      // 使用默认配置
-      existingConfig = {
+      // 返回默认配置
+      return {
         sourcePath: "//A6/蓝岸文件/1、客户总文件/3、生产/1、正单",
         localPath: "C:/Program Files (x86)/MPM/temp/local",
         networkPath: "//c1/mpm/temp/local/test",
@@ -43,6 +24,33 @@ async function saveConfigWithMerge(newConfig) {
         autoSavePath: "C:\\Users\\Administrator\\Documents\\PackNodeAutoSaves"
       };
     }
+  } catch (error) {
+    console.error('读取配置文件出错:', error);
+    // 返回默认配置
+    return {
+      sourcePath: "//A6/蓝岸文件/1、客户总文件/3、生产/1、正单",
+      localPath: "C:/Program Files (x86)/MPM/temp/local",
+      networkPath: "//c1/mpm/temp/local/test",
+      customerPackedPath: "D:/backup_data/backup/customer",
+      workerPackagesPath: "D:/backup_data/backup/worker",
+      autoSaveCustomerPath: "D:/backup_data/backup/customer",
+      autoSaveWorkerPath: "D:/backup_data/backup/worker",
+      autoSavePath: "C:\\Users\\Administrator\\Documents\\PackNodeAutoSaves"
+    };
+  }
+}
+
+/**
+ * 修复后的配置保存功能
+ * 先读取现有配置，然后进行增量更新
+ */
+function saveConfigWithMerge(newConfig) {
+  try {
+    // 读取现有配置文件
+    const configPath = path.join(__dirname, '../../config.json');
+
+    // 读取现有配置
+    let existingConfig = getConfig();
 
     // 合并配置 - 只更新提供的字段，保留其他现有字段
     const mergedConfig = { ...existingConfig, ...newConfig };
@@ -99,5 +107,6 @@ async function saveConfigWithMerge(newConfig) {
 }
 
 module.exports = {
+  getConfig,
   saveConfigWithMerge
 };

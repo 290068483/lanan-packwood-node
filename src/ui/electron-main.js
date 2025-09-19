@@ -1,9 +1,12 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
-const { exec } = require('child_process');
-const DataManager = require('../utils/data-manager');
 const fs = require('fs');
+const { exec } = require('child_process');
+
+// 导入功能模块
 const { processAllCustomers } = require('../main');
+const configManager = require('../utils/config-manager');
+const DataManager = require('../utils/data-manager');
 
 // 禁用安全警告
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
@@ -16,17 +19,25 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: false, // 禁用 nodeIntegration 提高安全性
-      contextIsolation: true, // 启用上下文隔离
-      preload: path.join(__dirname, 'electron-preload.js'), // 指定预加载脚本
+      // 启用沙箱
+      sandbox: false,
+      // 预加载脚本
+      preload: path.join(__dirname, 'electron-preload.js'),
+      // 启用Node.js集成
+      nodeIntegration: false,
+      // 启用上下文隔离
+      contextIsolation: true,
+      // 禁用实验性特性
+      experimentalFeatures: false,
+      // 禁用webview标签
+      webviewTag: false
     }
   });
 
-  // 加载界面文件
-  const startUrl = process.env.ELECTRON_START_URL || `file://${path.resolve(__dirname, 'index.html')}`;
-  mainWindow.loadURL(startUrl);
+  // 加载主界面
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  // 在开发模式下打开开发者工具
+  // 开发环境下打开开发者工具
   if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
   }
@@ -36,24 +47,22 @@ function createWindow() {
   });
 }
 
+// 应用准备就绪时创建窗口
 app.whenReady().then(() => {
-  try {
-    createWindow();
+  createWindow();
 
-    app.on('activate', function () {
-      if (BrowserWindow.getAllWindows().length === 0) createWindow();
-    });
-  } catch (error) {
-    console.error('创建窗口失败:', error);
-    process.exit(1);
-  }
-}).catch(error => {
-  console.error('应用启动失败:', error);
-  process.exit(1);
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
 });
 
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit();
+// 所有窗口关闭时退出应用（非macOS）
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
 // 全局未捕获异常处理
@@ -78,99 +87,13 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // IPC 处理程序
+// 获取客户数据
 ipcMain.handle('get-customers', async () => {
   try {
-    // 读取配置
-    const configPath = path.join(__dirname, '../../config.json');
-    if (!fs.existsSync(configPath)) {
-      return { success: false, error: '配置文件不存在' };
-    }
-    
-    const configContent = fs.readFileSync(configPath, 'utf8');
-    const config = JSON.parse(configContent);
-    
-    // 检查源路径是否存在
-    const sourcePath = config.sourcePath;
-    if (!sourcePath) {
-      return { success: false, error: '未配置源路径' };
-    }
-    
-    // 读取源路径中的客户目录
-    let customerDirs = [];
-    try {
-      customerDirs = fs.readdirSync(sourcePath)
-        .filter(dir => {
-          const fullPath = path.join(sourcePath, dir);
-          return fs.statSync(fullPath).isDirectory();
-        });
-    } catch (error) {
-      return { success: false, error: `读取客户目录出错: ${error.message}` };
-    }
-    
-    // 处理每个客户目录
-    const customers = [];
-    for (const dir of customerDirs) {
-      try {
-        // 解析客户名称（从目录名中提取）
-        const customerName = dir.replace(/^\d{6}_/, '').replace(/#$/, '');
-        
-        // 获取客户目录路径
-        const customerDirPath = path.join(sourcePath, dir);
-        
-        // 检查是否有packages.json文件
-        const packagesPath = path.join(customerDirPath, 'packages.json');
-        let packagesData = [];
-        let packProgress = 0;
-        let packSeqs = [];
-        
-        if (fs.existsSync(packagesPath)) {
-          packagesData = JSON.parse(fs.readFileSync(packagesPath, 'utf8'));
-          
-          // 计算打包进度
-          if (Array.isArray(packagesData)) {
-            // 获取所有partIDs
-            const allPartIDs = [];
-            packagesData.forEach(pkg => {
-              if (pkg.partIDs && Array.isArray(pkg.partIDs)) {
-                allPartIDs.push(...pkg.partIDs);
-              }
-            });
-            
-            // 获取包号
-            packSeqs = packagesData.map(pkg => pkg.packSeq || '').filter(seq => seq);
-            
-            // 假设客户数据中所有板件都需要打包
-            // 这里需要根据实际情况调整
-            const totalParts = allPartIDs.length;
-            packProgress = totalParts > 0 ? Math.round(100) : 0; // 假设所有板件都已打包
-          }
-        }
-        
-        // 确定客户状态
-        let status = '未打包';
-        if (packProgress === 100) {
-          status = '已打包';
-        } else if (packProgress > 0) {
-          status = '正在处理';
-        }
-        
-        // 添加到客户列表
-        customers.push({
-          name: customerName,
-          status,
-          packProgress,
-          packSeqs,
-          lastUpdate: new Date().toISOString()
-        });
-      } catch (error) {
-        console.error(`处理客户目录 ${dir} 出错:`, error);
-      }
-    }
-    
-    return customers;
+    return DataManager.getAllCustomers();
   } catch (error) {
-    console.error('获取客户数据出错:', error);
-    return { success: false, error: `获取客户数据出错: ${error.message}` };
+    console.error('获取客户数据时出错:', error);
+    throw error;
   }
 });
 
@@ -184,13 +107,14 @@ ipcMain.handle('add-customer', async (event, customer) => {
   }
 });
 
-ipcMain.handle('update-customer-status', async (event, name, status, remark) => {
+// 更新客户状态
+ipcMain.handle('update-customer-status', async (_event, customerName, status, remark) => {
   try {
-    await DataManager.updateCustomerStatus(name, status, remark);
+    await DataManager.updateCustomerStatus(customerName, status, remark);
     return { success: true };
   } catch (error) {
-    console.error('更新客户状态失败:', error);
-    return { success: false, error: `更新客户状态失败: ${error.message}` };
+    console.error('更新客户状态时出错:', error);
+    throw error;
   }
 });
 
@@ -294,61 +218,43 @@ ipcMain.handle('get-customer-details', async (event, customerName) => {
 });
 
 
-// 配置相关处理程序
+// 获取配置
 ipcMain.handle('get-config', async () => {
   try {
-    const configPath = path.join(__dirname, '../../config.json');
-    if (fs.existsSync(configPath)) {
-      const configContent = fs.readFileSync(configPath, 'utf8');
-      const config = JSON.parse(configContent);
-      // 确保配置包含自动保存路径属性
-      if (!config.autoSavePath) {
-        config.autoSavePath = path.join(app.getPath('documents'), 'PackNodeAutoSaves');
-      }
-      return config;
-    }
-    // 返回默认配置，包含自动保存路径
-    return {
-      autoSavePath: path.join(app.getPath('documents'), 'PackNodeAutoSaves')
-    };
+    return configManager.getConfig();
   } catch (error) {
-    console.error('读取配置文件失败:', error);
-    return { error: error.message };
+    console.error('获取配置时出错:', error);
+    throw error;
   }
 });
 
-ipcMain.handle('save-config', async (event, config) => {
+// 保存配置
+ipcMain.handle('save-config', async (_event, config) => {
   try {
-    // 导入增量更新配置功能
-    const { saveConfigWithMerge } = require('../utils/config-manager');
-
-    // 使用增量更新功能保存配置
-    const result = await saveConfigWithMerge(config);
-
-    if (result.success) {
-      console.log('✅ 配置保存成功（增量更新）');
-      return result;
-    } else {
-      console.error('✗ 配置保存失败:', result.error);
-      return result;
-    }
+    await configManager.saveConfigWithMerge(config);
+    return { success: true };
   } catch (error) {
-    console.error('✗ 保存配置时出错:', error);
-    return { success: false, error: `保存配置时出错: ${error.message}` };
+    console.error('保存配置时出错:', error);
+    throw error;
   }
 });
 
 // 文件/目录操作处理程序
-ipcMain.handle('select-directory', async (event, title) => {
-  const result = await dialog.showOpenDialog(mainWindow, {
-    title: title || '选择目录',
-    properties: ['openDirectory']
-  });
-
-  if (!result.canceled && result.filePaths.length > 0) {
-    return result.filePaths[0];
+// 选择目录
+ipcMain.handle('select-directory', async () => {
+  try {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory']
+    });
+    
+    if (!result.canceled && result.filePaths.length > 0) {
+      return result.filePaths[0];
+    }
+    return null;
+  } catch (error) {
+    console.error('选择目录时出错:', error);
+    throw error;
   }
-  return null;
 });
 
 ipcMain.handle('open-directory', async (event, dirPath) => {
@@ -544,4 +450,25 @@ ipcMain.handle('start-auto-save-worker', async () => {
 ipcMain.handle('view-auto-save-data', async () => {
   // 这里应该实现查看自动保存数据的逻辑
   return { success: true, message: '查看自动保存数据' };
+});
+
+// 检查数据库连接状态
+ipcMain.handle('check-database-connection', async () => {
+  try {
+    return DataManager.checkConnection();
+  } catch (error) {
+    console.error('检查数据库连接状态时出错:', error);
+    return false;
+  }
+});
+
+// 同步数据源到数据库
+ipcMain.handle('sync-data-source', async () => {
+  try {
+    const result = await processAllCustomers();
+    return result;
+  } catch (error) {
+    console.error('同步数据源时出错:', error);
+    throw error;
+  }
 });

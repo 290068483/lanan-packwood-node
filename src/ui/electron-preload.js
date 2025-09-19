@@ -15,9 +15,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getConfig: () => ipcRenderer.invoke('get-config'),
   saveConfig: (config) => ipcRenderer.invoke('save-config', config),
   
+  // 数据库相关
+  checkDatabaseConnection: () => ipcRenderer.invoke('check-database-connection'),
+  
   // 文件/目录操作相关
   selectDirectory: (title) => ipcRenderer.invoke('select-directory', title),
   openDirectory: (dirPath) => ipcRenderer.invoke('open-directory', dirPath),
+  
+  // 数据同步相关
+  syncDataSource: () => ipcRenderer.invoke('sync-data-source'),
   
   // 处理控制相关
   startProcessing: () => ipcRenderer.invoke('start-processing'),
@@ -35,9 +41,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   viewAutoSaveData: () => ipcRenderer.invoke('view-auto-save-data'),
   
   // 监听主进程发送的事件
+  onUpdateProcessing: (callback) => ipcRenderer.on('update-processing', (_event, value) => callback(value)),
+  onUpdateProgress: (callback) => ipcRenderer.on('update-progress', (_event, value) => callback(value)),
+  onUpdateCustomerStatus: (callback) => ipcRenderer.on('update-customer-status', (_event, customerName, status, progress) => callback(customerName, status, progress)),
+  onProcessingComplete: (callback) => ipcRenderer.on('processing-complete', (_event, result) => callback(result)),
+  onProcessingError: (callback) => ipcRenderer.on('processing-error', (_event, error) => callback(error)),
   onProcessingStatus: (callback) => ipcRenderer.on('processing-status', (event, data) => callback(data)),
   onUncaughtError: (callback) => ipcRenderer.on('uncaught-error', (event, data) => callback(data)),
-  onUnhandledRejection: (callback) => ipcRenderer.on('unhandled-rejection', (event, data) => callback(data))
+  onUnhandledRejection: (callback) => ipcRenderer.on('unhandled-rejection', (event, data) => callback(data)),
+  removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel)
 });
 
 // 添加 DOM 加载完成事件监听

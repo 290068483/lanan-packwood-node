@@ -39,3 +39,4 @@ temp-logs/
 fomat-xml/
 # 临时测试文件夹
 src/temp-pack/
+coverage/
