@@ -7,6 +7,7 @@ const { exec } = require('child_process');
 const { processAllCustomers } = require('../main');
 const configManager = require('../utils/config-manager');
 const DataManager = require('../utils/data-manager');
+const { initArchiveHandlers } = require('../main-archive'); // 添加这一行
 
 // 禁用安全警告
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
@@ -50,6 +51,9 @@ function createWindow() {
 // 应用准备就绪时创建窗口
 app.whenReady().then(() => {
   createWindow();
+  
+  // 初始化归档处理程序
+  initArchiveHandlers(mainWindow); // 添加这一行
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -477,21 +481,30 @@ ipcMain.handle('get-history-records', async (event, limit = 10) => {
 // 重新启动应用程序
 ipcMain.handle('restart-application', async () => {
   try {
+    // 尝试关闭可能占用端口的服务
+    // 这里可以添加特定的端口释放逻辑
+    
     // 关闭所有窗口
     if (mainWindow) {
       mainWindow.close();
     }
     
-    // 延迟后重新启动应用
-    setTimeout(() => {
-      app.relaunch();
-      app.exit(0);
-    }, 1000);
+    // 使用更可靠的重启方法
+    app.relaunch();
+    app.exit(0);
     
+    // 不会执行到这里，但为了代码完整性保留返回
     return { success: true, message: '应用程序正在重新启动...' };
   } catch (error) {
     console.error('重新启动应用程序时出错:', error);
-    return { success: false, error: `重新启动失败: ${error.message}` };
+    // 即使出现错误也尝试重启
+    try {
+      app.relaunch();
+      app.exit(0);
+    } catch (retryError) {
+      console.error('重新启动重试失败:', retryError);
+      return { success: false, error: `重新启动失败: ${error.message}` };
+    }
   }
 });
 

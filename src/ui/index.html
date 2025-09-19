@@ -1144,14 +1144,27 @@
               currentConfig.localPath || '';
             document.getElementById('networkPathModal').value =
               currentConfig.networkPath || '';
-            document.getElementById('customerPackedPathModal').value =
-              currentConfig.customerPackedPath || '';
-            document.getElementById('workerPackagesPathModal').value =
-              currentConfig.workerPackagesPath || '';
-            document.getElementById('autoSaveCustomerPathModal').value =
-              currentConfig.autoSaveCustomerPath || '';
-            document.getElementById('autoSaveWorkerPathModal').value =
-              currentConfig.autoSaveWorkerPath || '';
+              
+            // 只有当元素存在时才设置它们的值
+            const customerPackedPathEl = document.getElementById('customerPackedPathModal');
+            if (customerPackedPathEl) {
+              customerPackedPathEl.value = currentConfig.customerPackedPath || '';
+            }
+            
+            const workerPackagesPathEl = document.getElementById('workerPackagesPathModal');
+            if (workerPackagesPathEl) {
+              workerPackagesPathEl.value = currentConfig.workerPackagesPath || '';
+            }
+            
+            const autoSaveCustomerPathEl = document.getElementById('autoSaveCustomerPathModal');
+            if (autoSaveCustomerPathEl) {
+              autoSaveCustomerPathEl.value = currentConfig.autoSaveCustomerPath || '';
+            }
+            
+            const autoSaveWorkerPathEl = document.getElementById('autoSaveWorkerPathModal');
+            if (autoSaveWorkerPathEl) {
+              autoSaveWorkerPathEl.value = currentConfig.autoSaveWorkerPath || '';
+            }
           }
           document.getElementById('configModal').style.display = 'block';
         } catch (error) {
@@ -1172,8 +1185,13 @@
           
           if (isElectron && window.electronAPI) {
             // Electron环境中请求重新启动
-            await window.electronAPI.restartApplication();
-            showNotification('应用程序正在重新启动...');
+            const result = await window.electronAPI.restartApplication();
+            // 注意：由于restartApplication会关闭应用，所以通常不会收到返回结果
+            // 如果收到结果，说明可能重启过程出现问题
+            if (result && !result.success) {
+              showNotification(result.error || '重新启动失败', 'error');
+              hideProcessingStatus();
+            }
           } else {
             // Web环境中提示用户手动刷新页面
             showNotification('请手动刷新页面以重新启动应用程序', 'info');
@@ -1184,8 +1202,11 @@
           }
         } catch (error) {
           console.error('重新启动应用程序时出错:', error);
-          showNotification('重新启动失败: ' + error.message, 'error');
-          hideProcessingStatus();
+          // 即使出现错误也尝试刷新页面作为备用方案
+          showNotification('正在尝试重新启动...', 'info');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
         }
       }
 
