@@ -816,6 +816,91 @@
 
         // 初始加载客户数据
         loadCustomers();
+
+        // 检查状态按钮事件
+        document.addEventListener('click', async event => {
+          if (event.target.classList.contains('check-status-btn')) {
+            const customerName = event.target.getAttribute('data-customer');
+            try {
+              let result;
+              if (isElectron) {
+                // Electron环境中调用检查功能
+                result = await window.electronAPI.checkCustomerStatus(
+                  customerName
+                );
+              } else {
+                // Web环境中调用API
+                const response = await fetch(
+                  `/api/customers/${encodeURIComponent(
+                    customerName
+                  )}/check-status`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  }
+                );
+                result = await response.json();
+              }
+
+              if (result.success) {
+                showNotification(
+                  `客户 ${customerName} 状态: ${result.status}, 打包进度: ${result.packProgress}%`,
+                  'info'
+                );
+                // 刷新客户数据
+                await loadCustomers();
+              } else {
+                showNotification(`检查状态失败: ${result.message}`, 'error');
+              }
+            } catch (error) {
+              console.error('检查客户状态出错:', error);
+              showNotification(`检查客户状态出错: ${error.message}`, 'error');
+            }
+          }
+
+          // 处理'去处理'按钮点击事件
+          if (event.target.classList.contains('process-btn')) {
+            const customerName = event.target.getAttribute('data-customer');
+            try {
+              if (isElectron) {
+                // Electron环境中调用打开Excel文件功能
+                await window.electronAPI.openCustomerExcelFile(customerName);
+              } else {
+                // Web环境中调用API获取Excel文件路径
+                const response = await fetch(
+                  `/api/customers/${encodeURIComponent(
+                    customerName
+                  )}/open-excel`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  }
+                );
+                const result = await response.json();
+
+                if (result.success) {
+                  // 在Web模式下，我们提示用户手动打开文件
+                  showNotification(
+                    `请手动打开文件: ${result.filePath}`,
+                    'info'
+                  );
+                } else {
+                  showNotification(
+                    `查找Excel文件失败: ${result.message}`,
+                    'error'
+                  );
+                }
+              }
+            } catch (error) {
+              console.error('打开Excel文件出错:', error);
+              showNotification(`打开Excel文件出错: ${error.message}`, 'error');
+            }
+          }
+        });
       });
 
       // 刷新数据
@@ -852,7 +937,7 @@
               case '未打包':
                 statusClass = 'status-not-packed';
                 break;
-              case '打包中':
+              case '正在处理':
                 statusClass = 'status-in-progress';
                 break;
               case '已打包':
@@ -861,10 +946,10 @@
               case '已归档':
                 statusClass = 'status-archived';
                 break;
-              case '已发货':
+              case '已出货':
                 statusClass = 'status-shipped';
                 break;
-              case '未发货':
+              case '未出货':
                 statusClass = 'status-not-shipped';
                 break;
             }
@@ -873,6 +958,27 @@
             const lastUpdate = customer.lastUpdate
               ? new Date(customer.lastUpdate).toLocaleString()
               : '无';
+
+            // 操作按钮
+            let actionButtons = '';
+            if (customer.status === '未打包') {
+              actionButtons = `
+                <button class="action-btn process-btn" data-customer="${customer.name}">去处理</button>
+              `;
+            } else if (customer.status === '已打包') {
+              actionButtons = `
+                <button class="action-btn archive-btn" data-customer="${customer.name}">归档</button>
+              `;
+            } else if (customer.status === '已归档') {
+              actionButtons = `
+                <button class="action-btn ship-btn" data-customer="${customer.name}">出货</button>
+                <button class="action-btn not-shipped-btn" data-customer="${customer.name}">标记为未出货</button>
+              `;
+            } else if (customer.status === '未出货') {
+              actionButtons = `
+                <button class="action-btn ship-btn" data-customer="${customer.name}">出货</button>
+              `;
+            }
 
             row.innerHTML = `
               <td>${customer.name}</td>
@@ -888,17 +994,7 @@
                 </div>
               </td>
               <td>${customer.packSeqs ? customer.packSeqs.join(', ') : ''}</td>
-              <td class="action-cell">
-                <button class="action-btn archive-btn" onclick="updateCustomerStatus('${
-                  customer.name
-                }', '已归档')">归档</button>
-                <button class="action-btn ship-btn" onclick="updateCustomerStatus('${
-                  customer.name
-                }', '已发货')">发货</button>
-                <button class="action-btn not-shipped-btn" onclick="updateCustomerStatus('${
-                  customer.name
-                }', '未发货')">未发货</button>
-              </td>
+              <td class="action-cell">${actionButtons}</td>
               <td>${lastUpdate}</td>
             `;
             tableBody.appendChild(row);

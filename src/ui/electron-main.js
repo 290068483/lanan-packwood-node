@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
@@ -470,5 +470,43 @@ ipcMain.handle('sync-data-source', async () => {
   } catch (error) {
     console.error('同步数据源时出错:', error);
     throw error;
+  }
+});
+
+// 处理打开客户Excel文件的请求
+ipcMain.handle('open-customer-excel-file', async (event, customerName) => {
+  try {
+    // 获取配置
+    const config = configManager.getConfig();
+    
+    // 构建客户目录路径
+    const customerDir = path.join(config.sourcePath, customerName);
+    
+    // 查找Excel文件
+    let excelFile = null;
+    if (fs.existsSync(customerDir)) {
+      const files = fs.readdirSync(customerDir);
+      // 查找xlsx或xls文件
+      const excelFiles = files.filter(file => 
+        file.endsWith('.xlsx') || file.endsWith('.xls')
+      );
+      
+      if (excelFiles.length > 0) {
+        // 优先选择xlsx文件，如果没有则选择第一个xls文件
+        excelFile = excelFiles.find(file => file.endsWith('.xlsx')) || excelFiles[0];
+        excelFile = path.join(customerDir, excelFile);
+      }
+    }
+    
+    if (excelFile && fs.existsSync(excelFile)) {
+      // 打开Excel文件
+      await shell.openPath(excelFile);
+      return { success: true, message: 'Excel文件已打开' };
+    } else {
+      return { success: false, message: '未找到客户的Excel文件' };
+    }
+  } catch (error) {
+    console.error('打开客户Excel文件时出错:', error);
+    return { success: false, message: `打开Excel文件出错: ${error.message}` };
   }
 });

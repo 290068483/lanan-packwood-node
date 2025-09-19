@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
 
 const { logError, logInfo, logSuccess, logWarning } = require('./utils/logger');
 const { processCustomerData } = require('./utils/customer-data-processor');
@@ -10,6 +11,8 @@ const { checkDataIntegrity } = require('./utils/data-integrity-check');
 
 const DataManager = require('./utils/data-manager');
 const EnhancedFileWatcher = require('./utils/enhanced-file-watcher');
+const customerStatusManager = require('./utils/customer-status-manager');
+const PackageDataExtractor = require('./utils/package-data-extractor');
 
 // 添加Electron支持
 let isElectron = false;
@@ -21,6 +24,108 @@ try {
   }
 } catch (e) {
   // Electron环境不可用
+}
+
+// 创建HTTP服务器
+let server = null;
+function startServer(port = 3000) {
+  server = http.createServer((req, res) => {
+    const { pathname } = new URL(req.url, `http://${req.headers.host}`);
+
+    // 设置CORS头
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // 处理预检请求
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
+    // 打开客户Excel文件
+    else if (pathname.startsWith('/api/customers/') && pathname.includes('/open-excel')) {
+      if (req.method === 'POST') {
+        try {
+          const customerName = decodeURIComponent(pathname.split('/')[3]);
+
+          // 获取配置
+          const configPath = path.join(__dirname, '../config.json');
+          const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+          // 构建客户目录路径
+          const customerDir = path.join(config.sourcePath, customerName);
+
+          // 查找Excel文件
+          let excelFile = null;
+          if (fs.existsSync(customerDir)) {
+            const files = fs.readdirSync(customerDir);
+            // 查找xlsx或xls文件
+            const excelFiles = files.filter(file =>
+              file.endsWith('.xlsx') || file.endsWith('.xls')
+            );
+
+            if (excelFiles.length > 0) {
+              // 优先选择xlsx文件，如果没有则选择第一个xls文件
+              excelFile = excelFiles.find(file => file.endsWith('.xlsx')) || excelFiles[0];
+              excelFile = path.join(customerDir, excelFile);
+            }
+          }
+
+          if (excelFile && fs.existsSync(excelFile)) {
+            // 在Web模式下，我们不能直接打开文件，而是返回文件路径供前端处理
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              success: true,
+              message: '找到Excel文件',
+              filePath: excelFile
+            }));
+          } else {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              success: false,
+              message: '未找到客户的Excel文件'
+            }));
+          }
+        } catch (error) {
+          console.error('查找客户Excel文件时出错:', error);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            success: false,
+            message: `查找Excel文件出错: ${error.message}`
+          }));
+        }
+      } else {
+        res.writeHead(405, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          message: '请求方法不允许'
+        }));
+      }
+    }
+    // 未知路由
+    else {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        success: false,
+        message: 'API未找到'
+      }));
+    }
+  });
+
+  server.listen(port, () => {
+    console.log(`🚀 HTTP服务器已启动，监听端口 ${port}`);
+    logInfo('SYSTEM', 'SERVER', `HTTP服务器已启动，监听端口 ${port}`);
+  });
+
+  // 错误处理
+  server.on('error', (error) => {
+    console.error('服务器启动失败:', error);
+    logError('SYSTEM', 'SERVER', `服务器启动失败: ${error.message}`);
+  });
+
+  return server;
 }
 
 // 读取配置文件
@@ -159,20 +264,64 @@ async function processAllCustomers() {
           successCount++;
         }
 
+        // 获取客户处理后的状态
+        const processedCustomer = await DataManager.getCustomer(customerDir);
+        let finalStatus = customerStatusManager.STATUS.NOT_PACKED;
+        let packProgress = 0;
+        
+        if (processedCustomer) {
+          // 获取packages.json文件路径
+          const packagesPath = path.join(processedCustomer.outputPath, 'packages.json');
+          
+          // 读取packages.json数据
+          let packagesData = [];
+          if (fs.existsSync(packagesPath)) {
+            packagesData = PackageDataExtractor.extractCustomerPackageData(packagesPath);
+          }
+          
+          // 检查客户状态
+          const statusInfo = customerStatusManager.checkPackStatus(processedCustomer, packagesData);
+          finalStatus = statusInfo.status;
+          packProgress = statusInfo.packProgress;
+        }
+
         // 更新客户状态到数据管理器
         DataManager.upsertCustomer({
           name: customerDir,
           sourcePath: customerPath,
           outputPath: customerOutputDir,
-          status: result !== undefined ? '已处理' : '无数据',
+          status: finalStatus,
+          packProgress: packProgress,
           lastUpdate: new Date().toISOString(),
           success: result !== undefined ? result : true // 无数据也算成功处理
         });
       } catch (error) {
         console.error(`✗ 处理客户 ${customerDir} 时出错:`, error.message);
+        // 获取客户当前状态
+        const processedCustomer = await DataManager.getCustomer(customerDir);
+        let finalStatus = customerStatusManager.STATUS.NOT_PACKED;
+        let packProgress = 0;
+        
+        if (processedCustomer) {
+          // 获取packages.json文件路径
+          const packagesPath = path.join(processedCustomer.outputPath, 'packages.json');
+          
+          // 读取packages.json数据
+          let packagesData = [];
+          if (fs.existsSync(packagesPath)) {
+            packagesData = PackageDataExtractor.extractCustomerPackageData(packagesPath);
+          }
+          
+          // 检查客户状态
+          const statusInfo = customerStatusManager.checkPackStatus(processedCustomer, packagesData);
+          finalStatus = statusInfo.status;
+          packProgress = statusInfo.packProgress;
+        }
+        
         DataManager.upsertCustomer({
           name: customerDir,
-          status: '处理失败',
+          status: finalStatus,
+          packProgress: packProgress,
           remark: error.message,
           lastUpdate: new Date().toISOString(),
           success: false
@@ -210,11 +359,16 @@ async function main() {
   if (isElectron) {
     console.log(' Electron环境中，等待UI触发处理...');
     // 在Electron环境中，我们导出函数供UI调用
+    // 同时启动HTTP服务器以支持API请求
+    startServer(3000);
     return;
   }
 
   // 在非Electron环境中，直接执行
   await processAllCustomers();
+
+  // 启动HTTP服务器
+  startServer(3000);
 }
 
 // 只有在直接运行此脚本时才执行main函数
@@ -228,5 +382,6 @@ if (require.main === module) {
 // 导出供其他模块使用
 module.exports = {
   processAllCustomers,
-  initFileWatcher
+  initFileWatcher,
+  startServer
 };

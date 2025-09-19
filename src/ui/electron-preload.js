@@ -3,7 +3,7 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 
-// 暴露安全的 API 给渲染进程
+// 安全地暴露 API 给渲染进程
 contextBridge.exposeInMainWorld('electronAPI', {
   // 客户数据相关
   getCustomers: () => ipcRenderer.invoke('get-customers'),
@@ -24,6 +24,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // 数据同步相关
   syncDataSource: () => ipcRenderer.invoke('sync-data-source'),
+  openCustomerExcelFile: (customerName) => ipcRenderer.invoke('open-customer-excel-file', customerName),
   
   // 处理控制相关
   startProcessing: () => ipcRenderer.invoke('start-processing'),

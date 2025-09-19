@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // 确保数据目录存在
-const dataDir = path.join(__dirname, '../../data');
+const dataDir = path.join(__dirname, '../data');
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
