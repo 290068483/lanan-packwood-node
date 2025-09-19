@@ -479,13 +479,20 @@ ipcMain.handle('open-customer-excel-file', async (event, customerName) => {
     // 获取配置
     const config = configManager.getConfig();
     
-    // 构建客户目录路径
-    const customerDir = path.join(config.sourcePath, customerName);
+    // 从数据管理器获取客户信息
+    const customerData = await DataManager.getCustomer(customerName);
+    
+    if (!customerData) {
+      return { success: false, message: '客户不存在' };
+    }
+
+    // 构建客户输出目录路径
+    const customerOutputDir = customerData.outputPath;
     
     // 查找Excel文件
     let excelFile = null;
-    if (fs.existsSync(customerDir)) {
-      const files = fs.readdirSync(customerDir);
+    if (fs.existsSync(customerOutputDir)) {
+      const files = fs.readdirSync(customerOutputDir);
       // 查找xlsx或xls文件
       const excelFiles = files.filter(file => 
         file.endsWith('.xlsx') || file.endsWith('.xls')
@@ -494,19 +501,19 @@ ipcMain.handle('open-customer-excel-file', async (event, customerName) => {
       if (excelFiles.length > 0) {
         // 优先选择xlsx文件，如果没有则选择第一个xls文件
         excelFile = excelFiles.find(file => file.endsWith('.xlsx')) || excelFiles[0];
-        excelFile = path.join(customerDir, excelFile);
+        excelFile = path.join(customerOutputDir, excelFile);
       }
     }
     
     if (excelFile && fs.existsSync(excelFile)) {
       // 打开Excel文件
       await shell.openPath(excelFile);
-      return { success: true, message: 'Excel文件已打开' };
+      return { success: true, message: '板件明细Excel文件已打开' };
     } else {
-      return { success: false, message: '未找到客户的Excel文件' };
+      return { success: false, message: '未找到客户的板件明细Excel文件' };
     }
   } catch (error) {
-    console.error('打开客户Excel文件时出错:', error);
+    console.error('打开客户板件明细Excel文件时出错:', error);
     return { success: false, message: `打开Excel文件出错: ${error.message}` };
   }
 });
