@@ -55,19 +55,25 @@ describe('CustomerPackageUtils', function() {
     }
   ];
 
-  // 创建测试目录和文件
-  before(function() {
-    // 创建目录结构
+  // 在所有测试之前创建测试目录和文件
+  beforeAll(function() {
+    // 确保测试目录存在
+    if (!fs.existsSync(testDir)) {
+      fs.mkdirSync(testDir, { recursive: true });
+    }
+    
+    // 创建客户目录
     if (!fs.existsSync(customerPackageDir)) {
       fs.mkdirSync(customerPackageDir, { recursive: true });
     }
     
-    // 创建测试用的packages.json文件
+    // 创建测试 packages.json 文件
     fs.writeFileSync(packagesPath, JSON.stringify(testPackagesData, null, 2));
   });
 
-  // 删除测试目录和文件
-  after(function() {
+  // 在所有测试之后清理测试目录
+  afterAll(function() {
+    // 删除测试目录
     if (fs.existsSync(testDir)) {
       fs.rmSync(testDir, { recursive: true, force: true });
     }
@@ -103,6 +109,45 @@ describe('CustomerPackageUtils', function() {
       if (fs.existsSync(savedDir)) {
         fs.rmSync(savedDir, { recursive: true, force: true });
       }
+    });
+  });
+
+  describe('processCustomerPackages', function() {
+    // 在测试前设置
+    beforeAll(function() {
+      // 确保 customer 目录存在
+      if (!fs.existsSync(customerDir)) {
+        fs.mkdirSync(customerDir, { recursive: true });
+      }
+    });
+
+    // 在测试后清理
+    afterAll(function() {
+      // 清理生成的文件
+      const outputFiles = [
+        path.join(customerDir, '250915 王大海#.xlsx'),
+        path.join(customerDir, '250915 王大海#_剩余.xlsx')
+      ];
+      
+      outputFiles.forEach(file => {
+        if (fs.existsSync(file)) {
+          fs.unlinkSync(file);
+        }
+      });
+    });
+
+    it('应该能够处理客户打包数据', async function() {
+      this.timeout(5000); // 设置超时时间
+      
+      const result = await CustomerPackageUtils.processCustomerPackages(
+        packagesPath,
+        customerDir,
+        false // 不压缩
+      );
+      
+      assert.strictEqual(Array.isArray(result), true);
+      assert.strictEqual(result.length, 1);
+      assert.strictEqual(fs.existsSync(result[0]), true);
     });
   });
 

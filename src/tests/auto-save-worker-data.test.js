@@ -71,8 +71,7 @@ describe('AutoSave Worker Packages Data', function() {
 
   describe('saveWorkerPackagesData', function() {
     it('应该能够保存工人打包数据（非压缩模式）', async function() {
-      this.timeout(10000); // 设置超时时间
-      
+      this.timeout(10000);
       // 创建AutoSaveManager实例
       const autoSaveManager = new AutoSaveManager(testConfig);
       
@@ -97,8 +96,7 @@ describe('AutoSave Worker Packages Data', function() {
     });
     
     it('应该能够保存工人打包数据（压缩模式）', async function() {
-      this.timeout(10000); // 设置超时时间
-      
+      this.timeout(10000);
       // 更新配置以启用压缩
       const compressConfig = JSON.parse(JSON.stringify(testConfig));
       compressConfig.autoSave.compress = true;

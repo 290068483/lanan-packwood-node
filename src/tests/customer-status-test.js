@@ -7,8 +7,7 @@ const PackageDataExtractor = require('../utils/package-data-extractor');
  * 客户状态管理测试
  */
 async function testCustomerStatusManager() {
-  console.log('开始测试客户状态管理功能...
-');
+  console.log('开始测试客户状态管理功能...');
 
   // 1. 准备测试数据
   const testDataDir = path.join(__dirname, '../test-data');
@@ -68,8 +67,7 @@ async function testCustomerStatusManager() {
   console.log(`包号: ${statusInfo.packSeqs.join(', ')}`);
 
   // 3. 测试更新客户状态功能
-  console.log('
-2. 测试更新客户状态功能...');
+  console.log('\n2. 测试更新客户状态功能...');
   const updatedData = customerStatusManager.updateCustomerStatus(
     mockCustomerData, 
     statusInfo, 
@@ -82,8 +80,7 @@ async function testCustomerStatusManager() {
   console.log(`最后状态更新时间: ${updatedData.lastStatusUpdate}`);
 
   // 4. 测试归档功能
-  console.log('
-3. 测试归档功能...');
+  console.log('\n3. 测试归档功能...');
   try {
     const archivedData = customerStatusManager.archiveCustomer(
       updatedData, 
@@ -97,8 +94,7 @@ async function testCustomerStatusManager() {
   }
 
   // 5. 测试出货功能
-  console.log('
-4. 测试出货功能...');
+  console.log('\n4. 测试出货功能...');
   try {
     const shippedData = customerStatusManager.shipCustomer(
       { ...updatedData, status: customerStatusManager.STATUS.ARCHIVED }, 
@@ -112,8 +108,7 @@ async function testCustomerStatusManager() {
   }
 
   // 6. 测试标记为未出货功能
-  console.log('
-5. 测试标记为未出货功能...');
+  console.log('\n5. 测试标记为未出货功能...');
   try {
     const notShippedData = customerStatusManager.markCustomerNotShipped(
       { ...updatedData, status: customerStatusManager.STATUS.ARCHIVED }, 
@@ -126,8 +121,7 @@ async function testCustomerStatusManager() {
   }
 
   // 7. 测试状态颜色功能
-  console.log('
-6. 测试状态颜色功能...');
+  console.log('\n6. 测试状态颜色功能...');
   const colors = Object.keys(customerStatusManager.STATUS).map(status => {
     return {
       status,
@@ -143,8 +137,7 @@ async function testCustomerStatusManager() {
   fs.unlinkSync(packagesPath);
   fs.rmdirSync(testDataDir);
 
-  console.log('
-客户状态管理测试完成！');
+  console.log('\n客户状态管理测试完成！');
 }
 
 // 运行测试

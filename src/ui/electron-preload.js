@@ -35,6 +35,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   shipCustomer: (customerName) => ipcRenderer.invoke('ship-customer', customerName),
   markCustomerNotShipped: (customerName) => ipcRenderer.invoke('mark-customer-not-shipped', customerName),
   checkCustomerStatus: (customerName) => ipcRenderer.invoke('check-customer-status', customerName),
+  getHistoryRecords: (limit = 10) => ipcRenderer.invoke('get-history-records', limit),
+  
+  // 归档相关
+  getArchiveList: (page = 1, pageSize = 20) => ipcRenderer.invoke('get-archive-list', page, pageSize),
+  getArchiveDetail: (archiveId) => ipcRenderer.invoke('get-archive-detail', archiveId),
+  restoreArchive: (archiveId) => ipcRenderer.invoke('restore-archive', archiveId),
+  exportArchiveToExcel: (archiveId) => ipcRenderer.invoke('export-archive-to-excel', archiveId),
+  exportArchiveToPDF: (archiveId) => ipcRenderer.invoke('export-archive-to-pdf', archiveId),
+  
+  // 应用程序控制相关
+  restartApplication: () => ipcRenderer.invoke('restart-application'),
   
   // 自动保存相关
   startAutoSaveCustomer: () => ipcRenderer.invoke('start-auto-save-customer'),

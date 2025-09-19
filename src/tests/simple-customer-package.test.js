@@ -56,7 +56,7 @@ describe('Simple Customer Package Tests', function() {
   ];
 
   // 创建测试目录和文件
-  before(function() {
+  beforeAll(function() {
     // 创建目录结构
     if (!fs.existsSync(customerPackageDir)) {
       fs.mkdirSync(customerPackageDir, { recursive: true });
@@ -67,7 +67,7 @@ describe('Simple Customer Package Tests', function() {
   });
 
   // 删除测试目录和文件
-  after(function() {
+  afterAll(function() {
     if (fs.existsSync(testDir)) {
       fs.rmSync(testDir, { recursive: true, force: true });
     }

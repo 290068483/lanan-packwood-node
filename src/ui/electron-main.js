@@ -462,6 +462,39 @@ ipcMain.handle('check-database-connection', async () => {
   }
 });
 
+// 获取历史记录
+ipcMain.handle('get-history-records', async (event, limit = 10) => {
+  try {
+    // 从数据管理器获取历史记录
+    const history = DataManager.getHistoryRecords(limit);
+    return history;
+  } catch (error) {
+    console.error('获取历史记录时出错:', error);
+    throw error;
+  }
+});
+
+// 重新启动应用程序
+ipcMain.handle('restart-application', async () => {
+  try {
+    // 关闭所有窗口
+    if (mainWindow) {
+      mainWindow.close();
+    }
+    
+    // 延迟后重新启动应用
+    setTimeout(() => {
+      app.relaunch();
+      app.exit(0);
+    }, 1000);
+    
+    return { success: true, message: '应用程序正在重新启动...' };
+  } catch (error) {
+    console.error('重新启动应用程序时出错:', error);
+    return { success: false, error: `重新启动失败: ${error.message}` };
+  }
+});
+
 // 同步数据源到数据库
 ipcMain.handle('sync-data-source', async () => {
   try {

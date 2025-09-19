@@ -1,0 +1,13 @@
+{
+  "name": "archive-tests",
+  "version": "1.0.0",
+  "description": "归档功能测试",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^30.1.3",
+    "archiver": "^5.3.1",
+    "unzipper": "^0.10.14"
+  }
+}

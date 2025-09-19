@@ -494,6 +494,112 @@
       .sync-status-error {
         background-color: #e74c3c;
       }
+
+      /* 历史记录表格样式 */
+      .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      .history-table th,
+      .history-table td {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      .history-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      .history-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      .history-table tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      /* 归档详情样式 */
+      .archive-detail {
+        padding: 15px;
+      }
+
+      .info-section {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .info-section:last-child {
+        border-bottom: none;
+      }
+
+      .info-section h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #34495e;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .info-item label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+      }
+
+      .info-item.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .table-container {
+        overflow-x: auto;
+        margin-top: 10px;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        justify-content: flex-end;
+      }
+
+      .no-data {
+        text-align: center;
+        padding: 20px;
+        color: #777;
+        font-style: italic;
+      }
+
+      /* 重新启动按钮样式 */
+      .restart-button {
+        background-color: #e67e22;
+      }
+
+      .restart-button:hover {
+        background-color: #d35400;
+      }
+
+      /* 归档历史按钮样式 */
+      .archive-button {
+        background-color: #9b59b6;
+      }
+
+      .archive-button:hover {
+        background-color: #8e44ad;
+      }
     </style>
   </head>
 
@@ -506,6 +612,8 @@
       <div class="button-group">
         <button id="syncDataBtn">同步数据源到数据库</button>
         <button id="refreshBtn">刷新数据</button>
+        <button id="archiveHistoryBtn" class="archive-button">归档历史</button>
+        <button id="restartBtn" class="restart-button">重新启动</button>
         <button id="configBtn" class="config-button">打开路径配置</button>
         <div id="syncStatus" class="sync-status">
           <span class="sync-status-indicator sync-status-idle"></span>
@@ -576,7 +684,7 @@
               />
             </div>
           </div>
-          <div class="config-section">
+          <!-- <div class="config-section">
             <h3>打包数据路径</h3>
             <div class="path-row">
               <span class="path-label">客户已打包数据:</span>
@@ -617,7 +725,7 @@
                 placeholder="自动保存工人数据路径"
               />
             </div>
-          </div>
+          </div> -->
           <div class="modal-buttons">
             <button type="submit" id="saveModalConfigBtn">保存配置</button>
             <button type="button" id="cancelModalBtn">取消</button>
@@ -791,6 +899,12 @@
         document
           .getElementById('refreshBtn')
           .addEventListener('click', refreshData);
+        document
+          .getElementById('archiveHistoryBtn')
+          .addEventListener('click', showArchiveHistory);
+        document
+          .getElementById('restartBtn')
+          .addEventListener('click', restartApplication);
         document
           .getElementById('configBtn')
           .addEventListener('click', openConfigModal);
@@ -1049,6 +1163,392 @@
       // 关闭配置模态框
       function closeConfigModal() {
         document.getElementById('configModal').style.display = 'none';
+      }
+
+      // 重新启动应用程序
+      async function restartApplication() {
+        try {
+          showProcessingStatus('正在重新启动应用程序...');
+          
+          if (isElectron && window.electronAPI) {
+            // Electron环境中请求重新启动
+            await window.electronAPI.restartApplication();
+            showNotification('应用程序正在重新启动...');
+          } else {
+            // Web环境中提示用户手动刷新页面
+            showNotification('请手动刷新页面以重新启动应用程序', 'info');
+            // 延迟后刷新页面
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          }
+        } catch (error) {
+          console.error('重新启动应用程序时出错:', error);
+          showNotification('重新启动失败: ' + error.message, 'error');
+          hideProcessingStatus();
+        }
+      }
+
+      // 显示归档历史
+      async function showArchiveHistory(page = 1, pageSize = 20) {
+        try {
+          showProcessingStatus('正在加载归档历史...');
+          
+          let archives = [];
+          if (isElectron && window.electronAPI) {
+            // Electron环境中获取归档列表
+            const response = await window.electronAPI.getArchiveList(page, pageSize);
+            if (response.success) {
+              archives = response.data;
+            }
+          }
+          
+          // 创建归档历史模态框
+          const modal = document.createElement('div');
+          modal.className = 'modal';
+          modal.innerHTML = `
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <h2>归档历史</h2>
+              <div id="archiveHistoryContent">
+                ${archives.length > 0 ? 
+                  `<table class="history-table">
+                    <thead>
+                      <tr>
+                        <th>客户名称</th>
+                        <th>归档日期</th>
+                        <th>包数量</th>
+                        <th>板件总数</th>
+                        <th>操作员</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${archives.map(archive => `
+                        <tr>
+                          <td>${archive.customer_name || '未知'}</td>
+                          <td>${archive.archive_date ? new Date(archive.archive_date).toLocaleString() : '未知'}</td>
+                          <td>${archive.packages_count || 0}</td>
+                          <td>${archive.total_parts_count || 0}</td>
+                          <td>${archive.archive_user || '未知'}</td>
+                          <td>
+                            <button class="action-btn view-archive-btn" data-id="${archive.id}">查看详情</button>
+                            <button class="action-btn restore-archive-btn" data-id="${archive.id}">恢复</button>
+                          </td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>` : 
+                  `<p>暂无归档数据</p>`}
+              </div>
+              <div class="modal-buttons">
+                <button type="button" id="closeArchiveHistoryBtn">关闭</button>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(modal);
+          modal.style.display = 'block';
+          showProcessingStatus('');
+          
+          // 绑定关闭按钮事件
+          modal.querySelector('.close').addEventListener('click', () => {
+            document.body.removeChild(modal);
+          });
+          
+          modal.querySelector('#closeArchiveHistoryBtn').addEventListener('click', () => {
+            document.body.removeChild(modal);
+          });
+          
+          // 点击模态框外部关闭
+          window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+              document.body.removeChild(modal);
+            }
+          });
+          
+          // 添加查看详情按钮事件
+          modal.querySelectorAll('.view-archive-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const archiveId = btn.getAttribute('data-id');
+              await showArchiveDetail(archiveId);
+            });
+          });
+          
+          // 添加恢复按钮事件
+          modal.querySelectorAll('.restore-archive-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const archiveId = btn.getAttribute('data-id');
+              await confirmRestoreArchive(archiveId);
+            });
+          });
+        } catch (error) {
+          console.error('获取归档历史时出错:', error);
+          showNotification('获取归档历史失败: ' + error.message, 'error');
+          hideProcessingStatus();
+        }
+      }
+
+      // 显示归档详情
+      async function showArchiveDetail(archiveId) {
+        try {
+          showProcessingStatus('正在加载归档详情...');
+
+          let archive = null;
+          if (isElectron && window.electronAPI) {
+            // Electron环境中获取归档详情
+            const response = await window.electronAPI.getArchiveDetail(archiveId);
+            if (response.success) {
+              archive = response.data;
+            }
+          }
+
+          if (!archive) {
+            showNotification('归档不存在', 'error');
+            return;
+          }
+
+          // 创建归档详情模态框
+          const modal = document.createElement('div');
+          modal.className = 'modal';
+          modal.innerHTML = `
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <h2>客户归档详情</h2>
+              <div class="archive-detail">
+                <div class="info-section">
+                  <h3>基本信息</h3>
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <label>客户名称:</label>
+                      <span>${archive.customer_name || '未知'}</span>
+                    </div>
+                    <div class="info-item">
+                      <label>归档日期:</label>
+                      <span>${archive.archive_date ? new Date(archive.archive_date).toLocaleString() : '未知'}</span>
+                    </div>
+                    <div class="info-item">
+                      <label>包数量:</label>
+                      <span>${archive.packages_count || 0}</span>
+                    </div>
+                    <div class="info-item">
+                      <label>板件总数:</label>
+                      <span>${archive.total_parts_count || 0}</span>
+                    </div>
+                    <div class="info-item">
+                      <label>操作员:</label>
+                      <span>${archive.archive_user || '未知'}</span>
+                    </div>
+                    <div class="info-item">
+                      <label>归档ID:</label>
+                      <span>${archive.id || '未知'}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="info-section">
+                  <h3>包信息</h3>
+                  ${
+                    archive.packages && archive.packages.length > 0 ?
+                    `<div class="table-container">
+                      <table class="history-table">
+                        <thead>
+                          <tr>
+                            <th>包号</th>
+                            <th>板件数量</th>
+                            <th>文件路径</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${archive.packages.map(pkg => `
+                            <tr>
+                              <td>${pkg.package_id || '未知'}</td>
+                              <td>${pkg.parts_count || 0}</td>
+                              <td>${pkg.file_path || '未知'}</td>
+                            </tr>
+                          `).join('')}
+                        </tbody>
+                      </table>
+                    </div>` :
+                    `<p class="no-data">暂无包信息</p>`
+                  }
+                </div>
+                
+                <div class="info-section">
+                  <h3>XML文件</h3>
+                  ${
+                    archive.xml_files && archive.xml_files.length > 0 ?
+                    `<div class="table-container">
+                      <table class="history-table">
+                        <thead>
+                          <tr>
+                            <th>文件名</th>
+                            <th>文件路径</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${archive.xml_files.map(file => `
+                            <tr>
+                              <td>${file.name || '未知'}</td>
+                              <td>${file.path || '未知'}</td>
+                            </tr>
+                          `).join('')}
+                        </tbody>
+                      </table>
+                    </div>` :
+                    `<p class="no-data">暂无XML文件</p>`
+                  }
+                </div>
+              </div>
+              <div class="modal-buttons">
+                <button type="button" id="closeDetailBtn">关闭</button>
+              </div>
+            </div>
+          `;
+
+          document.body.appendChild(modal);
+          modal.style.display = 'block';
+          showProcessingStatus('');
+
+          // 绑定关闭按钮事件
+          modal.querySelector('.close').addEventListener('click', () => {
+            document.body.removeChild(modal);
+          });
+
+          modal.querySelector('#closeDetailBtn').addEventListener('click', () => {
+            document.body.removeChild(modal);
+          });
+
+          // 点击模态框外部关闭
+          window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+              document.body.removeChild(modal);
+            }
+          });
+        } catch (error) {
+          console.error('获取归档详情时出错:', error);
+          showNotification('获取归档详情失败: ' + error.message, 'error');
+          hideProcessingStatus();
+        }
+      }
+
+      // 确认恢复归档
+      async function confirmRestoreArchive(archiveId) {
+        try {
+          // 创建确认模态框
+          const modal = document.createElement('div');
+          modal.className = 'modal';
+          modal.innerHTML = `
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <h2>确认恢复归档</h2>
+              <p>您确定要恢复此归档吗？这将把归档数据恢复到客户目录中。</p>
+              <div class="modal-buttons">
+                <button type="button" id="cancel-restore-btn">取消</button>
+                <button type="button" id="confirm-restore-btn" style="background-color: #e74c3c;">确认恢复</button>
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(modal);
+          modal.style.display = 'block';
+          
+          // 绑定关闭按钮事件
+          modal.querySelector('.close').addEventListener('click', () => {
+            document.body.removeChild(modal);
+          });
+          
+          // 取消按钮事件
+          document
+            .getElementById('cancel-restore-btn')
+            .addEventListener('click', () => {
+              document.body.removeChild(modal);
+            });
+          
+          // 确认按钮事件
+          document
+            .getElementById('confirm-restore-btn')
+            .addEventListener('click', async () => {
+              document.body.removeChild(modal);
+              
+              try {
+                showProcessingStatus('正在恢复归档...');
+                
+                let result = { success: false };
+                if (isElectron && window.electronAPI) {
+                  // Electron环境中恢复归档
+                  result = await window.electronAPI.restoreArchive(archiveId);
+                  
+                  if (result.success) {
+                    showNotification(result.message || '归档恢复成功');
+                    // 刷新客户数据
+                    await loadCustomers();
+                  } else {
+                    showNotification(result.message || '归档恢复失败', 'error');
+                  }
+                }
+                
+                showProcessingStatus('');
+              } catch (error) {
+                console.error('恢复归档时出错:', error);
+                showNotification('恢复归档失败: ' + error.message, 'error');
+                showProcessingStatus('');
+              }
+            });
+        } catch (error) {
+          console.error('确认恢复归档时出错:', error);
+          showNotification('确认恢复归档失败: ' + error.message, 'error');
+        }
+      }
+
+      // 导出归档数据到Excel
+      async function exportArchiveToExcel(archiveId) {
+        try {
+          showProcessingStatus('正在导出Excel...');
+          
+          let result = { success: false };
+          if (isElectron && window.electronAPI) {
+            // Electron环境中导出Excel
+            result = await window.electronAPI.exportArchiveToExcel(archiveId);
+          }
+          
+          if (result.success) {
+            showNotification(`Excel文件已导出到: ${result.filePath}`);
+          } else {
+            showNotification(result.message || '导出Excel失败', 'error');
+          }
+          
+          showProcessingStatus('');
+        } catch (error) {
+          console.error('导出Excel时出错:', error);
+          showNotification('导出Excel失败: ' + error.message, 'error');
+          showProcessingStatus('');
+        }
+      }
+
+      // 导出归档数据到PDF
+      async function exportArchiveToPDF(archiveId) {
+        try {
+          showProcessingStatus('正在导出PDF...');
+          
+          let result = { success: false };
+          if (isElectron && window.electronAPI) {
+            // Electron环境中导出PDF
+            result = await window.electronAPI.exportArchiveToPDF(archiveId);
+          }
+          
+          if (result.success) {
+            showNotification(`PDF文件已导出到: ${result.filePath}`);
+          } else {
+            showNotification(result.message || '导出PDF失败', 'error');
+          }
+          
+          showProcessingStatus('');
+        } catch (error) {
+          console.error('导出PDF时出错:', error);
+          showNotification('导出PDF失败: ' + error.message, 'error');
+          showProcessingStatus('');
+        }
       }
 
       // 保存配置
