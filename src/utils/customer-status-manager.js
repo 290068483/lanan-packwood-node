@@ -22,6 +22,14 @@ class CustomerStatusManager {
       NOT_SHIPPED: '未出货'
     };
 
+    // 补件状态枚举
+    this.REPLACEMENT_STATUS = {
+      NONE: '无补件',
+      PENDING: '补件待处理',
+      PROCESSING: '补件处理中',
+      COMPLETED: '补件完成'
+    };
+
     // 状态颜色映射
     this.STATUS_COLORS = {
       [this.STATUS.NOT_PACKED]: '#888888', // 灰色
@@ -31,6 +39,14 @@ class CustomerStatusManager {
       [this.STATUS.SHIPPED]: '#4CAF50', // 绿色
       [this.STATUS.PARTIAL_SHIPPED]: '#FFCA28', // 橙色
       [this.STATUS.NOT_SHIPPED]: '#FF9800' // 橙色
+    };
+
+    // 补件状态颜色映射
+    this.REPLACEMENT_COLORS = {
+      [this.REPLACEMENT_STATUS.NONE]: '#888888',        // 灰色
+      [this.REPLACEMENT_STATUS.PENDING]: '#FF9800',     // 橙色
+      [this.REPLACEMENT_STATUS.PROCESSING]: '#2196F3',  // 蓝色
+      [this.REPLACEMENT_STATUS.COMPLETED]: '#4CAF50'    // 绿色
     };
   }
 
@@ -303,6 +319,66 @@ class CustomerStatusManager {
     };
 
     return this.updateCustomerStatus(customerData, statusInfo, operator, remark);
+  }
+
+  /**
+   * 更新客户补件状态
+   * @param {Object} customerData - 客户数据
+   * @param {string} replacementStatus - 补件状态
+   * @param {string} operator - 操作人员
+   * @param {string} remark - 备注
+   * @returns {Object} - 更新后的客户数据
+   */
+  updateReplacementStatus(customerData, replacementStatus, operator = '系统', remark = '') {
+    // 创建客户数据的副本
+    const updatedData = { ...customerData };
+    
+    // 确保补件状态历史存在
+    if (!updatedData.replacementHistory) {
+      updatedData.replacementHistory = [];
+    }
+    
+    // 添加初始补件状态记录（如果这是第一次设置补件状态）
+    if (updatedData.replacementHistory.length === 0) {
+      updatedData.replacementHistory.push({
+        status: this.REPLACEMENT_STATUS.NONE,
+        timestamp: new Date().toISOString(),
+        operator: '系统',
+        remark: '初始状态'
+      });
+    }
+    
+    // 验证补件状态值是否有效
+    const validStatuses = Object.values(this.REPLACEMENT_STATUS);
+    if (!validStatuses.includes(replacementStatus)) {
+      throw new Error(`无效的补件状态。可选值: ${validStatuses.join(', ')}`);
+    }
+    
+    // 更新补件状态相关字段
+    updatedData.replacementStatus = replacementStatus;
+    updatedData.lastReplacementUpdate = new Date().toISOString();
+    
+    // 添加到补件状态历史
+    const replacementRecord = {
+      status: replacementStatus,
+      previousStatus: customerData.replacementStatus || this.REPLACEMENT_STATUS.NONE,
+      timestamp: new Date().toISOString(),
+      operator,
+      remark: remark || `补件状态从 ${customerData.replacementStatus || this.REPLACEMENT_STATUS.NONE} 变更为 ${replacementStatus}`
+    };
+    
+    updatedData.replacementHistory.push(replacementRecord);
+    
+    return updatedData;
+  }
+
+  /**
+   * 获取补件状态颜色
+   * @param {string} status - 补件状态
+   * @returns {string} - 颜色代码
+   */
+  getReplacementColor(status) {
+    return this.REPLACEMENT_COLORS[status] || '#888888';
   }
 }
 

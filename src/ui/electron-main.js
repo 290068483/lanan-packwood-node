@@ -3,6 +3,9 @@ const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
 
+// 设置用户数据路径以解决缓存权限问题
+app.setPath('userData', path.join(app.getPath('appData'), 'PackNode'));
+
 // 导入功能模块
 const { processAllCustomers } = require('../main');
 const configManager = require('../utils/config-manager');
@@ -91,13 +94,14 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // IPC 处理程序
-// 获取客户数据
+// 获取所有客户数据
 ipcMain.handle('get-customers', async () => {
   try {
-    return DataManager.getAllCustomers();
+    const customers = await DataManager.getAllCustomers();
+    return customers;
   } catch (error) {
     console.error('获取客户数据时出错:', error);
-    throw error;
+    return [];
   }
 });
 
@@ -459,10 +463,15 @@ ipcMain.handle('view-auto-save-data', async () => {
 // 检查数据库连接状态
 ipcMain.handle('check-database-connection', async () => {
   try {
-    return DataManager.checkConnection();
+    const result = await DataManager.checkConnection();
+    return result;
   } catch (error) {
     console.error('检查数据库连接状态时出错:', error);
-    return false;
+    return {
+      connected: false,
+      status: 'error',
+      message: `检查数据库连接失败: ${error.message}`
+    };
   }
 });
 
@@ -526,7 +535,8 @@ ipcMain.handle('open-customer-excel-file', async (event, customerName) => {
     const config = configManager.getConfig();
     
     // 从数据管理器获取客户信息
-    const customerData = await DataManager.getCustomer(customerName);
+    const { getCustomer } = require('../utils/data-manager');
+    const customerData = await getCustomer(customerName);
     
     if (!customerData) {
       return { success: false, message: '客户不存在' };
