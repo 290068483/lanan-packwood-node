@@ -1014,6 +1014,50 @@
               showNotification(`打开Excel文件出错: ${error.message}`, 'error');
             }
           }
+
+          // 处理'归档'按钮点击事件
+          if (event.target.classList.contains('archive-btn')) {
+            const customerName = event.target.getAttribute('data-customer');
+            try {
+              if (isElectron) {
+                // Electron环境中调用归档功能
+                const result = await window.electronAPI.archiveCustomer(customerName);
+                
+                if (result.success) {
+                  showNotification(`客户 ${customerName} 归档成功`);
+                  // 刷新客户数据
+                  await loadCustomers();
+                } else {
+                  showNotification(`归档失败: ${result.message}`, 'error');
+                }
+              } else {
+                // Web环境中调用API
+                const response = await fetch(
+                  `/api/customers/${encodeURIComponent(
+                    customerName
+                  )}/archive`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  }
+                );
+                const result = await response.json();
+
+                if (result.success) {
+                  showNotification(`客户 ${customerName} 归档成功`);
+                  // 刷新客户数据
+                  await loadCustomers();
+                } else {
+                  showNotification(`归档失败: ${result.message}`, 'error');
+                }
+              }
+            } catch (error) {
+              console.error('归档客户出错:', error);
+              showNotification(`归档客户出错: ${error.message}`, 'error');
+            }
+          }
         });
       });
 

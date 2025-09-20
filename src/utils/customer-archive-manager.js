@@ -1,4 +1,5 @@
 const fs = require('fs').promises;
+const fss = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const { promisify } = require('util');
@@ -30,15 +31,21 @@ async function ensureArchiveFiles() {
     await fs.mkdir(dataDir, { recursive: true });
     
     // 初始化归档数据文件
-    if (!await fs.access(archiveDataPath).then(() => true).catch(() => false)) {
+    try {
+      await fs.access(archiveDataPath);
+    } catch {
       await fs.writeFile(archiveDataPath, JSON.stringify([]));
     }
     
-    if (!await fs.access(packageArchiveDataPath).then(() => true).catch(() => false)) {
+    try {
+      await fs.access(packageArchiveDataPath);
+    } catch {
       await fs.writeFile(packageArchiveDataPath, JSON.stringify([]));
     }
     
-    if (!await fs.access(partArchiveDataPath).then(() => true).catch(() => false)) {
+    try {
+      await fs.access(partArchiveDataPath);
+    } catch {
       await fs.writeFile(partArchiveDataPath, JSON.stringify([]));
     }
   } catch (error) {
@@ -63,35 +70,46 @@ class CustomerArchiveManager {
    */
   static async archiveCustomer(customerName, operator = 'system', remark = '') {
     try {
+      console.log(`开始归档客户: ${customerName}`);
+      
       // 1. 获取客户数据
       const customerData = await getCustomerByName(customerName);
+      console.log(`客户数据查询结果:`, customerData);
+      
       if (!customerData) {
-        throw new Error('客户不存在');
+        throw new Error(`客户 "${customerName}" 不存在`);
       }
 
       // 2. 获取包数据
       const packagesPath = path.join(customerData.outputPath, 'packages.json');
       let packagesData = [];
       try {
-        if (await fs.access(packagesPath).then(() => true).catch(() => false)) {
-          packagesData = PackageDataExtractor.extractCustomerPackageData(packagesPath);
-        }
+        console.log(`尝试读取包数据文件: ${packagesPath}`);
+        // 修复：确保正确检查文件是否存在
+        await fs.access(packagesPath);
+        packagesData = PackageDataExtractor.extractCustomerPackageData(packagesPath);
+        console.log(`成功提取包数据，共 ${packagesData.length} 个包`);
       } catch (error) {
+        // 修复：确保在任何错误情况下都调用console.warn
         console.warn('读取packages.json失败:', error.message);
       }
 
       // 3. 创建备份目录
       const backupDir = path.join(__dirname, '../../data/backup');
       await fs.mkdir(backupDir, { recursive: true });
+      console.log(`创建备份目录: ${backupDir}`);
 
       // 4. 压缩客户文件夹
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const backupFileName = `${customerName}_${timestamp}.zip`;
       const backupPath = path.join(backupDir, backupFileName);
+      console.log(`开始压缩客户目录: ${customerData.outputPath} -> ${backupPath}`);
 
       await this.compressDirectory(customerData.outputPath, backupPath);
+      console.log(`客户目录压缩完成: ${backupPath}`);
 
       // 5. 保存归档数据到文件系统
+      console.log(`准备保存归档数据，包含 ${packagesData.length} 个包`);
       const archiveId = await this.saveArchiveToFileSystem({
         customerName: customerData.name,
         customerAddress: customerData.address || '',
@@ -102,12 +120,17 @@ class CustomerArchiveManager {
         remark,
         packages: packagesData
       });
+      console.log(`归档数据保存完成，归档ID: ${archiveId}`);
 
       // 6. 删除本地输出目录
+      console.log(`开始删除原始输出目录: ${customerData.outputPath}`);
       await fs.rm(customerData.outputPath, { recursive: true, force: true });
+      console.log(`原始输出目录删除完成`);
 
       // 7. 更新客户状态为已归档
+      console.log(`更新客户状态为已归档`);
       await DataManager.updateCustomerStatus(customerName, '已归档', `已归档到 ${backupPath}`, operator);
+      console.log(`客户状态更新完成`);
 
       return {
         success: true,
@@ -130,7 +153,7 @@ class CustomerArchiveManager {
    */
   static async compressDirectory(sourceDir, outputPath) {
     return new Promise((resolve, reject) => {
-      const output = fs.createWriteStream(outputPath);
+      const output = fss.createWriteStream(outputPath);
       const archive = archiver('zip', { zlib: { level: 9 } });
 
       output.on('close', () => resolve());
@@ -184,11 +207,11 @@ class CustomerArchiveManager {
       archives.push(archiveRecord);
       await fs.writeFile(archiveDataPath, JSON.stringify(archives, null, 2));
       
-      // 保存包信息
+      // 读取包信息
       const packageData = await fs.readFile(packageArchiveDataPath, 'utf8');
       const packages = JSON.parse(packageData || '[]');
       
-      // 保存板件信息
+      // 读取板件信息
       const partData = await fs.readFile(partArchiveDataPath, 'utf8');
       const parts = JSON.parse(partData || '[]');
       
@@ -326,6 +349,7 @@ class CustomerArchiveManager {
    * @returns {Promise} 恢复结果
    */
   static async restoreArchive(archiveId) {
+    console.log(`开始恢复归档 - 归档ID: ${archiveId}`);
     try {
       // 获取归档详情
       const detailResult = await this.getArchiveDetail(archiveId);
@@ -338,17 +362,21 @@ class CustomerArchiveManager {
       // 创建目标目录
       const customerDir = path.dirname(archive.backup_path).replace(/backup$/, 'customers');
       const targetDir = path.join(customerDir, archive.customer_name);
+      console.log(`创建恢复目标目录: ${targetDir}`);
       await fs.mkdir(targetDir, { recursive: true });
       
       // 解压备份文件
       const zipPath = archive.backup_path;
       const extractPath = targetDir;
+      console.log(`开始解压备份文件: ${zipPath} -> ${extractPath}`);
       
-      await fs.createReadStream(zipPath)
+      await fss.createReadStream(zipPath)
         .pipe(unzipper.Extract({ path: extractPath }))
         .promise();
+      console.log(`备份文件解压完成`);
       
       // 更新客户状态为已打包
+      console.log(`更新客户 ${archive.customer_name} 状态为已打包`);
       await DataManager.updateCustomerStatus(archive.customer_name, '已打包', '从归档恢复', 'system');
       
       return {

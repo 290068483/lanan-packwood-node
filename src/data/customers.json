@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "id": 1,
+    "name": "测试客户",
+    "status": "已打包",
+    "packProgress": 0,
+    "packedCount": 0,
+    "totalParts": 0,
+    "packSeqs": [],
+    "lastUpdate": "2025-09-19T08:51:44.588Z",
+    "packDate": null,
+    "archiveDate": null,
+    "shipmentDate": null,
+    "statusHistory": [],
+    "createdAt": "2025-09-19T08:26:17.988Z",
+    "updatedAt": "2025-09-19T08:51:44.588Z",
+    "outputPath": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\test-output"
+  }
+]

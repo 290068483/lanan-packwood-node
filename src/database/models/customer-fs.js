@@ -48,7 +48,8 @@ async function createOrUpdateCustomer(customerData) {
         archiveDate = null,
         shipmentDate = null,
         statusHistory = [],
-        panels = []
+        panels = [],
+        outputPath = null
       } = customerData;
 
       // 读取现有数据
@@ -73,6 +74,7 @@ async function createOrUpdateCustomer(customerData) {
         customer.archiveDate = archiveDate;
         customer.shipmentDate = shipmentDate;
         customer.statusHistory = statusHistory;
+        customer.outputPath = outputPath;
         customer.updatedAt = now;
 
         // 更新状态历史
@@ -92,7 +94,9 @@ async function createOrUpdateCustomer(customerData) {
         // 更新面板数据
         if (panels && panels.length > 0) {
           // 删除现有面板数据
-          panelsData.filter(p => p.customerId !== customer.id);
+          const filteredPanels = panelsData.filter(p => p.customerId !== customer.id);
+          panelsData.length = 0;
+          panelsData.push(...filteredPanels);
 
           // 添加新面板数据
           panels.forEach(panel => {
@@ -135,6 +139,7 @@ async function createOrUpdateCustomer(customerData) {
           archiveDate,
           shipmentDate,
           statusHistory,
+          outputPath, // 添加outputPath字段
           createdAt: now,
           updatedAt: now
         };
@@ -147,16 +152,15 @@ async function createOrUpdateCustomer(customerData) {
             historyData.push({
               customerId: newCustomer.id,
               status: history.status,
+              timestamp: history.timestamp || now,
               operator: history.operator,
-              remark: history.remark,
-              timestamp: history.timestamp,
-              createdAt: now
+              remark: history.remark
             });
           });
         }
 
         // 添加面板数据
-        if (panels && panels.length > 0) {
+        if (panels && Array.isArray(panels)) {
           panels.forEach(panel => {
             panelsData.push({
               customerId: newCustomer.id,
@@ -242,6 +246,7 @@ function getCustomerById(id) {
         archiveDate: customer.archiveDate,
         shipmentDate: customer.shipmentDate,
         statusHistory: (customer.statusHistory || []).concat(history),
+        outputPath: customer.outputPath, // 添加outputPath字段
         panels
       });
     } catch (err) {
@@ -258,16 +263,27 @@ function getCustomerById(id) {
 async function getCustomerByName(name) {
   return new Promise((resolve, reject) => {
     try {
+      // 确保数据文件存在
+      if (!fs.existsSync(customerDataPath)) {
+        console.warn(`客户数据文件不存在: ${customerDataPath}`);
+        resolve(null);
+        return;
+      }
+      
       const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      console.log(`从文件中读取到 ${customers.length} 个客户`);
       const customer = customers.find(c => c.name === name);
-
+      
       if (!customer) {
+        console.warn(`未找到名称为 "${name}" 的客户`);
+        console.log(`可用的客户列表:`, customers.map(c => c.name));
         resolve(null);
         return;
       }
 
       getCustomerById(customer.id).then(resolve).catch(reject);
     } catch (err) {
+      console.error('获取客户数据时出错:', err);
       reject(err);
     }
   });

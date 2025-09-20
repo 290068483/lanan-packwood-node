@@ -1,314 +1,564 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
-const CustomerArchiveManager = require('../src/utils/customer-archive-manager');
+const archiver = require('archiver');
+const unzipper = require('unzipper');
+
+// Mock modules
+jest.mock('fs/promises');
+jest.mock('archiver');
+jest.mock('unzipper');
+
+// Mock config
+jest.mock('../config.json', () => ({
+  sourcePath: '/mock/source',
+  localPath: '/mock/local',
+  networkPath: '/mock/network'
+}), { virtual: true });
+
+// Mock dependent modules
+jest.mock('../src/utils/data-manager', () => ({
+  updateCustomerStatus: jest.fn()
+}), { virtual: true });
+
+jest.mock('../src/utils/package-data-extractor', () => ({
+  extractCustomerPackageData: jest.fn()
+}), { virtual: true });
+
+jest.mock('../src/database/models/customer-fs', () => ({
+  getCustomerByName: jest.fn()
+}), { virtual: true });
+
 const DataManager = require('../src/utils/data-manager');
-const Database = require('../src/database/connection');
-const config = require('../config.json');
-
-// 模拟依赖模块
-jest.mock('../src/utils/data-manager');
-jest.mock('../src/database/connection');
-jest.mock('fs');
-
-// 模拟配置
-const testConfig = {
-  outputPath: 'C:\\test\\output'
-};
-
-// 模拟客户数据
-const mockCustomerData = {
-  name: '测试客户',
-  address: '测试地址',
-  outputPath: path.join(testConfig.outputPath, '测试客户')
-};
-
-// 模拟包数据
-const mockPackagesData = [
-  {
-    packSeq: '包1',
-    weight: 10.5,
-    volume: 0.8,
-    partIDs: ['ID001', 'ID002', 'ID003'],
-    partNames: {
-      'ID001': '板件1',
-      'ID002': '板件2',
-      'ID003': '板件3'
-    }
-  },
-  {
-    packSeq: '包2',
-    weight: 15.2,
-    volume: 1.2,
-    partIDs: ['ID004', 'ID005'],
-    partNames: {
-      'ID004': '板件4',
-      'ID005': '板件5'
-    }
-  }
-];
-
-// 模拟数据库实例
-const mockDbInstance = {
-  query: jest.fn()
-};
-
-// 模拟 archiver
-const mockArchive = {
-  on: jest.fn().mockReturnThis(),
-  pipe: jest.fn().mockReturnThis(),
-  directory: jest.fn().mockReturnThis(),
-  finalize: jest.fn()
-};
-
-jest.mock('archiver', () => {
-  return jest.fn(() => mockArchive);
-});
-
-beforeAll(async () => {
-  // 设置测试配置
-  global.config = testConfig;
-
-  // 模拟 Database.getInstance 返回 mockDbInstance
-  Database.getInstance = jest.fn().mockReturnValue(mockDbInstance);
-
-  // 模拟 fs 方法
-  fs.promises = {
-    mkdir: jest.fn().mockResolvedValue(undefined),
-    writeFile: jest.fn().mockResolvedValue(undefined),
-    readFile: jest.fn(),
-    rm: jest.fn().mockResolvedValue(undefined)
-  };
-  
-  // 模拟 fs.readFile 以返回 packages.json 的内容
-  fs.promises.readFile.mockImplementation((filePath) => {
-    if (filePath.endsWith('packages.json')) {
-      return Promise.resolve(JSON.stringify(mockPackagesData));
-    }
-    return Promise.reject(new Error('File not found'));
-  });
-
-  // 模拟 fs.existsSync
-  fs.existsSync = jest.fn().mockReturnValue(true); // packages.json存在
-
-  // 模拟 DataManager 方法
-  DataManager.getCustomer = jest.fn().mockResolvedValue(mockCustomerData);
-  DataManager.updateCustomerStatus = jest.fn().mockResolvedValue(true);
-  
-  // 模拟 createWriteStream
-  const mockWriteStream = {
-    on: jest.fn().mockImplementation((event, callback) => {
-      if (event === 'close') {
-        setImmediate(callback);
-      }
-      return mockWriteStream;
-    }),
-    pipe: jest.fn().mockReturnThis()
-  };
-  fs.createWriteStream = jest.fn().mockReturnValue(mockWriteStream);
-});
-
-afterAll(async () => {
-  // 清理测试目录
-  try {
-    if (fs.promises && fs.promises.rm) {
-      await fs.promises.rm(testConfig.outputPath, { recursive: true, force: true });
-    }
-  } catch (error) {
-    console.error('清理测试目录失败:', error);
-  }
-});
+const PackageDataExtractor = require('../src/utils/package-data-extractor');
+const { getCustomerByName } = require('../src/database/models/customer-fs');
+const CustomerArchiveManager = require('../src/utils/customer-archive-manager');
 
 describe('CustomerArchiveManager', () => {
-  describe('archiveCustomer', () => {
-    beforeEach(() => {
-      // 重置模拟
-      jest.clearAllMocks();
-      
-      // 重新设置模拟
-      mockDbInstance.query
-        .mockResolvedValueOnce([{ insertId: 1 }]) // 归档记录插入
-        .mockResolvedValueOnce([{ insertId: 1 }]) // 包1插入
-        .mockResolvedValueOnce([{ insertId: 2 }]); // 包2插入
-      
-      if (fs.promises) {
-        fs.promises.mkdir.mockResolvedValue(undefined);
-        fs.promises.rm.mockResolvedValue(undefined);
+  const mockCustomerName = 'TestCustomer';
+  const mockCustomerData = {
+    name: mockCustomerName,
+    outputPath: '/mock/output/TestCustomer',
+    address: 'Test Address'
+  };
+
+  const mockPackagesData = [
+    {
+      packSeq: '001',
+      packageInfo: { quantity: 5 },
+      partIDs: ['part1', 'part2', 'part3']
+    },
+    {
+      packSeq: '002',
+      packageInfo: { quantity: 3 },
+      partIDs: ['part4', 'part5']
+    }
+  ];
+
+  beforeEach(() => {
+    // Clear all mocks
+    jest.clearAllMocks();
+    
+    // Setup default mock behaviors
+    getCustomerByName.mockResolvedValue(mockCustomerData);
+    PackageDataExtractor.extractCustomerPackageData.mockReturnValue(mockPackagesData);
+    
+    // Mock file system operations
+    fs.access = jest.fn().mockResolvedValue();
+    fs.mkdir = jest.fn().mockResolvedValue(undefined);
+    fs.readFile = jest.fn();
+    fs.readFile.mockImplementation(async (filePath) => {
+      if (filePath.includes('archive.json')) {
+        return JSON.stringify([]);
+      } else if (filePath.includes('package-archive.json')) {
+        return JSON.stringify([]);
+      } else if (filePath.includes('part-archive.json')) {
+        return JSON.stringify([]);
       }
-      
-      
-      // 模拟 DataManager 方法
-      DataManager.getCustomer.mockResolvedValue(mockCustomerData);
-      DataManager.updateCustomerStatus.mockResolvedValue(true);
-      
-      // 模拟 createWriteStream
-      const mockWriteStream = {
-        on: jest.fn().mockImplementation((event, callback) => {
+      return '[]';
+    });
+    
+    fs.writeFile = jest.fn().mockResolvedValue(undefined);
+    fs.rm = jest.fn().mockResolvedValue(undefined);
+    fs.createWriteStream = jest.fn();
+    fs.createReadStream = jest.fn();
+  });
+
+  describe('archiveCustomer', () => {
+    it('should archive customer successfully', async () => {
+      // Mock archive creation
+      const mockOutputStream = {
+        on: jest.fn((event, callback) => {
           if (event === 'close') {
-            setImmediate(callback);
+            setTimeout(callback, 0);
           }
-          return mockWriteStream;
-        }),
-        pipe: jest.fn().mockReturnThis()
+          return mockOutputStream;
+        })
       };
-      fs.createWriteStream.mockReturnValue(mockWriteStream);
+      fs.createWriteStream.mockReturnValue(mockOutputStream);
       
-      // 重置 archiver 模拟
-      mockArchive.on.mockReturnThis();
-      mockArchive.pipe.mockReturnThis();
-      mockArchive.directory.mockReturnThis();
-      mockArchive.finalize.mockReturnValue(undefined);
-    });
-
-    it('应成功归档客户数据', async () => {
-      const result = await CustomerArchiveManager.archiveCustomer('测试客户', '测试操作员', '测试备注');
-
+      const mockArchive = {
+        pipe: jest.fn(),
+        directory: jest.fn(),
+        finalize: jest.fn(),
+        on: jest.fn((event, callback) => {
+          if (event === 'error') {
+            // Do nothing
+          }
+          return mockArchive;
+        })
+      };
+      archiver.mockReturnValue(mockArchive);
+      
+      const result = await CustomerArchiveManager.archiveCustomer(
+        mockCustomerName,
+        'testOperator',
+        'test remark'
+      );
+      
       expect(result.success).toBe(true);
-      expect(result.archiveId).toBeDefined();
-      expect(result.message).toContain('已成功归档');
-      expect(DataManager.getCustomer).toHaveBeenCalledWith('测试客户');
+      expect(getCustomerByName).toHaveBeenCalledWith(mockCustomerName);
+      expect(DataManager.updateCustomerStatus).toHaveBeenCalledWith(
+        mockCustomerName,
+        '已归档',
+        expect.stringContaining('已归档到'),
+        'testOperator'
+      );
     });
 
-    it('应处理客户不存在的情况', async () => {
-      DataManager.getCustomer.mockResolvedValueOnce(null);
-
-      const result = await CustomerArchiveManager.archiveCustomer('不存在的客户');
-
+    it('should return error when customer does not exist', async () => {
+      getCustomerByName.mockResolvedValue(null);
+      
+      const result = await CustomerArchiveManager.archiveCustomer(
+        'NonExistentCustomer',
+        'testOperator',
+        'test remark'
+      );
+      
       expect(result.success).toBe(false);
       expect(result.message).toContain('客户不存在');
     });
 
-    it('应处理归档过程中的错误', async () => {
-      // 模拟 DataManager.getCustomer 抛出错误
-      DataManager.getCustomer.mockImplementationOnce(() => {
-        throw new Error('模拟的数据库错误');
+    it('should handle packages.json read error gracefully', async () => {
+      // Mock console.warn
+      const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      
+      // 模拟 fs.access 抛出错误，触发 packages.json 读取失败
+      fs.access.mockImplementation(async (filePath) => {
+        if (filePath && filePath.includes && filePath.includes('packages.json')) {
+          throw new Error('File not found');
+        }
+        // 对于其他文件，正常返回
+        return Promise.resolve();
       });
-
-      const result = await CustomerArchiveManager.archiveCustomer('测试客户');
-
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('模拟的数据库错误');
+      
+      const mockOutputStream = {
+        on: jest.fn((event, callback) => {
+          if (event === 'close') {
+            setTimeout(callback, 0);
+          }
+          return mockOutputStream;
+        })
+      };
+      fs.createWriteStream.mockReturnValue(mockOutputStream);
+      
+      const mockArchive = {
+        pipe: jest.fn(),
+        directory: jest.fn(),
+        finalize: jest.fn(),
+        on: jest.fn((event, callback) => {
+          if (event === 'error') {
+            // Do nothing
+          }
+          return mockArchive;
+        })
+      };
+      archiver.mockReturnValue(mockArchive);
+      
+      const result = await CustomerArchiveManager.archiveCustomer(
+        mockCustomerName,
+        'testOperator',
+        'test remark'
+      );
+      
+      expect(result.success).toBe(true);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '读取packages.json失败:',
+        'File not found'
+      );
+      
+      // Restore console.warn
+      consoleWarnSpy.mockRestore();
     });
   });
 
   describe('calculateTotalParts', () => {
-    it('应正确计算总板件数', () => {
-      const totalParts = CustomerArchiveManager.calculateTotalParts(mockPackagesData);
-      expect(totalParts).toBe(5); // 3 + 2
+    it('should calculate total parts correctly', () => {
+      const total = CustomerArchiveManager.calculateTotalParts(mockPackagesData);
+      expect(total).toBe(5); // 3 parts + 2 parts
     });
 
-    it('应处理空包数据', () => {
-      const totalParts = CustomerArchiveManager.calculateTotalParts([]);
-      expect(totalParts).toBe(0);
+    it('should handle empty packages array', () => {
+      const total = CustomerArchiveManager.calculateTotalParts([]);
+      expect(total).toBe(0);
     });
 
-    it('应处理无partIDs的包数据', () => {
-      const packagesWithoutPartIDs = [
-        { packSeq: '包1' },
-        { packSeq: '包2' }
+    it('should handle packages without partIDs', () => {
+      const packages = [
+        { packageInfo: { quantity: 1 } },
+        { packageInfo: { quantity: 2 }, partIDs: ['part1', 'part2'] }
       ];
-
-      const totalParts = CustomerArchiveManager.calculateTotalParts(packagesWithoutPartIDs);
-      expect(totalParts).toBe(0);
+      const total = CustomerArchiveManager.calculateTotalParts(packages);
+      expect(total).toBe(2);
     });
   });
 
   describe('getArchiveList', () => {
-    it('应成功获取归档列表', async () => {
-      // 模拟数据库查询结果
-      mockDbInstance.query
-        .mockResolvedValueOnce([[{ id: 1, customer_name: '测试客户' }], [{ total: 10 }]]); // 归档列表查询
-
+    it('should return archive list with pagination', async () => {
+      const mockArchives = [
+        {
+          id: 1,
+          customer_name: 'Customer1',
+          archive_date: '2023-01-02T00:00:00Z'
+        },
+        {
+          id: 2,
+          customer_name: 'Customer2',
+          archive_date: '2023-01-01T00:00:00Z'
+        }
+      ];
+      
+      fs.readFile.mockImplementation(async (filePath) => {
+        if (filePath.includes('archive.json')) {
+          return JSON.stringify(mockArchives);
+        }
+        return '[]';
+      });
+      
       const result = await CustomerArchiveManager.getArchiveList(1, 10);
-
+      
       expect(result.success).toBe(true);
-      expect(result.data).toBeDefined();
-      expect(result.total).toBe(10);
+      // Should be sorted by date descending
+      expect(result.data).toEqual([
+        mockArchives[0], // newer date first
+        mockArchives[1]  // older date second
+      ]);
+      expect(result.total).toBe(2);
       expect(result.page).toBe(1);
       expect(result.pageSize).toBe(10);
+    });
+
+    it('should handle empty archive list', async () => {
+      fs.readFile.mockImplementation(async (filePath) => {
+        if (filePath.includes('archive.json')) {
+          return JSON.stringify([]);
+        }
+        return '[]';
+      });
+      
+      const result = await CustomerArchiveManager.getArchiveList(1, 10);
+      
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual([]);
+      expect(result.total).toBe(0);
+    });
+
+    it('should handle file read error', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      fs.readFile.mockRejectedValue(new Error('File read error'));
+      
+      const result = await CustomerArchiveManager.getArchiveList(1, 10);
+      
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('获取归档列表失败');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '获取归档列表失败:',
+        expect.any(Error)
+      );
+      
+      consoleErrorSpy.mockRestore();
     });
   });
 
   describe('getArchiveDetail', () => {
-    it('应成功获取归档详情', async () => {
-      // 模拟数据库查询结果
-      mockDbInstance.query
-        .mockResolvedValueOnce([[{ id: 1, customer_name: '测试客户' }]]) // 归档详情查询
-        .mockResolvedValueOnce([[]]) // 包信息查询
-        .mockResolvedValueOnce([[]]); // 板件信息查询
-
+    it('should return archive detail successfully', async () => {
+      const mockArchive = [{
+        id: 1,
+        customer_name: 'TestCustomer',
+        archive_date: '2023-01-01T00:00:00Z'
+      }];
+      
+      const mockPackages = [{
+        id: 1,
+        archive_id: 1,  // 确保与归档ID匹配
+        pack_seq: '001'
+      }];
+      
+      const mockParts = [{
+        id: 1,
+        package_id: 1,  // 与包的id匹配
+        part_id: 'part1'
+      }];
+      
+      // 确保正确模拟文件读取
+      fs.readFile.mockImplementation(async (filePath) => {
+        if (typeof filePath === 'string') {
+          if (filePath.includes('archive.json')) {
+            return JSON.stringify(mockArchive);
+          } else if (filePath.includes('package-archive.json')) {
+            return JSON.stringify(mockPackages);
+          } else if (filePath.includes('part-archive.json')) {
+            return JSON.stringify(mockParts);
+          }
+        }
+        return '[]';
+      });
+      
       const result = await CustomerArchiveManager.getArchiveDetail(1);
-
+      
       expect(result.success).toBe(true);
-      expect(result.data).toBeDefined();
-      expect(result.data.customer_name).toBe('测试客户');
+      expect(result.data.id).toBe(mockArchive[0].id);
+      expect(result.data.customer_name).toBe(mockArchive[0].customer_name);
+      expect(result.data.archive_date).toBe(mockArchive[0].archive_date);
+      // 检查 packages 数组是否正确关联
+      expect(result.data.packages).toBeDefined();
+      expect(result.data.packages.length).toBe(1);
+      expect(result.data.packages[0].id).toBe(mockPackages[0].id);
+      expect(result.data.packages[0].archive_id).toBe(mockPackages[0].archive_id);
+      // 检查 parts 是否正确关联到 packages
+      expect(result.data.packages[0].parts).toBeDefined();
+      expect(result.data.packages[0].parts.length).toBe(1);
+      expect(result.data.packages[0].parts[0].id).toBe(mockParts[0].id);
     });
 
-    it('应处理不存在的归档ID', async () => {
-      // 模拟数据库返回空结果
-      mockDbInstance.query
-        .mockResolvedValueOnce([[]]); // 归档不存在
-
+    it('should return error when archive not found', async () => {
+      fs.readFile.mockImplementation(async (filePath) => {
+        if (filePath.includes('archive.json')) {
+          return JSON.stringify([]);
+        }
+        return '[]';
+      });
+      
       const result = await CustomerArchiveManager.getArchiveDetail(999);
-
+      
       expect(result.success).toBe(false);
       expect(result.message).toBe('归档记录不存在');
+    });
+
+    it('should handle file read error', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      fs.readFile.mockRejectedValue(new Error('File read error'));
+      
+      const result = await CustomerArchiveManager.getArchiveDetail(1);
+      
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('获取归档详情失败');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '获取归档详情失败:',
+        expect.any(Error)
+      );
+      
+      consoleErrorSpy.mockRestore();
     });
   });
 
   describe('restoreArchive', () => {
-    beforeEach(() => {
-      // 重置所有模拟
-      jest.clearAllMocks();
+    it('should restore archive successfully', async () => {
+      const mockArchive = {
+        id: 1,
+        customer_name: 'TestCustomer',
+        backup_path: '/mock/data/backup/TestCustomer_2023-01-01.zip'
+      };
       
-      // 为每次测试重新设置数据库查询模拟
-      mockDbInstance.query
-        .mockResolvedValueOnce([[{ id: 1, customer_name: '测试客户', backup_path: '测试路径' }]]); // 归档详情查询
+      // Mock getArchiveDetail to return success
+      jest.spyOn(CustomerArchiveManager, 'getArchiveDetail').mockResolvedValue({
+        success: true,
+        data: mockArchive
+      });
       
-      // 模拟 DataManager 方法
-      DataManager.updateCustomerStatus.mockResolvedValue(true);
+      // Mock unzipper
+      const mockExtract = {
+        promise: jest.fn().mockResolvedValue(Promise.resolve())
+      };
+      unzipper.Extract = jest.fn().mockReturnValue(mockExtract);
       
-      // 模拟解压功能
-      CustomerArchiveManager.extractArchive = jest.fn().mockResolvedValue();
-    });
-
-    it('应成功恢复归档', async () => {
-      const result = await CustomerArchiveManager.restoreArchive(1, '测试操作员');
-
+      const mockReadStream = {
+        pipe: jest.fn().mockReturnValue({
+          promise: jest.fn().mockResolvedValue(Promise.resolve())
+        })
+      };
+      fs.createReadStream.mockReturnValue(mockReadStream);
+      
+      const result = await CustomerArchiveManager.restoreArchive(1);
+      
       expect(result.success).toBe(true);
-      expect(result.message).toContain('已成功恢复');
       expect(DataManager.updateCustomerStatus).toHaveBeenCalledWith(
-        '测试客户', 
-        '已打包', 
-        expect.stringContaining('从归档恢复'), 
-        '测试操作员'
+        'TestCustomer',
+        '已打包',
+        '从归档恢复',
+        'system'
       );
     });
 
-    it('应处理不存在的归档', async () => {
-      // 模拟数据库返回空结果
-      mockDbInstance.query
-        .mockResolvedValueOnce([[]]); // 归档不存在
-
+    it('should return error when archive detail retrieval fails', async () => {
+      jest.spyOn(CustomerArchiveManager, 'getArchiveDetail').mockResolvedValue({
+        success: false,
+        message: 'Archive not found'
+      });
+      
       const result = await CustomerArchiveManager.restoreArchive(999);
-
+      
       expect(result.success).toBe(false);
-      expect(result.message).toBe('归档记录不存在');
+      expect(result.message).toBe('Archive not found');
     });
 
-    it('应处理备份文件不存在的情况', async () => {
-      // 模拟数据库查询结果
-      mockDbInstance.query
-        .mockResolvedValueOnce([[{ id: 1, customer_name: '测试客户', backup_path: '不存在的路径' }]]); // 归档详情查询
-
-      // 模拟解压功能抛出错误
-      CustomerArchiveManager.extractArchive = jest.fn().mockImplementation(() => {
-        throw new Error('备份文件不存在');
+    it('should handle restore error', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      
+      const mockArchive = {
+        id: 1,
+        customer_name: 'TestCustomer',
+        backup_path: '/mock/data/backup/TestCustomer_2023-01-01.zip'
+      };
+      
+      jest.spyOn(CustomerArchiveManager, 'getArchiveDetail').mockResolvedValue({
+        success: true,
+        data: mockArchive
       });
-
+      
+      fs.createReadStream.mockImplementation(() => {
+        throw new Error('Read stream error');
+      });
+      
       const result = await CustomerArchiveManager.restoreArchive(1);
-
+      
       expect(result.success).toBe(false);
-      expect(result.message).toContain('备份文件不存在');
+      expect(result.message).toContain('恢复归档失败');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '恢复归档失败:',
+        expect.any(Error)
+      );
+      
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('exportArchiveToExcel', () => {
+    it('should export archive to Excel successfully', async () => {
+      const mockArchive = {
+        id: 1,
+        customer_name: 'TestCustomer'
+      };
+      
+      // Mock getArchiveDetail to return success
+      jest.spyOn(CustomerArchiveManager, 'getArchiveDetail').mockResolvedValue({
+        success: true,
+        data: mockArchive
+      });
+      
+      const result = await CustomerArchiveManager.exportArchiveToExcel(1);
+      
+      expect(result.success).toBe(true);
+      expect(result.filePath).toContain('归档_TestCustomer_');
+      expect(result.filePath).toContain('.xlsx');
+    });
+
+    it('should return error when archive detail retrieval fails', async () => {
+      jest.spyOn(CustomerArchiveManager, 'getArchiveDetail').mockResolvedValue({
+        success: false,
+        message: 'Archive not found'
+      });
+      
+      const result = await CustomerArchiveManager.exportArchiveToExcel(999);
+      
+      expect(result.success).toBe(false);
+      expect(result.message).toBe('Archive not found');
+    });
+
+    it('should handle export error', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      
+      const mockArchive = {
+        id: 1,
+        customer_name: 'TestCustomer'
+      };
+      
+      jest.spyOn(CustomerArchiveManager, 'getArchiveDetail').mockResolvedValue({
+        success: true,
+        data: mockArchive
+      });
+      
+      fs.mkdir = jest.fn().mockRejectedValue(new Error('Mkdir error'));
+      
+      const result = await CustomerArchiveManager.exportArchiveToExcel(1);
+      
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('导出归档到Excel失败');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '导出归档到Excel失败:',
+        expect.any(Error)
+      );
+      
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('exportArchiveToPDF', () => {
+    it('should export archive to PDF successfully', async () => {
+      const mockArchive = {
+        id: 1,
+        customer_name: 'TestCustomer'
+      };
+      
+      // Mock getArchiveDetail to return success
+      jest.spyOn(CustomerArchiveManager, 'getArchiveDetail').mockResolvedValue({
+        success: true,
+        data: mockArchive
+      });
+      
+      const result = await CustomerArchiveManager.exportArchiveToPDF(1);
+      
+      expect(result.success).toBe(true);
+      expect(result.filePath).toContain('归档_TestCustomer_');
+      expect(result.filePath).toContain('.pdf');
+    });
+
+    it('should return error when archive detail retrieval fails', async () => {
+      jest.spyOn(CustomerArchiveManager, 'getArchiveDetail').mockResolvedValue({
+        success: false,
+        message: 'Archive not found'
+      });
+      
+      const result = await CustomerArchiveManager.exportArchiveToPDF(999);
+      
+      expect(result.success).toBe(false);
+      expect(result.message).toBe('Archive not found');
+    });
+
+    it('should handle export error', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      
+      const mockArchive = {
+        id: 1,
+        customer_name: 'TestCustomer'
+      };
+      
+      jest.spyOn(CustomerArchiveManager, 'getArchiveDetail').mockResolvedValue({
+        success: true,
+        data: mockArchive
+      });
+      
+      fs.mkdir = jest.fn().mockRejectedValue(new Error('Mkdir error'));
+      
+      const result = await CustomerArchiveManager.exportArchiveToPDF(1);
+      
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('导出归档到PDF失败');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '导出归档到PDF失败:',
+        expect.any(Error)
+      );
+      
+      consoleErrorSpy.mockRestore();
     });
   });
 });
