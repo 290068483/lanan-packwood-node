@@ -300,5 +300,37 @@
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_龙湖西苑（鞋柜）#",
     "createdAt": "2025-09-20T06:01:14.232Z",
     "updatedAt": "2025-09-20T06:01:14.232Z"
+  },
+  {
+    "id": 17,
+    "name": "示例客户",
+    "status": "已归档",
+    "packProgress": 100,
+    "packedCount": 150,
+    "totalParts": 150,
+    "packSeqs": ["PACK001", "PACK002", "PACK003"],
+    "lastUpdate": "2025-09-20T08:30:00.000Z",
+    "packDate": "2025-09-20T08:30:00.000Z",
+    "archiveDate": "2025-09-20T08:30:00.000Z",
+    "shipmentDate": null,
+    "statusHistory": [
+      {
+        "status": "已打包",
+        "operator": "system",
+        "remark": "完成打包",
+        "timestamp": "2025-09-20T08:30:00.000Z"
+      },
+      {
+        "status": "已归档",
+        "operator": "admin",
+        "remark": "示例归档备注",
+        "timestamp": "2025-09-20T08:30:00.000Z"
+      }
+    ],
+    "replacementStatus": "none",
+    "replacementHistory": [],
+    "outputPath": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\backup\\示例客户_2025-09-20T08-30-00-000Z.zip",
+    "createdAt": "2025-09-20T08:30:00.000Z",
+    "updatedAt": "2025-09-20T08:30:00.000Z"
   }
 ]

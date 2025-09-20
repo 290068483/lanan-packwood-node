@@ -19,8 +19,12 @@ if (process.platform === 'win32') {
  * @param {Electron.BrowserWindow} mainWindow - 主窗口实例
  */
 function initArchiveHandlers(mainWindow) {
-  // 确保归档数据文件存在
-  CustomerArchiveManager.ensureArchiveFiles();
+  try {
+    // 确保归档数据文件存在
+    CustomerArchiveManager.ensureArchiveFiles();
+  } catch (error) {
+    console.error('初始化归档数据文件失败:', error);
+  }
   
   // 移除可能已存在的处理器，避免重复注册
   ipcMain.removeHandler('archive-customer');
@@ -119,6 +123,4 @@ function initArchiveHandlers(mainWindow) {
   });
 }
 
-module.exports = {
-  initArchiveHandlers
-};
+module.exports = { initArchiveHandlers };
