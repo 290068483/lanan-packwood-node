@@ -12,7 +12,8 @@ const CustomerStatus = {
   PROCESSING: '正在处理',
   PACKED: '已打包',
   ARCHIVED: '已归档',
-  SHIPPED: '已出货',
+  SHIPPED: '全部出货',
+  PARTIAL_SHIPPED: '部分出货',
   NOT_SHIPPED: '未出货'
 };
 
@@ -23,6 +24,7 @@ const StatusColor = {
   [CustomerStatus.PACKED]: '#f1c40f', // 黄色
   [CustomerStatus.ARCHIVED]: '#9b59b6', // 紫色
   [CustomerStatus.SHIPPED]: '#2ecc71', // 绿色
+  [CustomerStatus.PARTIAL_SHIPPED]: '#e67e22', // 橙色
   [CustomerStatus.NOT_SHIPPED]: '#e67e22' // 橙色
 };
 
@@ -169,6 +171,8 @@ function updateCustomerStatus(customerData, status, operator = '系统', remark 
       updatedCustomer.archiveDate = new Date().toISOString();
       break;
     case CustomerStatus.SHIPPED:
+    case CustomerStatus.PARTIAL_SHIPPED:
+    case CustomerStatus.NOT_SHIPPED:
       updatedCustomer.shipmentDate = new Date().toISOString();
       break;
   }

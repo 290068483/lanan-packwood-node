@@ -17,7 +17,8 @@ class CustomerStatusManager {
       IN_PROGRESS: '正在处理',
       PACKED: '已打包',
       ARCHIVED: '已归档',
-      SHIPPED: '已出货',
+      SHIPPED: '全部出货',
+      PARTIAL_SHIPPED: '部分出货',
       NOT_SHIPPED: '未出货'
     };
 
@@ -28,6 +29,7 @@ class CustomerStatusManager {
       [this.STATUS.PACKED]: '#FFC107', // 黄色
       [this.STATUS.ARCHIVED]: '#9C27B0', // 紫色
       [this.STATUS.SHIPPED]: '#4CAF50', // 绿色
+      [this.STATUS.PARTIAL_SHIPPED]: '#FFCA28', // 橙色
       [this.STATUS.NOT_SHIPPED]: '#FF9800' // 橙色
     };
   }
@@ -42,7 +44,7 @@ class CustomerStatusManager {
     // 确保customerData和packagesData存在
     if (!customerData || !packagesData) {
       return {
-        status: this.STATUS.UNKNOWN,
+        status: this.STATUS.NOT_PACKED,
         packProgress: 0,
         packedParts: 0,
         totalParts: 0,
@@ -174,7 +176,7 @@ class CustomerStatusManager {
     }
 
     // 如果是出货，记录出货时间
-    if (statusInfo.status === this.STATUS.SHIPPED && !updatedData.shipmentDate) {
+    if ((statusInfo.status === this.STATUS.SHIPPED || statusInfo.status === this.STATUS.PARTIAL_SHIPPED) && !updatedData.shipmentDate) {
       updatedData.shipmentDate = statusInfo.timestamp;
     }
 
@@ -229,19 +231,45 @@ class CustomerStatusManager {
   }
 
   /**
-   * 出货客户
+   * 全部出货客户
    * @param {Object} customerData - 客户数据
    * @param {string} operator - 操作人员
    * @param {string} remark - 备注
    * @returns {Object} - 更新后的客户数据
    */
   shipCustomer(customerData, operator = '系统', remark = '') {
-    if (customerData.status !== this.STATUS.ARCHIVED) {
-      throw new Error('只有已归档的客户才能进行出货');
+    // 检查客户是否已打包，而不是检查是否已归档
+    if (customerData.status !== this.STATUS.PACKED && customerData.status !== this.STATUS.IN_PROGRESS) {
+      throw new Error('只有已打包或正在处理的客户才能进行出货');
     }
 
     const statusInfo = {
       status: this.STATUS.SHIPPED,
+      packedCount: customerData.packedParts || 0,
+      totalParts: customerData.totalParts || 0,
+      packProgress: customerData.packProgress || 0,
+      packSeqs: customerData.packSeqs || [],
+      timestamp: new Date().toISOString()
+    };
+
+    return this.updateCustomerStatus(customerData, statusInfo, operator, remark);
+  }
+
+  /**
+   * 部分出货客户
+   * @param {Object} customerData - 客户数据
+   * @param {string} operator - 操作人员
+   * @param {string} remark - 备注
+   * @returns {Object} - 更新后的客户数据
+   */
+  partialShipCustomer(customerData, operator = '系统', remark = '') {
+    // 检查客户是否已打包，而不是检查是否已归档
+    if (customerData.status !== this.STATUS.PACKED && customerData.status !== this.STATUS.IN_PROGRESS) {
+      throw new Error('只有已打包或正在处理的客户才能进行部分出货');
+    }
+
+    const statusInfo = {
+      status: this.STATUS.PARTIAL_SHIPPED,
       packedCount: customerData.packedParts || 0,
       totalParts: customerData.totalParts || 0,
       packProgress: customerData.packProgress || 0,
@@ -260,8 +288,9 @@ class CustomerStatusManager {
    * @returns {Object} - 更新后的客户数据
    */
   markCustomerNotShipped(customerData, operator = '系统', remark = '') {
-    if (customerData.status !== this.STATUS.ARCHIVED) {
-      throw new Error('只有已归档的客户才能标记为未出货');
+    // 检查客户是否已打包，而不是检查是否已归档
+    if (customerData.status !== this.STATUS.PACKED && customerData.status !== this.STATUS.IN_PROGRESS) {
+      throw new Error('只有已打包或正在处理的客户才能标记为未出货');
     }
 
     const statusInfo = {

@@ -122,13 +122,13 @@ router.post('/:id/archive', async (req, res) => {
 });
 
 /**
- * 出货客户
+ * 全部出货客户
  * POST /api/customers/:id/ship
  */
 router.post('/:id/ship', async (req, res) => {
   try {
     const customerName = req.params.id;
-    console.log(`出货客户: ${customerName}`);
+    console.log(`全部出货客户: ${customerName}`);
 
     // 从数据管理器获取客户数据
     const customerData = await DataManager.getCustomer(customerName);
@@ -139,34 +139,89 @@ router.post('/:id/ship', async (req, res) => {
       });
     }
 
-    // 检查客户状态是否为已归档
-    if (customerData.status !== customerStatusManager.STATUS.ARCHIVED) {
+    // 检查客户状态是否为已打包或正在处理
+    if (customerData.status !== customerStatusManager.STATUS.PACKED && 
+        customerData.status !== customerStatusManager.STATUS.IN_PROGRESS) {
       return res.status(400).json({
         success: false,
-        message: `只有已归档的客户才能进行出货，当前状态: ${customerData.status}`
+        message: `只有已打包或正在处理的客户才能进行全部出货，当前状态: ${customerData.status}`
       });
     }
 
-    // 出货客户
+    // 全部出货客户
     const updatedData = customerStatusManager.shipCustomer(
       customerData,
       req.user ? req.user.name : 'API',
-      req.body.remark || 'API出货'
+      req.body.remark || 'API全部出货'
     );
 
     // 保存更新后的数据
     await DataManager.upsertCustomer(updatedData);
 
-    logSuccess(customerName, 'API', '客户出货成功');
+    logSuccess(customerName, 'API', '客户全部出货成功');
 
     return res.json({
       success: true,
       status: updatedData.status,
       shipmentDate: updatedData.shipmentDate,
-      message: '客户出货成功'
+      message: '客户全部出货成功'
     });
   } catch (error) {
-    logError(customerName, 'API', `客户出货失败: ${error.message}`);
+    logError(customerName, 'API', `客户全部出货失败: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+/**
+ * 部分出货客户
+ * POST /api/customers/:id/partial-ship
+ */
+router.post('/:id/partial-ship', async (req, res) => {
+  try {
+    const customerName = req.params.id;
+    console.log(`部分出货客户: ${customerName}`);
+
+    // 从数据管理器获取客户数据
+    const customerData = await DataManager.getCustomer(customerName);
+    if (!customerData) {
+      return res.status(404).json({
+        success: false,
+        message: '客户不存在'
+      });
+    }
+
+    // 检查客户状态是否为已打包或正在处理
+    if (customerData.status !== customerStatusManager.STATUS.PACKED && 
+        customerData.status !== customerStatusManager.STATUS.IN_PROGRESS) {
+      return res.status(400).json({
+        success: false,
+        message: `只有已打包或正在处理的客户才能进行部分出货，当前状态: ${customerData.status}`
+      });
+    }
+
+    // 部分出货客户
+    const updatedData = customerStatusManager.partialShipCustomer(
+      customerData,
+      req.user ? req.user.name : 'API',
+      req.body.remark || 'API部分出货'
+    );
+
+    // 保存更新后的数据
+    await DataManager.upsertCustomer(updatedData);
+
+    logSuccess(customerName, 'API', '客户部分出货成功');
+
+    return res.json({
+      success: true,
+      status: updatedData.status,
+      shipmentDate: updatedData.shipmentDate,
+      message: '客户部分出货成功'
+    });
+  } catch (error) {
+    logError(customerName, 'API', `客户部分出货失败: ${error.message}`);
     return res.status(500).json({
       success: false,
       message: error.message
@@ -192,11 +247,12 @@ router.post('/:id/mark-not-shipped', async (req, res) => {
       });
     }
 
-    // 检查客户状态是否为已归档
-    if (customerData.status !== customerStatusManager.STATUS.ARCHIVED) {
+    // 检查客户状态是否为已打包或正在处理
+    if (customerData.status !== customerStatusManager.STATUS.PACKED && 
+        customerData.status !== customerStatusManager.STATUS.IN_PROGRESS) {
       return res.status(400).json({
         success: false,
-        message: `只有已归档的客户才能标记为未出货，当前状态: ${customerData.status}`
+        message: `只有已打包或正在处理的客户才能标记为未出货，当前状态: ${customerData.status}`
       });
     }
 
