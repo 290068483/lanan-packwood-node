@@ -9,7 +9,7 @@ const config = require('../../config.json');
 const DataManager = require('./data-manager');
 const PackageDataExtractor = require('./package-data-extractor');
 // 修复导入问题，正确导入getCustomerByName函数
-const { getCustomerByName } = require('../database/models/customer-fs');
+const { getCustomerByName, updateCustomerStatus } = require('../database/models/customer-fs');
 const { CustomerStatus } = require('./status-manager');
 
 
@@ -129,7 +129,7 @@ class CustomerArchiveManager {
 
       // 7. 更新客户状态为已归档
       console.log(`更新客户状态为已归档`);
-      await DataManager.updateCustomerStatus(customerName, '已归档', `已归档到 ${backupPath}`, operator);
+      await updateCustomerStatus(customerData, '已归档', operator, `已归档到 ${backupPath}`);
       console.log(`客户状态更新完成`);
 
       return {

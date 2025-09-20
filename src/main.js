@@ -1,3 +1,15 @@
+const { exec } = require('child_process');
+const os = require('os');
+
+// 设置控制台编码为UTF-8，解决Windows平台乱码问题
+if (os.platform() === 'win32') {
+  exec('chcp 65001', (error, stdout, stderr) => {
+    if (error) {
+      console.error('设置控制台编码时出错:', error);
+    }
+  });
+}
+
 const fs = require('fs');
 const path = require('path');
 const http = require('http');

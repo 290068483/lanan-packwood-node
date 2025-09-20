@@ -254,7 +254,7 @@ class CustomerStatusManager {
    * @returns {Object} - 更新后的客户数据
    */
   shipCustomer(customerData, operator = '系统', remark = '') {
-    // 检查客户是否已打包，而不是检查是否已归档
+    // 检查客户是否已打包
     if (customerData.status !== this.STATUS.PACKED && customerData.status !== this.STATUS.IN_PROGRESS) {
       throw new Error('只有已打包或正在处理的客户才能进行出货');
     }
@@ -279,7 +279,7 @@ class CustomerStatusManager {
    * @returns {Object} - 更新后的客户数据
    */
   partialShipCustomer(customerData, operator = '系统', remark = '') {
-    // 检查客户是否已打包，而不是检查是否已归档
+    // 检查客户是否已打包
     if (customerData.status !== this.STATUS.PACKED && customerData.status !== this.STATUS.IN_PROGRESS) {
       throw new Error('只有已打包或正在处理的客户才能进行部分出货');
     }
@@ -304,7 +304,7 @@ class CustomerStatusManager {
    * @returns {Object} - 更新后的客户数据
    */
   markCustomerNotShipped(customerData, operator = '系统', remark = '') {
-    // 检查客户是否已打包，而不是检查是否已归档
+    // 检查客户是否已打包
     if (customerData.status !== this.STATUS.PACKED && customerData.status !== this.STATUS.IN_PROGRESS) {
       throw new Error('只有已打包或正在处理的客户才能标记为未出货');
     }

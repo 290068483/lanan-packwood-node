@@ -1,18 +1,32 @@
 /**
- * 主服务文件
- * 启动数据同步服务和HTTP服务器
+ * 主服务
+ * 负责监控packages.json文件变化并更新客户状态
  */
 
+const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
 const url = require('url');
-const { createDataSyncService } = require('./data-sync-service');
-const { getAllCustomersAPI, getCustomerAPI, updateCustomerStatusAPI, getCustomersByStatusAPI } = require('../database/api');
-const { CustomerStatus } = require('../utils/status-manager');
+const { exec } = require('child_process');
 
-// 配置文件路径
-const configPath = path.join(__dirname, '../../config-sync.json');
+// 设置控制台编码为UTF-8，解决乱码问题
+if (process.platform === 'win32') {
+  exec('chcp 65001', (error, stdout, stderr) => {
+    if (error) {
+      console.error('设置控制台编码时出错:', error);
+    }
+  });
+}
+
+const configPath = path.join(__dirname, '../../config.json');
+const CustomerStatusManager = require('../utils/customer-status-manager');
+const { CustomerStatus } = require('../utils/status-manager');
+const {
+  getAllCustomersAPI,
+  getCustomerAPI,
+  updateCustomerStatusAPI,
+  getCustomersByStatusAPI
+} = require('../database/api');
 
 // 读取配置文件
 let config = {};
@@ -23,20 +37,20 @@ if (fs.existsSync(configPath)) {
   process.exit(1);
 }
 
-// 创建数据同步服务
-const dataSyncService = createDataSyncService(config.dataSync);
+// 创建客户状态管理器
+const customerStatusManager = new CustomerStatusManager(config.customerStatus);
 
-// 数据同步服务事件监听
-dataSyncService.on('syncCompleted', (data) => {
-  console.log(`数据同步完成: ${data.customersCount} 个客户, 时间: ${data.timestamp}`);
+// 客户状态管理器事件监听
+customerStatusManager.on('statusUpdated', (data) => {
+  console.log(`客户状态更新: ${data.customerName}, 新状态: ${data.newStatus}`);
 });
 
-dataSyncService.on('syncError', (error) => {
-  console.error('数据同步出错:', error);
+customerStatusManager.on('statusUpdateError', (error) => {
+  console.error('客户状态更新出错:', error);
 });
 
-// 启动数据同步服务
-dataSyncService.start();
+// 启动客户状态管理器
+customerStatusManager.start();
 
 // 创建HTTP服务器
 const server = http.createServer(async (req, res) => {
@@ -159,9 +173,9 @@ const server = http.createServer(async (req, res) => {
         const customer = await getCustomerAPI(customerName);
 
         // 检查客户当前状态
-        if (customer.status !== CustomerStatus.ARCHIVED) {
+        if (customer.status !== CustomerStatus.PACKED && customer.status !== CustomerStatus.IN_PROGRESS) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: '只有已归档的客户才能出货' }));
+          res.end(JSON.stringify({ error: '只有已打包或正在处理的客户才能出货' }));
           return;
         }
 
@@ -194,9 +208,9 @@ const server = http.createServer(async (req, res) => {
         const customer = await getCustomerAPI(customerName);
 
         // 检查客户当前状态
-        if (customer.status !== CustomerStatus.ARCHIVED) {
+        if (customer.status !== CustomerStatus.PACKED && customer.status !== CustomerStatus.IN_PROGRESS) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: '只有已归档的客户才能标记为未出货' }));
+          res.end(JSON.stringify({ error: '只有已打包或正在处理的客户才能标记为未出货' }));
           return;
         }
 

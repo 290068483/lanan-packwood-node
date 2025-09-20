@@ -3,6 +3,15 @@ const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
 
+// 设置控制台编码为UTF-8，解决乱码问题
+if (process.platform === 'win32') {
+  exec('chcp 65001', (error, stdout, stderr) => {
+    if (error) {
+      console.error('设置控制台编码时出错:', error);
+    }
+  });
+}
+
 // 设置用户数据路径以解决缓存权限问题
 app.setPath('userData', path.join(app.getPath('appData'), 'PackNode'));
 

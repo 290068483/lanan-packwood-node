@@ -1,6 +1,16 @@
 const readline = require('readline');
+const { exec } = require('child_process');
 const DataManager = require('../utils/data-manager');
 const MainUI = require('./main-ui');
+
+// 设置控制台编码为UTF-8，解决乱码问题
+if (process.platform === 'win32') {
+  exec('chcp 65001', (error, stdout, stderr) => {
+    if (error) {
+      console.error('设置控制台编码时出错:', error);
+    }
+  });
+}
 
 class CLIInterface {
   constructor() {

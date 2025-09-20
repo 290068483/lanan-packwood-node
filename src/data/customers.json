@@ -2,18 +2,25 @@
   {
     "id": 1,
     "name": "测试客户",
-    "status": "已打包",
+    "status": "已归档",
     "packProgress": 0,
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
     "lastUpdate": "2025-09-19T08:51:44.588Z",
     "packDate": null,
-    "archiveDate": null,
+    "archiveDate": "2025-09-20T07:17:43.404Z",
     "shipmentDate": null,
-    "statusHistory": [],
+    "statusHistory": [
+      {
+        "status": "已打包",
+        "timestamp": "2025-09-19T08:51:44.588Z",
+        "operator": "system",
+        "remark": "已归档到 C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\backup\\测试客户_2025-09-20T07-17-43-388Z.zip"
+      }
+    ],
     "createdAt": "2025-09-19T08:26:17.988Z",
-    "updatedAt": "2025-09-19T08:51:44.588Z",
+    "updatedAt": "2025-09-20T07:17:43.404Z",
     "outputPath": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\test-output"
   },
   {
@@ -24,7 +31,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:42.186Z",
+    "lastUpdate": "2025-09-20T07:36:26.359Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -33,7 +40,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_(退单)赵月（隔断）#",
     "createdAt": "2025-09-20T06:00:42.186Z",
-    "updatedAt": "2025-09-20T06:00:42.186Z"
+    "updatedAt": "2025-09-20T07:36:26.359Z"
   },
   {
     "id": 3,
@@ -43,7 +50,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:46.252Z",
+    "lastUpdate": "2025-09-20T07:36:28.484Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -52,7 +59,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_0、废弃#",
     "createdAt": "2025-09-20T06:00:46.252Z",
-    "updatedAt": "2025-09-20T06:00:46.252Z"
+    "updatedAt": "2025-09-20T07:36:28.484Z"
   },
   {
     "id": 4,
@@ -62,7 +69,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:48.245Z",
+    "lastUpdate": "2025-09-20T07:36:29.543Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -71,7 +78,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_GN康桑林#",
     "createdAt": "2025-09-20T06:00:48.245Z",
-    "updatedAt": "2025-09-20T06:00:48.245Z"
+    "updatedAt": "2025-09-20T07:36:29.543Z"
   },
   {
     "id": 5,
@@ -81,7 +88,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:52.639Z",
+    "lastUpdate": "2025-09-20T07:36:31.929Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -90,7 +97,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_MS外滩壹号（兰州）#",
     "createdAt": "2025-09-20T06:00:52.639Z",
-    "updatedAt": "2025-09-20T06:00:52.639Z"
+    "updatedAt": "2025-09-20T07:36:31.929Z"
   },
   {
     "id": 6,
@@ -100,7 +107,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:52.789Z",
+    "lastUpdate": "2025-09-20T07:36:32.006Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -109,7 +116,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_MS孔总补柜#",
     "createdAt": "2025-09-20T06:00:52.789Z",
-    "updatedAt": "2025-09-20T06:00:52.789Z"
+    "updatedAt": "2025-09-20T07:36:32.006Z"
   },
   {
     "id": 7,
@@ -119,7 +126,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:53.293Z",
+    "lastUpdate": "2025-09-20T07:36:32.263Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -128,7 +135,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_TZ奥体工装#",
     "createdAt": "2025-09-20T06:00:53.294Z",
-    "updatedAt": "2025-09-20T06:00:53.294Z"
+    "updatedAt": "2025-09-20T07:36:32.263Z"
   },
   {
     "id": 8,
@@ -138,7 +145,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:56.755Z",
+    "lastUpdate": "2025-09-20T07:36:34.141Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -147,7 +154,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_WLJ王姐-2#",
     "createdAt": "2025-09-20T06:00:56.755Z",
-    "updatedAt": "2025-09-20T06:00:56.755Z"
+    "updatedAt": "2025-09-20T07:36:34.141Z"
   },
   {
     "id": 9,
@@ -157,7 +164,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:00.964Z",
+    "lastUpdate": "2025-09-20T07:36:36.697Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -166,7 +173,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_付序欢#",
     "createdAt": "2025-09-20T06:01:00.964Z",
-    "updatedAt": "2025-09-20T06:01:00.964Z"
+    "updatedAt": "2025-09-20T07:36:36.698Z"
   },
   {
     "id": 10,
@@ -176,7 +183,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:01.620Z",
+    "lastUpdate": "2025-09-20T07:36:37.076Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -185,7 +192,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_工厂展柜#",
     "createdAt": "2025-09-20T06:01:01.620Z",
-    "updatedAt": "2025-09-20T06:01:01.620Z"
+    "updatedAt": "2025-09-20T07:36:37.076Z"
   },
   {
     "id": 11,
@@ -195,7 +202,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:06.121Z",
+    "lastUpdate": "2025-09-20T07:36:39.903Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -204,7 +211,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_汪廷#",
     "createdAt": "2025-09-20T06:01:06.121Z",
-    "updatedAt": "2025-09-20T06:01:06.121Z"
+    "updatedAt": "2025-09-20T07:36:39.903Z"
   },
   {
     "id": 12,
@@ -214,7 +221,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:07.611Z",
+    "lastUpdate": "2025-09-20T07:36:40.831Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -223,7 +230,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_熊松琴#",
     "createdAt": "2025-09-20T06:01:07.611Z",
-    "updatedAt": "2025-09-20T06:01:07.611Z"
+    "updatedAt": "2025-09-20T07:36:40.831Z"
   },
   {
     "id": 13,
@@ -233,7 +240,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:11.271Z",
+    "lastUpdate": "2025-09-20T07:36:43.156Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -242,7 +249,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_肖妍柔#",
     "createdAt": "2025-09-20T06:01:11.271Z",
-    "updatedAt": "2025-09-20T06:01:11.271Z"
+    "updatedAt": "2025-09-20T07:36:43.157Z"
   },
   {
     "id": 14,
@@ -252,7 +259,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:13.228Z",
+    "lastUpdate": "2025-09-20T07:36:44.388Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -261,7 +268,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_邱海岸#",
     "createdAt": "2025-09-20T06:01:13.229Z",
-    "updatedAt": "2025-09-20T06:01:13.229Z"
+    "updatedAt": "2025-09-20T07:36:44.388Z"
   },
   {
     "id": 15,
@@ -271,7 +278,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:14.065Z",
+    "lastUpdate": "2025-09-20T07:36:44.916Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -280,7 +287,7 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_魏敏#",
     "createdAt": "2025-09-20T06:01:14.065Z",
-    "updatedAt": "2025-09-20T06:01:14.065Z"
+    "updatedAt": "2025-09-20T07:36:44.916Z"
   },
   {
     "id": 16,
@@ -290,7 +297,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:14.232Z",
+    "lastUpdate": "2025-09-20T07:36:45.044Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -299,6 +306,6 @@
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_龙湖西苑（鞋柜）#",
     "createdAt": "2025-09-20T06:01:14.232Z",
-    "updatedAt": "2025-09-20T06:01:14.232Z"
+    "updatedAt": "2025-09-20T07:36:45.044Z"
   }
 ]

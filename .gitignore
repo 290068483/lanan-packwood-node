@@ -5,8 +5,6 @@ node_modules/
 logs/
 *.log
 
-
-
 # 系统文件
 .DS_Store
 Thumbs.db
@@ -28,6 +26,10 @@ output_table*.xlsx
 # XML优化文件
 优化文件.xml
 
+# 数据备份目录
+data/backup/
+
+# 测试相关目录
 test/
 test_data/
 temp-data/
