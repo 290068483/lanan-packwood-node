@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": 1,
+    "archive_id": 2,
+    "pack_seq": "PACK001",
+    "package_weight": 25.5,
+    "package_volume": 0,
+    "created_at": "2025-09-20T08:30:00.000Z"
+  },
+  {
+    "id": 2,
+    "archive_id": 2,
+    "pack_seq": "PACK002",
+    "package_weight": 32.0,
+    "package_volume": 0,
+    "created_at": "2025-09-20T08:30:00.000Z"
+  },
+  {
+    "id": 3,
+    "archive_id": 2,
+    "pack_seq": "PACK003",
+    "package_weight": 18.7,
+    "package_volume": 0,
+    "created_at": "2025-09-20T08:30:00.000Z"
+  }
+]

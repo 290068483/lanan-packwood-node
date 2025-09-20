@@ -1059,6 +1059,100 @@
             }
           }
         });
+
+        // 出货按钮事件
+        document.addEventListener('click', async event => {
+          if (event.target.classList.contains('ship-btn')) {
+            const customerName = event.target.getAttribute('data-customer');
+            if (confirm(`确定要出货客户 ${customerName} 吗？`)) {
+              try {
+                let result;
+                if (isElectron) {
+                  // Electron环境中调用出货功能
+                  result = await window.electronAPI.shipCustomer(customerName);
+                } else {
+                  // Web环境中调用API
+                  const response = await fetch(
+                    `/api/customers/${encodeURIComponent(customerName)}/ship`,
+                    {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        remark: '通过界面出货',
+                      }),
+                    }
+                  );
+                  result = await response.json();
+                }
+
+                if (result.success) {
+                  showNotification(`客户 ${customerName} 出货成功`, 'success');
+                  // 刷新客户数据
+                  await loadCustomers();
+                } else {
+                  showNotification(`出货失败: ${result.message}`, 'error');
+                }
+              } catch (error) {
+                console.error('出货客户出错:', error);
+                showNotification(`出货客户出错: ${error.message}`, 'error');
+              }
+            }
+          }
+        });
+
+        // 标记为未出货按钮事件
+        document.addEventListener('click', async event => {
+          if (event.target.classList.contains('not-shipped-btn')) {
+            const customerName = event.target.getAttribute('data-customer');
+            if (confirm(`确定要将客户 ${customerName} 标记为未出货吗？`)) {
+              try {
+                let result;
+                if (isElectron) {
+                  // Electron环境中调用标记功能
+                  result = await window.electronAPI.markCustomerNotShipped(
+                    customerName
+                  );
+                } else {
+                  // Web环境中调用API
+                  const response = await fetch(
+                    `/api/customers/${encodeURIComponent(
+                      customerName
+                    )}/mark-not-shipped`,
+                    {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        remark: '通过界面标记为未出货',
+                      }),
+                    }
+                  );
+                  result = await response.json();
+                }
+
+                if (result.success) {
+                  showNotification(
+                    `客户 ${customerName} 已标记为未出货`,
+                    'success'
+                  );
+                  // 刷新客户数据
+                  await loadCustomers();
+                } else {
+                  showNotification(`标记失败: ${result.message}`, 'error');
+                }
+              } catch (error) {
+                console.error('标记客户为未出货出错:', error);
+                showNotification(
+                  `标记客户为未出货出错: ${error.message}`,
+                  'error'
+                );
+              }
+            }
+          }
+        });
       });
 
       // 刷新数据
@@ -1259,14 +1353,22 @@
         try {
           showProcessingStatus('正在加载归档历史...');
           
-          let archives = [];
+          // 获取归档数据
+          let archiveResult = null;
           if (isElectron && window.electronAPI) {
             // Electron环境中获取归档列表
-            const response = await window.electronAPI.getArchiveList(page, pageSize);
-            if (response.success) {
-              archives = response.data;
-            }
+            archiveResult = await window.electronAPI.getArchiveList(page, pageSize);
+          } else {
+            // Web环境中调用API
+            const response = await fetch(`/api/archive/list?page=${page}&pageSize=${pageSize}`);
+            archiveResult = await response.json();
           }
+          
+          if (!archiveResult || !archiveResult.success) {
+            throw new Error(archiveResult?.message || '获取归档列表失败');
+          }
+          
+          const archives = archiveResult.data || [];
           
           // 创建归档历史模态框
           const modal = document.createElement('div');
@@ -1275,7 +1377,7 @@
             <div class="modal-content">
               <span class="close">&times;</span>
               <h2>归档历史</h2>
-              <div id="archiveHistoryContent">
+              <div class="archive-history">
                 ${archives.length > 0 ? 
                   `<table class="history-table">
                     <thead>
@@ -1292,7 +1394,7 @@
                       ${archives.map(archive => `
                         <tr>
                           <td>${archive.customer_name || '未知'}</td>
-                          <td>${archive.archive_date ? new Date(archive.archive_date).toLocaleString() : '未知'}</td>
+                          <td>${archive.archive_date ? new Date(archive.archive_date).toLocaleDateString() : '未知'}</td>
                           <td>${archive.packages_count || 0}</td>
                           <td>${archive.total_parts_count || 0}</td>
                           <td>${archive.archive_user || '未知'}</td>

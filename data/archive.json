@@ -9,5 +9,16 @@
     "total_parts_count": 0,
     "archive_user": "system",
     "remark": ""
+  },
+  {
+    "id": 2,
+    "customer_name": "示例客户",
+    "customer_address": "示例地址",
+    "archive_date": "2025-09-20T08:30:00.000Z",
+    "backup_path": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\backup\\示例客户_2025-09-20T08-30-00-000Z.zip",
+    "packages_count": 3,
+    "total_parts_count": 150,
+    "archive_user": "admin",
+    "remark": "示例归档备注"
   }
 ]

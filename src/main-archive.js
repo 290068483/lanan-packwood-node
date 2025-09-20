@@ -26,7 +26,7 @@ function initArchiveHandlers(mainWindow) {
   ipcMain.removeHandler('archive-customer');
   ipcMain.removeHandler('get-archive-list');
   ipcMain.removeHandler('restore-archive');
-  ipcMain.removeHandler('get-archive-details');
+  ipcMain.removeHandler('get-archive-detail');
   ipcMain.removeHandler('delete-archive');
   ipcMain.removeHandler('export-archive-to-excel');
   ipcMain.removeHandler('export-archive-to-pdf');
@@ -53,10 +53,10 @@ function initArchiveHandlers(mainWindow) {
   });
 
   // 获取归档列表
-  ipcMain.handle('get-archive-list', async () => {
+  ipcMain.handle('get-archive-list', async (event, page = 1, pageSize = 20) => {
     try {
-      const archives = await CustomerArchiveManager.getArchiveList();
-      return { success: true, archives };
+      const result = await CustomerArchiveManager.getArchiveList(page, pageSize);
+      return { success: true, ...result };
     } catch (error) {
       console.error('获取归档列表失败:', error);
       return { success: false, error: error.message };
@@ -75,10 +75,10 @@ function initArchiveHandlers(mainWindow) {
   });
 
   // 获取归档详情
-  ipcMain.handle('get-archive-details', async (event, archiveId) => {
+  ipcMain.handle('get-archive-detail', async (event, archiveId) => {
     try {
-      const details = await CustomerArchiveManager.getArchiveDetails(archiveId);
-      return { success: true, details };
+      const result = await CustomerArchiveManager.getArchiveDetail(archiveId);
+      return { success: true, ...result };
     } catch (error) {
       console.error('获取归档详情失败:', error);
       return { success: false, error: error.message };
@@ -99,7 +99,7 @@ function initArchiveHandlers(mainWindow) {
   // 导出归档到Excel
   ipcMain.handle('export-archive-to-excel', async (event, archiveId) => {
     try {
-      const result = await CustomerArchiveManager.exportToExcel(archiveId);
+      const result = await CustomerArchiveManager.exportArchiveToExcel(archiveId);
       return { success: true, ...result };
     } catch (error) {
       console.error('导出归档到Excel失败:', error);
@@ -110,7 +110,7 @@ function initArchiveHandlers(mainWindow) {
   // 导出归档到PDF
   ipcMain.handle('export-archive-to-pdf', async (event, archiveId) => {
     try {
-      const result = await CustomerArchiveManager.exportToPDF(archiveId);
+      const result = await CustomerArchiveManager.exportArchiveToPDF(archiveId);
       return { success: true, ...result };
     } catch (error) {
       console.error('导出归档到PDF失败:', error);
