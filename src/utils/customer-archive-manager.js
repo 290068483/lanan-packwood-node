@@ -8,7 +8,7 @@ const unzipper = require('unzipper');
 const config = require('../../config.json');
 const DataManager = require('./data-manager');
 const PackageDataExtractor = require('./package-data-extractor');
-// 修复导入问题，正确导入getCustomerByName和updateCustomerStatus函数
+// 修复导入问题，正确导入customerModel实例
 const customerModel = require('../database/models/customer-fs');
 const { CustomerStatus } = require('./status-manager');
 const ExcelJS = require('exceljs'); // 添加Excel处理库
@@ -75,7 +75,7 @@ class CustomerArchiveManager {
       await ensureArchiveFiles();
 
       // 获取客户信息
-      const customer = await getCustomerByName(customerName);
+      const customer = await customerModel.getCustomerByName(customerName);
       if (!customer) {
         return {
           success: false,
@@ -196,7 +196,9 @@ class CustomerArchiveManager {
 
       // 更新客户状态
       try {
-        await updateCustomerStatus(customer, CustomerStatus.ARCHIVED, operator, '已归档');
+        await customerModel.updateCustomerStatus(customer.id, {
+          status: CustomerStatus.ARCHIVED
+        }, operator, '已归档');
         console.log(`客户 ${customerName} 状态更新成功`);
       } catch (statusError) {
         console.error(`更新客户状态失败:`, statusError);

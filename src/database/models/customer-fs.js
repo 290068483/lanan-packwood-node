@@ -1,469 +1,599 @@
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+const customerStatusManager = require('../../utils/customer-status-manager');
+
+// 数据文件路径
+const DATABASE_PATH = path.join(__dirname, '../../data/database.json');
+const PANELS_PATH = path.join(__dirname, '../../data/panels.json');
+const HISTORY_PATH = path.join(__dirname, '../../data/history.json');
+
 /**
  * 客户数据模型 - 文件系统版本
  */
-
-const fs = require('fs');
-const path = require('path');
-const { CustomerStatus } = require('../../utils/status-manager');
-
-// 默认数据文件路径
-let dataDir = path.join(__dirname, '../../data');
-let customerDataPath = path.join(dataDir, 'database.json');
-let panelDataPath = path.join(dataDir, 'panels.json');
-let historyDataPath = path.join(dataDir, 'history.json');
-
-/**
- * 设置数据路径
- * @param {string} newDataDir - 新的数据目录路径
- */
-function setDataPath(newDataDir) {
-  dataDir = newDataDir;
-  customerDataPath = path.join(dataDir, 'database.json');
-  panelDataPath = path.join(dataDir, 'panels.json');
-  historyDataPath = path.join(dataDir, 'history.json');
-
-  // 确保数据目录存在
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+class CustomerFS {
+  /**
+   * 构造函数
+   */
+  constructor() {
+    this.dataPath = DATABASE_PATH;
+    this.panelsPath = PANELS_PATH;
+    this.historyPath = HISTORY_PATH;
+    this.ensureDataFilesExist();
   }
 
-  // 初始化数据文件
-  if (!fs.existsSync(customerDataPath)) {
-    fs.writeFileSync(customerDataPath, JSON.stringify([]));
-  }
-  if (!fs.existsSync(panelDataPath)) {
-    fs.writeFileSync(panelDataPath, JSON.stringify([]));
-  }
-  if (!fs.existsSync(historyDataPath)) {
-    fs.writeFileSync(historyDataPath, JSON.stringify([]));
-  }
-
-  console.log(`数据路径已设置为: ${dataDir}`);
-}
-
-// 确保数据目录存在
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-
-// 初始化数据文件
-if (!fs.existsSync(customerDataPath)) {
-  fs.writeFileSync(customerDataPath, JSON.stringify([]));
-}
-if (!fs.existsSync(panelDataPath)) {
-  fs.writeFileSync(panelDataPath, JSON.stringify([]));
-}
-if (!fs.existsSync(historyDataPath)) {
-  fs.writeFileSync(historyDataPath, JSON.stringify([]));
-}
-
-/**
- * 创建或更新客户数据
- * @param {Object} customerData - 客户数据
- * @returns {Promise<Object>} 创建或更新的客户数据
- */
-async function createOrUpdateCustomer(customerData) {
-  return new Promise((resolve, reject) => {
-    try {
-      const {
-        name,
-        status = CustomerStatus.UNPACKED,
-        packProgress = 0,
-        packedCount = 0,
-        totalParts = 0,
-        packSeqs = [],
-        lastUpdate = new Date().toISOString(),
-        packDate = null,
-        archiveDate = null,
-        shipmentDate = null,
-        statusHistory = [],
-        panels = [],
-        outputPath = null
-      } = customerData;
-
-      // 读取现有数据
-      const database = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
-      const customers = database.customers || [];
-      const panelsData = JSON.parse(fs.readFileSync(panelDataPath, 'utf8'));
-      const historyData = JSON.parse(fs.readFileSync(historyDataPath, 'utf8'));
-
-      // 查找现有客户
-      const existingCustomerIndex = customers.findIndex(c => c.name === name);
-      const now = new Date().toISOString();
-
-      if (existingCustomerIndex >= 0) {
-        // 更新现有客户
-        const customer = customers[existingCustomerIndex];
-        customer.status = status;
-        customer.packProgress = packProgress;
-        customer.packedCount = packedCount;
-        customer.totalParts = totalParts;
-        customer.packSeqs = packSeqs;
-        customer.lastUpdate = lastUpdate;
-        customer.packDate = packDate;
-        customer.archiveDate = archiveDate;
-        customer.shipmentDate = shipmentDate;
-        customer.statusHistory = statusHistory;
-        customer.outputPath = outputPath;
-        customer.updatedAt = now;
-
-        // 更新状态历史
-        if (statusHistory.length > 0) {
-          statusHistory.forEach(history => {
-            historyData.push({
-              customerId: customer.id,
-              status: history.status,
-              operator: history.operator,
-              remark: history.remark,
-              timestamp: history.timestamp,
-              createdAt: now
-            });
-          });
-        }
-
-        // 更新面板数据
-        if (panels && panels.length > 0) {
-          // 删除现有面板数据
-          const filteredPanels = panelsData.filter(p => p.customerId !== customer.id);
-          panelsData.length = 0;
-          panelsData.push(...filteredPanels);
-
-          // 添加新面板数据
-          panels.forEach(panel => {
-            panelsData.push({
-              customerId: customer.id,
-              panelId: panel.id,
-              name: panel.name,
-              width: panel.width,
-              height: panel.height,
-              thickness: panel.thickness,
-              material: panel.material,
-              edgeBand: panel.edgeBand,
-              edgeBandWidth: panel.edgeBandWidth,
-              edgeBandColor: panel.edgeBandColor,
-              isPacked: panel.isPacked ? 1 : 0,
-              createdAt: new Date().toISOString()
-            });
-          });
-        }
-
-        // 保存数据
-        const databaseToSave = {
-          customers: customers,
-          settings: database.settings || {},
-          history: database.history || []
-        };
-        fs.writeFileSync(customerDataPath, JSON.stringify(databaseToSave, null, 2));
-        fs.writeFileSync(panelDataPath, JSON.stringify(panelsData, null, 2));
-        fs.writeFileSync(historyDataPath, JSON.stringify(historyData, null, 2));
-
-        // 返回更新后的客户数据
-        getCustomerById(customer.id).then(resolve).catch(reject);
-      } else {
-        // 创建新客户
-        const newCustomer = {
-          id: customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1,
-          name,
-          status,
-          packProgress,
-          packedCount,
-          totalParts,
-          packSeqs,
-          lastUpdate,
-          packDate,
-          archiveDate,
-          shipmentDate,
-          statusHistory,
-          outputPath, // 添加outputPath字段
-          createdAt: now,
-          updatedAt: now
-        };
-
-        customers.push(newCustomer);
-
-        // 添加状态历史
-        if (statusHistory.length > 0) {
-          statusHistory.forEach(history => {
-            historyData.push({
-              customerId: newCustomer.id,
-              status: history.status,
-              timestamp: history.timestamp || now,
-              operator: history.operator,
-              remark: history.remark
-            });
-          });
-        }
-
-        // 添加面板数据
-        if (panels && Array.isArray(panels)) {
-          panels.forEach(panel => {
-            panelsData.push({
-              customerId: newCustomer.id,
-              panelId: panel.id,
-              name: panel.name,
-              width: panel.width,
-              height: panel.height,
-              thickness: panel.thickness,
-              material: panel.material,
-              edgeBand: panel.edgeBand,
-              edgeBandWidth: panel.edgeBandWidth,
-              edgeBandColor: panel.edgeBandColor,
-              isPacked: panel.isPacked ? 1 : 0,
-              createdAt: new Date().toISOString()
-            });
-          });
-        }
-
-        // 保存数据
-        const databaseToSave = {
-          customers: customers,
-          settings: database.settings || {},
-          history: database.history || []
-        };
-        fs.writeFileSync(customerDataPath, JSON.stringify(databaseToSave, null, 2));
-        fs.writeFileSync(panelDataPath, JSON.stringify(panelsData, null, 2));
-        fs.writeFileSync(historyDataPath, JSON.stringify(historyData, null, 2));
-
-        // 返回新创建的客户数据
-        getCustomerById(newCustomer.id).then(resolve).catch(reject);
-      }
-    } catch (err) {
-      reject(err);
+  /**
+   * 确保数据文件存在
+   */
+  ensureDataFilesExist() {
+    // 确保data目录存在
+    const dataDir = path.dirname(this.dataPath);
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
     }
-  });
-}
 
-/**
- * 根据客户ID获取客户数据
- * @param {number} id - 客户ID
- * @returns {Promise<Object>} 客户数据
- */
-function getCustomerById(id) {
-  return new Promise((resolve, reject) => {
+    // 确保数据文件存在
+    if (!fs.existsSync(this.dataPath)) {
+      fs.writeFileSync(this.dataPath, JSON.stringify({
+        customers: [],
+        settings: {},
+        history: []
+      }, null, 2));
+    }
+
+    if (!fs.existsSync(this.panelsPath)) {
+      fs.writeFileSync(this.panelsPath, JSON.stringify([], null, 2));
+    }
+
+    if (!fs.existsSync(this.historyPath)) {
+      fs.writeFileSync(this.historyPath, JSON.stringify([], null, 2));
+    }
+  }
+
+  /**
+   * 读取数据文件
+   * @returns {Object} - 数据对象
+   */
+  readDataFile() {
     try {
-      const database = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
-      const customers = database.customers || [];
-      const panelsData = JSON.parse(fs.readFileSync(panelDataPath, 'utf8'));
-      const historyData = JSON.parse(fs.readFileSync(historyDataPath, 'utf8'));
+      const data = fs.readFileSync(this.dataPath, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      console.error('读取数据文件失败:', error);
+      return { customers: [], settings: {}, history: [] };
+    }
+  }
 
-      const customer = customers.find(c => c.id === id);
-      if (!customer) {
-        resolve(null);
-        return;
+  /**
+   * 写入数据文件
+   * @param {Object} data - 数据对象
+   */
+  writeDataFile(data) {
+    try {
+      fs.writeFileSync(this.dataPath, JSON.stringify(data, null, 2));
+    } catch (error) {
+      console.error('写入数据文件失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 读取panels数据
+   * @returns {Array} - panels数据
+   */
+  readPanelsData() {
+    try {
+      const data = fs.readFileSync(this.panelsPath, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      console.error('读取panels数据失败:', error);
+      return [];
+    }
+  }
+
+  /**
+   * 写入panels数据
+   * @param {Array} panels - panels数据
+   */
+  writePanelsData(panels) {
+    try {
+      fs.writeFileSync(this.panelsPath, JSON.stringify(panels, null, 2));
+    } catch (error) {
+      console.error('写入panels数据失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 读取历史数据
+   * @returns {Array} - 历史数据
+   */
+  readHistoryData() {
+    try {
+      const data = fs.readFileSync(this.historyPath, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      console.error('读取历史数据失败:', error);
+      return [];
+    }
+  }
+
+  /**
+   * 写入历史数据
+   * @param {Array} history - 历史数据
+   */
+  writeHistoryData(history) {
+    try {
+      fs.writeFileSync(this.historyPath, JSON.stringify(history, null, 2));
+    } catch (error) {
+      console.error('写入历史数据失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 创建或更新客户
+   * @param {Object} customerData - 客户数据
+   * @param {string} operator - 操作人员
+   * @returns {Object} - 创建或更新后的客户数据
+   */
+  createOrUpdateCustomer(customerData, operator = '系统') {
+    // 验证必要字段
+    if (!customerData.name) {
+      throw new Error('客户名称是必填项');
+    }
+
+    // 读取现有数据
+    const data = this.readDataFile();
+    const customers = data.customers || [];
+
+    // 查找现有客户
+    const existingCustomerIndex = customers.findIndex(c => c.name === customerData.name);
+
+    // 生成客户ID（如果不存在）
+    let customerId = customerData.id;
+    if (!customerId) {
+      customerId = crypto.randomUUID();
+    }
+
+    // 处理面板数据
+    const panels = customerData.panels || [];
+    const allPanels = this.readPanelsData();
+
+    // 更新或创建客户对象
+    let customer;
+    if (existingCustomerIndex !== -1) {
+      // 更新现有客户
+      customer = {
+        ...customers[existingCustomerIndex],
+        ...customerData,
+        id: customerId,
+        updatedAt: new Date().toISOString()
+      };
+
+      // 更新客户列表
+      customers[existingCustomerIndex] = customer;
+    } else {
+      // 创建新客户
+      customer = {
+        id: customerId,
+        name: customerData.name,
+        address: customerData.address || '',
+        phone: customerData.phone || '',
+        email: customerData.email || '',
+        notes: customerData.notes || '',
+        panels: panels,
+        status: customerStatusManager.STATUS.NOT_PACKED,
+        shipmentStatus: customerStatusManager.SHIPMENT_STATUS.NOT_SHIPPED,
+        packProgress: 0,
+        packedParts: 0,
+        totalParts: panels.length,
+        packSeqs: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastPackUpdate: new Date().toISOString(),
+        lastShipmentUpdate: new Date().toISOString()
+      };
+
+      // 添加到客户列表
+      customers.push(customer);
+    }
+
+    // 更新面板数据
+    panels.forEach(panel => {
+      if (!panel.customerId) {
+        panel.customerId = customerId;
+      }
+      if (!panel.customerName) {
+        panel.customerName = customerData.name;
       }
 
-      // 获取面板数据
-      const panels = panelsData.filter(p => p.customerId === id).map(p => ({
-        id: p.panelId,
-        name: p.name,
-        width: p.width,
-        height: p.height,
-        thickness: p.thickness,
-        material: p.material,
-        edgeBand: p.edgeBand,
-        edgeBandWidth: p.edgeBandWidth,
-        edgeBandColor: p.edgeBandColor,
-        isPacked: p.isPacked === 1
-      }));
+      // 查找现有面板
+      const existingPanelIndex = allPanels.findIndex(p => p.id === panel.id);
+      if (existingPanelIndex !== -1) {
+        // 更新现有面板
+        allPanels[existingPanelIndex] = {
+          ...allPanels[existingPanelIndex],
+          ...panel,
+          customerId,
+          customerName: customerData.name,
+          updatedAt: new Date().toISOString()
+        };
+      } else {
+        // 创建新面板
+        if (!panel.id) {
+          panel.id = crypto.randomUUID();
+        }
+        panel.customerId = customerId;
+        panel.customerName = customerData.name;
+        panel.createdAt = new Date().toISOString();
+        panel.updatedAt = new Date().toISOString();
+        allPanels.push(panel);
+      }
+    });
 
-      // 获取状态历史
-      const history = historyData.filter(h => h.customerId === id).map(h => ({
-        status: h.status,
-        timestamp: h.timestamp,
-        operator: h.operator,
-        remark: h.remark
-      }));
+    // 保存数据
+    this.writeDataFile({
+      ...data,
+      customers
+    });
+    this.writePanelsData(allPanels);
 
-      resolve({
-        id: customer.id,
-        name: customer.name,
-        status: customer.status,
-        packProgress: customer.packProgress,
-        packedCount: customer.packedCount,
-        totalParts: customer.totalParts,
-        packSeqs: customer.packSeqs || [],
-        lastUpdate: customer.lastUpdate,
-        packDate: customer.packDate,
-        archiveDate: customer.archiveDate,
-        shipmentDate: customer.shipmentDate,
-        statusHistory: (customer.statusHistory || []).concat(history),
-        outputPath: customer.outputPath, // 添加outputPath字段
-        panels
+    return customer;
+  }
+
+  /**
+   * 根据ID获取客户
+   * @param {string} id - 客户ID
+   * @returns {Object|null} - 客户数据或null
+   */
+  getCustomerById(id) {
+    const data = this.readDataFile();
+    const customers = data.customers || [];
+    const customer = customers.find(c => c.id === id);
+
+    if (!customer) {
+      return null;
+    }
+
+    // 确保状态历史存在
+    if (!customer.statusHistory) {
+      customer.statusHistory = [];
+    }
+
+    // 添加初始状态记录（如果这是第一次状态更新）
+    if (customer.statusHistory.length === 0) {
+      customer.statusHistory.push({
+        status: customerStatusManager.STATUS.NOT_PACKED,
+        shipmentStatus: customerStatusManager.SHIPMENT_STATUS.NOT_SHIPPED,
+        timestamp: new Date().toISOString(),
+        operator: '系统',
+        remark: '初始状态'
       });
-    } catch (err) {
-      reject(err);
     }
-  });
-}
 
-/**
- * 根据客户名称获取客户数据
- * @param {string} name - 客户名称
- * @returns {Promise<Object>} 客户数据
- */
-async function getCustomerByName(name) {
-  return new Promise((resolve, reject) => {
-    try {
-      // 确保数据文件存在
-      if (!fs.existsSync(customerDataPath)) {
-        console.warn(`客户数据文件不存在: ${customerDataPath}`);
-        resolve(null);
-        return;
-      }
+    // 确保状态字段存在
+    const status = customer.status || customerStatusManager.STATUS.NOT_PACKED;
+    const shipmentStatus = customer.shipmentStatus || customerStatusManager.SHIPMENT_STATUS.NOT_SHIPPED;
 
-      const database = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
-      const customers = database.customers || [];
-      console.log(`从文件中读取到 ${customers.length} 个客户`);
-      const customer = customers.find(c => c.name === name);
+    // 返回客户数据副本
+    return {
+      ...customer,
+      status,
+      shipmentStatus,
+      packedParts: customer.packedParts || 0,
+      totalParts: customer.totalParts || 0,
+      packProgress: customer.packProgress || 0,
+      packSeqs: customer.packSeqs || [],
+      lastPackUpdate: customer.lastPackUpdate || new Date().toISOString(),
+      lastShipmentUpdate: customer.lastShipmentUpdate || new Date().toISOString()
+    };
+  }
 
-      if (!customer) {
-        console.warn(`未找到名称为 "${name}" 的客户`);
-        console.log(`可用的客户列表:`, customers.map(c => c.name));
-        resolve(null);
-        return;
-      }
+  /**
+   * 根据名称获取客户
+   * @param {string} name - 客户名称
+   * @returns {Object|null} - 客户数据或null
+   */
+  getCustomerByName(name) {
+    const data = this.readDataFile();
+    const customers = data.customers || [];
+    const customer = customers.find(c => c.name === name);
 
-      getCustomerById(customer.id).then(resolve).catch(reject);
-    } catch (err) {
-      console.error('获取客户数据时出错:', err);
-      reject(err);
+    if (!customer) {
+      return null;
     }
-  });
-}
 
-/**
- * 获取所有客户数据
- * @returns {Promise<Array>} 客户数据列表
- */
-async function getAllCustomers() {
-  return new Promise((resolve, reject) => {
-    try {
-      const database = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
-      const customers = database.customers || [];
-      const customerPromises = customers.map(c => getCustomerById(c.id));
-      Promise.all(customerPromises)
-        .then(customers => resolve(customers))
-        .catch(reject);
-    } catch (err) {
-      reject(err);
+    // 确保状态字段存在
+    const status = customer.status || customerStatusManager.STATUS.NOT_PACKED;
+    const shipmentStatus = customer.shipmentStatus || customerStatusManager.SHIPMENT_STATUS.NOT_SHIPPED;
+
+    // 返回客户数据副本
+    return {
+      ...customer,
+      status,
+      shipmentStatus,
+      packedParts: customer.packedParts || 0,
+      totalParts: customer.totalParts || 0,
+      packProgress: customer.packProgress || 0,
+      packSeqs: customer.packSeqs || [],
+      lastPackUpdate: customer.lastPackUpdate || new Date().toISOString(),
+      lastShipmentUpdate: customer.lastShipmentUpdate || new Date().toISOString()
+    };
+  }
+
+  /**
+   * 获取所有客户
+   * @returns {Array} - 客户数据数组
+   */
+  getAllCustomers() {
+    const data = this.readDataFile();
+    const customers = data.customers || [];
+
+    // 为每个客户确保状态字段存在
+    return customers.map(customer => {
+      const status = customer.status || customerStatusManager.STATUS.NOT_PACKED;
+      const shipmentStatus = customer.shipmentStatus || customerStatusManager.SHIPMENT_STATUS.NOT_SHIPPED;
+
+      return {
+        ...customer,
+        status,
+        shipmentStatus,
+        packedParts: customer.packedParts || 0,
+        totalParts: customer.totalParts || 0,
+        packProgress: customer.packProgress || 0,
+        packSeqs: customer.packSeqs || [],
+        lastPackUpdate: customer.lastPackUpdate || new Date().toISOString(),
+        lastShipmentUpdate: customer.lastShipmentUpdate || new Date().toISOString()
+      };
+    });
+  }
+
+  /**
+   * 更新客户状态
+   * @param {string} customerId - 客户ID
+   * @param {Object} statusInfo - 状态信息
+   * @param {string} operator - 操作人员
+   * @param {string} remark - 备注
+   * @returns {Object} - 更新后的客户数据
+   */
+  updateCustomerStatus(customerId, statusInfo, operator = '系统', remark = '') {
+    // 读取数据
+    const data = this.readDataFile();
+    const customers = data.customers || [];
+
+    // 查找客户
+    const customerIndex = customers.findIndex(c => c.id === customerId);
+    if (customerIndex === -1) {
+      throw new Error('客户不存在');
     }
-  });
-}
 
-/**
- * 更新客户状态
- * @param {Object} customer - 客户数据
- * @param {string} status - 新状态
- * @param {string} operator - 操作人员
- * @param {string} remark - 备注
- * @returns {Promise<Object>} 更新后的客户数据
- */
-async function updateCustomerStatus(customer, status, operator = '系统', remark = '') {
-  return new Promise((resolve, reject) => {
-    try {
-      const {
-        id,
-        name,
-        currentStatus = customer.status,
-        packProgress = customer.packProgress,
-        packedCount = customer.packedCount,
-        totalParts = customer.totalParts,
-        packSeqs = customer.packSeqs,
-        lastUpdate = customer.lastUpdate,
-        packDate = customer.packDate,
-        archiveDate = customer.archiveDate,
-        shipmentDate = customer.shipmentDate,
-        statusHistory = customer.statusHistory || []
-      } = customer;
+    const customer = customers[customerIndex];
 
-      // 读取现有数据
-      const database = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
-      const customers = database.customers || [];
-      const historyData = JSON.parse(fs.readFileSync(historyDataPath, 'utf8'));
-      const now = new Date().toISOString();
+    // 确保状态历史存在
+    if (!customer.statusHistory) {
+      customer.statusHistory = [];
+    }
 
-      // 获取当前状态历史
-      const currentStatusHistory = statusHistory || [];
+    // 添加初始状态记录（如果这是第一次状态更新）
+    if (customer.statusHistory.length === 0) {
+      customer.statusHistory.push({
+        status: customerStatusManager.STATUS.NOT_PACKED,
+        shipmentStatus: customerStatusManager.SHIPMENT_STATUS.NOT_SHIPPED,
+        timestamp: new Date().toISOString(),
+        operator: '系统',
+        remark: '初始状态'
+      });
+    }
 
-      // 创建新的状态记录
-      const newStatusHistory = [
-        ...currentStatusHistory,
-        {
-          status: currentStatus,
-          timestamp: lastUpdate,
-          operator: operator,
-          remark: remark
-        }
-      ];
+    // 获取当前状态
+    const currentStatus = customer.status || customerStatusManager.STATUS.NOT_PACKED;
+    const currentShipmentStatus = customer.shipmentStatus || customerStatusManager.SHIPMENT_STATUS.NOT_SHIPPED;
 
-      // 根据状态更新特定字段
-      let newPackDate = packDate;
-      let newArchiveDate = archiveDate;
-      let newShipmentDate = shipmentDate;
+    // 更新状态字段
+    if (statusInfo.status) {
+      customer.status = statusInfo.status;
+      customer.lastPackUpdate = new Date().toISOString();
+    }
 
-      switch (status) {
-        case CustomerStatus.PACKED:
-          newPackDate = now;
+    if (statusInfo.shipmentStatus) {
+      customer.shipmentStatus = statusInfo.shipmentStatus;
+      customer.lastShipmentUpdate = new Date().toISOString();
+    }
+
+    // 更新打包进度相关字段
+    customer.packedParts = statusInfo.packedParts || 0;
+    customer.totalParts = statusInfo.totalParts || 0;
+    customer.packSeqs = statusInfo.packSeqs || [];
+    customer.packProgress = statusInfo.packProgress || 0;
+
+    // 如果是第一次打包，记录打包时间
+    if (statusInfo.status === customerStatusManager.STATUS.PACKED && !customer.packDate) {
+      customer.packDate = new Date().toISOString();
+    }
+
+    // 如果是归档，记录归档时间
+    if (statusInfo.status === customerStatusManager.STATUS.ARCHIVED && !customer.archiveDate) {
+      customer.archiveDate = new Date().toISOString();
+    }
+
+    // 如果是出货，记录出货时间
+    if ((statusInfo.shipmentStatus === customerStatusManager.SHIPMENT_STATUS.FULL_SHIPPED ||
+      statusInfo.shipmentStatus === customerStatusManager.SHIPMENT_STATUS.PARTIAL_SHIPPED) &&
+      !customer.shipmentDate) {
+      customer.shipmentDate = new Date().toISOString();
+    }
+
+    // 更新时间戳
+    customer.updatedAt = new Date().toISOString();
+
+    // 添加到状态历史
+    const statusChangeRecord = {
+      status: statusInfo.status || currentStatus,
+      shipmentStatus: statusInfo.shipmentStatus || currentShipmentStatus,
+      previousStatus: currentStatus,
+      previousShipmentStatus: currentShipmentStatus,
+      timestamp: new Date().toISOString(),
+      operator,
+      remark: remark || `状态变更为 ${statusInfo.status || currentStatus}`,
+      packProgress: statusInfo.packProgress || 0,
+      packedParts: statusInfo.packedParts || 0,
+      totalParts: statusInfo.totalParts || 0
+    };
+
+    customer.statusHistory.push(statusChangeRecord);
+
+    // 保存数据
+    customers[customerIndex] = customer;
+    this.writeDataFile({
+      ...data,
+      customers
+    });
+
+    return customer;
+  }
+
+  /**
+   * 删除客户
+   * @param {string} customerId - 客户ID
+   * @returns {boolean} - 是否删除成功
+   */
+  deleteCustomer(customerId) {
+    // 读取数据
+    const data = this.readDataFile();
+    const customers = data.customers || [];
+    const allPanels = this.readPanelsData();
+
+    // 查找客户
+    const customerIndex = customers.findIndex(c => c.id === customerId);
+    if (customerIndex === -1) {
+      throw new Error('客户不存在');
+    }
+
+    const customer = customers[customerIndex];
+
+    // 删除客户
+    customers.splice(customerIndex, 1);
+
+    // 删除相关面板
+    const updatedPanels = allPanels.filter(panel => panel.customerId !== customerId);
+
+    // 保存数据
+    this.writeDataFile({
+      ...data,
+      customers
+    });
+    this.writePanelsData(updatedPanels);
+
+    return true;
+  }
+
+  /**
+   * 获取客户状态历史
+   * @param {string} customerId - 客户ID
+   * @returns {Array} - 状态历史数组
+   */
+  getCustomerStatusHistory(customerId) {
+    const customer = this.getCustomerById(customerId);
+    if (!customer) {
+      throw new Error('客户不存在');
+    }
+
+    return customer.statusHistory || [];
+  }
+
+  /**
+   * 添加客户备注
+   * @param {string} customerId - 客户ID
+   * @param {string} note - 备注内容
+   * @param {string} operator - 操作人员
+   * @returns {Object} - 更新后的客户数据
+   */
+  addCustomerNote(customerId, note, operator = '系统') {
+    const customer = this.getCustomerById(customerId);
+    if (!customer) {
+      throw new Error('客户不存在');
+    }
+
+    // 确保备注数组存在
+    if (!customer.notes) {
+      customer.notes = [];
+    }
+
+    // 添加备注
+    const noteRecord = {
+      id: crypto.randomUUID(),
+      content: note,
+      timestamp: new Date().toISOString(),
+      operator
+    };
+
+    customer.notes.push(noteRecord);
+    customer.updatedAt = new Date().toISOString();
+
+    // 更新客户数据
+    return this.createOrUpdateCustomer(customer, operator);
+  }
+
+  /**
+   * 获取客户统计信息
+   * @returns {Object} - 统计信息
+   */
+  getCustomerStatistics() {
+    const customers = this.getAllCustomers();
+    const statistics = {
+      total: customers.length,
+      notPacked: 0,
+      inProgress: 0,
+      packed: 0,
+      archived: 0,
+      notShipped: 0,
+      partialShipped: 0,
+      fullShipped: 0,
+      totalPanels: 0,
+      packedPanels: 0
+    };
+
+    customers.forEach(customer => {
+      // 统计打包状态
+      switch (customer.status) {
+        case customerStatusManager.STATUS.NOT_PACKED:
+          statistics.notPacked++;
           break;
-        case CustomerStatus.ARCHIVED:
-          newArchiveDate = now;
+        case customerStatusManager.STATUS.IN_PROGRESS:
+          statistics.inProgress++;
           break;
-        case CustomerStatus.SHIPPED:
-          newShipmentDate = now;
+        case customerStatusManager.STATUS.PACKED:
+          statistics.packed++;
+          break;
+        case customerStatusManager.STATUS.ARCHIVED:
+          statistics.archived++;
           break;
       }
 
-      // 更新客户状态
-      const customerIndex = customers.findIndex(c => c.id === id);
-      if (customerIndex >= 0) {
-        const customer = customers[customerIndex];
-        customer.status = status;
-        customer.packProgress = packProgress;
-        customer.packedCount = packedCount;
-        customer.totalParts = totalParts;
-        customer.packSeqs = packSeqs;
-        customer.lastUpdate = lastUpdate;
-        customer.packDate = newPackDate;
-        customer.archiveDate = newArchiveDate;
-        customer.shipmentDate = newShipmentDate;
-        customer.statusHistory = newStatusHistory;
-        customer.updatedAt = now;
-
-        // 添加状态历史记录
-        historyData.push({
-          customerId: id,
-          status: status,
-          operator: operator,
-          remark: remark,
-          timestamp: lastUpdate,
-          createdAt: now
-        });
-
-        // 保存数据
-        const databaseToSave = {
-          customers: customers,
-          settings: database.settings || {},
-          history: database.history || []
-        };
-        fs.writeFileSync(customerDataPath, JSON.stringify(databaseToSave, null, 2));
-        fs.writeFileSync(historyDataPath, JSON.stringify(historyData, null, 2));
-
-        // 返回更新后的客户数据
-        getCustomerById(id).then(resolve).catch(reject);
-      } else {
-        reject(new Error('客户不存在'));
+      // 统计出货状态
+      switch (customer.shipmentStatus) {
+        case customerStatusManager.SHIPMENT_STATUS.NOT_SHIPPED:
+          statistics.notShipped++;
+          break;
+        case customerStatusManager.SHIPMENT_STATUS.PARTIAL_SHIPPED:
+          statistics.partialShipped++;
+          break;
+        case customerStatusManager.SHIPMENT_STATUS.FULL_SHIPPED:
+          statistics.fullShipped++;
+          break;
       }
-    } catch (err) {
-      reject(err);
-    }
-  });
+
+      // 统计面板数量
+      statistics.totalPanels += customer.totalParts || 0;
+      statistics.packedPanels += customer.packedParts || 0;
+    });
+
+    return statistics;
+  }
 }
 
-module.exports = {
-  createOrUpdateCustomer,
-  getCustomerById,
-  getCustomerByName,
-  getAllCustomers,
-  updateCustomerStatus,
-  setDataPath
-};
+// 创建全局实例
+const customerFS = new CustomerFS();
+
+module.exports = customerFS;
