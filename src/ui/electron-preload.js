@@ -10,48 +10,49 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getCustomerDetails: (customerName) => ipcRenderer.invoke('get-customer-details', customerName),
   addCustomer: (customer) => ipcRenderer.invoke('add-customer', customer),
   updateCustomerStatus: (name, status, remark) => ipcRenderer.invoke('update-customer-status', name, status, remark),
-  
+
   // 配置相关
   getConfig: () => ipcRenderer.invoke('get-config'),
   saveConfig: (config) => ipcRenderer.invoke('save-config', config),
-  
+
   // 数据库相关
   checkDatabaseConnection: () => ipcRenderer.invoke('check-database-connection'),
-  
+
   // 文件/目录操作相关
   selectDirectory: (title) => ipcRenderer.invoke('select-directory', title),
   openDirectory: (dirPath) => ipcRenderer.invoke('open-directory', dirPath),
-  
+
   // 数据同步相关
   syncDataSource: () => ipcRenderer.invoke('sync-data-source'),
   openCustomerExcelFile: (customerName) => ipcRenderer.invoke('open-customer-excel-file', customerName),
-  
+
   // 处理控制相关
   startProcessing: () => ipcRenderer.invoke('start-processing'),
   stopProcessing: () => ipcRenderer.invoke('stop-processing'),
-  
+
   // 客户状态管理相关
   archiveCustomer: (customerName) => ipcRenderer.invoke('archive-customer', customerName),
   shipCustomer: (customerName) => ipcRenderer.invoke('ship-customer', customerName),
+  partialShipCustomer: (customerName) => ipcRenderer.invoke('partial-ship-customer', customerName),
   markCustomerNotShipped: (customerName) => ipcRenderer.invoke('mark-customer-not-shipped', customerName),
   checkCustomerStatus: (customerName) => ipcRenderer.invoke('check-customer-status', customerName),
   getHistoryRecords: (limit = 10) => ipcRenderer.invoke('get-history-records', limit),
-  
+
   // 归档相关
   getArchiveList: (page = 1, pageSize = 20) => ipcRenderer.invoke('get-archive-list', page, pageSize),
   getArchiveDetail: (archiveId) => ipcRenderer.invoke('get-archive-detail', archiveId),
   restoreArchive: (archiveId) => ipcRenderer.invoke('restore-archive', archiveId),
   exportArchiveToExcel: (archiveId) => ipcRenderer.invoke('export-archive-to-excel', archiveId),
   exportArchiveToPDF: (archiveId) => ipcRenderer.invoke('export-archive-to-pdf', archiveId),
-  
+
   // 应用程序控制相关
   restartApplication: () => ipcRenderer.invoke('restart-application'),
-  
+
   // 自动保存相关
   startAutoSaveCustomer: () => ipcRenderer.invoke('start-auto-save-customer'),
   startAutoSaveWorker: () => ipcRenderer.invoke('start-auto-save-worker'),
   viewAutoSaveData: () => ipcRenderer.invoke('view-auto-save-data'),
-  
+
   // 监听主进程发送的事件
   onUpdateProcessing: (callback) => ipcRenderer.on('update-processing', (_event, value) => callback(value)),
   onUpdateProgress: (callback) => ipcRenderer.on('update-progress', (_event, value) => callback(value)),

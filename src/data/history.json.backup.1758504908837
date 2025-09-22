@@ -1,5 +1,13 @@
 [
   {
+    "customerId": 1,
+    "status": "已归档",
+    "operator": "system",
+    "remark": "已归档到 C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\backup\\测试客户_2025-09-20T07-17-43-388Z.zip",
+    "timestamp": "2025-09-19T08:51:44.588Z",
+    "createdAt": "2025-09-20T07:17:43.404Z"
+  },
+  {
     "customerId": 2,
     "status": "未打包",
     "operator": "系统",
@@ -1926,37 +1934,5 @@
     "remark": "客户数据处理完成",
     "timestamp": "2025-09-22T01:31:57.857Z",
     "createdAt": "2025-09-22T01:31:57.857Z"
-  },
-  {
-    "customerId": 1,
-    "status": "已打包",
-    "operator": "system",
-    "remark": "已归档到 C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\backup\\测试客户_2025-09-20T07-17-43-388Z.zip",
-    "timestamp": "2025-09-19T08:51:44.588Z",
-    "createdAt": "2025-09-22T01:37:46.058Z"
-  },
-  {
-    "customerId": 1,
-    "status": "已归档",
-    "operator": "system",
-    "remark": "已归档到 C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\backup\\测试客户_2025-09-20T07-17-43-388Z.zip",
-    "timestamp": "2025-09-19T08:51:44.588Z",
-    "createdAt": "2025-09-22T01:37:46.058Z"
-  },
-  {
-    "customerId": 1,
-    "status": "已归档",
-    "operator": "system",
-    "remark": "从归档恢复",
-    "timestamp": "2025-09-19T08:51:44.588Z",
-    "createdAt": "2025-09-22T01:37:46.058Z"
-  },
-  {
-    "customerId": 1,
-    "status": "全部出货",
-    "operator": "Electron",
-    "remark": "通过界面出货",
-    "timestamp": "2025-09-22T01:37:46.057Z",
-    "createdAt": "2025-09-22T01:37:46.058Z"
   }
 ]

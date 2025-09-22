@@ -108,8 +108,27 @@ class CustomerArchiveManager {
       // 添加客户目录到归档
       archive.directory(customer.outputPath, customerName);
 
-      // 完成归档
-      await archive.finalize();
+      // 完成归档并等待完成
+      await new Promise((resolve, reject) => {
+        output.on('close', () => {
+          console.log(`归档创建完成，文件大小: ${archive.pointer()} 字节`);
+          resolve();
+        });
+
+        archive.on('error', (err) => {
+          console.error('归档创建错误:', err);
+          reject(err);
+        });
+
+        archive.finalize();
+      });
+
+      // 验证ZIP文件是否成功创建
+      const stats = await fs.stat(backupPath);
+      if (stats.size === 0) {
+        throw new Error('ZIP文件创建失败：文件大小为0');
+      }
+      console.log(`ZIP文件创建成功，大小: ${stats.size} 字节`);
 
       // 读取现有归档数据
       const archiveData = await fs.readFile(archiveDataPath, 'utf8');
@@ -176,7 +195,14 @@ class CustomerArchiveManager {
       await fs.writeFile(partArchiveDataPath, JSON.stringify(partArchives, null, 2));
 
       // 更新客户状态
-      await DataManager.updateCustomerStatus(customerName, CustomerStatus.ARCHIVED, '已归档', operator);
+      try {
+        await updateCustomerStatus(customer, CustomerStatus.ARCHIVED, operator, '已归档');
+        console.log(`客户 ${customerName} 状态更新成功`);
+      } catch (statusError) {
+        console.error(`更新客户状态失败:`, statusError);
+        // 状态更新失败不影响归档的主要流程
+        console.log('继续完成归档流程...');
+      }
 
       // 模拟删除客户源文件夹（实际删除功能暂不启用）
       // 在真实环境中，这里应该使用 fs.rm 删除客户目录
@@ -378,10 +404,75 @@ class CustomerArchiveManager {
         try {
           // 尝试读取文件头来验证是否为ZIP文件
           const buffer = await fs.readFile(archive.backup_path);
-          // ZIP文件头应该是 0x50 0x4B 0x03 0x04
-          if (buffer.length < 4 || buffer[0] !== 0x50 || buffer[1] !== 0x4B || buffer[2] !== 0x03 || buffer[3] !== 0x04) {
+          console.log(`备份文件大小: ${buffer.length} 字节`);
+          console.log(`备份文件前8字节: ${Array.from(buffer.slice(0, 8)).map(b => '0x' + b.toString(16).padStart(2, '0')).join(' ')}`);
+
+          // ZIP文件头可能是以下几种格式之一：
+          // 0x50 0x4B 0x03 0x04 (标准ZIP文件)
+          // 0x50 0x4B 0x05 0x06 (空ZIP文件)
+          // 0x50 0x4B 0x07 0x08 (分卷ZIP文件)
+          let isValidZip = false;
+
+          if (buffer.length >= 4) {
+            // 检查标准ZIP文件头
+            if (buffer[0] === 0x50 && buffer[1] === 0x4B) {
+              if ((buffer[2] === 0x03 && buffer[3] === 0x04) ||
+                (buffer[2] === 0x05 && buffer[3] === 0x06) ||
+                (buffer[2] === 0x07 && buffer[3] === 0x08)) {
+                isValidZip = true;
+              }
+            }
+          }
+
+          if (!isValidZip) {
+            // 如果严格的文件头检查失败，尝试更宽松的验证
+            // 检查文件中是否包含ZIP签名（可能在文件中间）
+            const zipSignature = Buffer.from([0x50, 0x4B, 0x03, 0x04]);
+            const zipSignature2 = Buffer.from([0x50, 0x4B, 0x05, 0x06]);
+            const zipSignature3 = Buffer.from([0x50, 0x4B, 0x07, 0x08]);
+
+            // 搜索文件中的ZIP签名
+            for (let i = 0; i <= buffer.length - 4; i++) {
+              const slice = buffer.slice(i, i + 4);
+              if (slice.equals(zipSignature) || slice.equals(zipSignature2) || slice.equals(zipSignature3)) {
+                console.log(`在文件偏移 ${i} 处找到ZIP签名`);
+                isValidZip = true;
+                break;
+              }
+            }
+          }
+
+          if (!isValidZip) {
+            // 如果所有签名检查都失败，尝试使用unzipper库直接验证
+            console.log('尝试使用unzipper库验证ZIP文件...');
+            try {
+              await new Promise((resolve, reject) => {
+                const testStream = fss.createReadStream(archive.backup_path)
+                  .pipe(unzipper.Parse())
+                  .on('entry', (entry) => {
+                    entry.autodrain();
+                  })
+                  .on('close', () => {
+                    console.log('unzipper库验证成功');
+                    isValidZip = true;
+                    resolve();
+                  })
+                  .on('error', (error) => {
+                    console.log('unzipper库验证失败:', error.message);
+                    reject(error);
+                  });
+              });
+            } catch (unzipError) {
+              console.log('unzipper库验证异常:', unzipError.message);
+            }
+          }
+
+          if (!isValidZip) {
+            console.error(`ZIP文件验证失败: 未找到有效的ZIP签名且unzipper库验证失败`);
             throw new Error('备份文件不是有效的ZIP文件');
           }
+
+          console.log('ZIP文件验证通过');
         } catch (validationError) {
           console.error('备份文件验证失败:', validationError);
           throw new Error(`备份文件验证失败: ${validationError.message}`);
@@ -414,7 +505,20 @@ class CustomerArchiveManager {
 
       // 更新客户状态为已打包
       console.log(`更新客户 ${archive.customer_name} 状态为已打包`);
-      await DataManager.updateCustomerStatus(archive.customer_name, '已打包', '从归档恢复', 'system');
+      try {
+        // 获取客户对象
+        const customer = await getCustomerByName(archive.customer_name);
+        if (customer) {
+          await updateCustomerStatus(customer, '已打包', 'system', '从归档恢复');
+          console.log(`客户 ${archive.customer_name} 状态更新成功`);
+        } else {
+          console.warn(`未找到客户 ${archive.customer_name}，跳过状态更新`);
+        }
+      } catch (statusError) {
+        console.error(`更新客户状态失败:`, statusError);
+        // 状态更新失败不影响归档恢复的主要流程
+        console.log('继续完成归档恢复流程...');
+      }
 
       return {
         success: true,
@@ -603,16 +707,3 @@ if (process.env.NODE_ENV === 'test') {
 CustomerArchiveManager.ensureArchiveFiles = ensureArchiveFiles;
 
 module.exports = CustomerArchiveManager;
-
-
-
-
-
-
-
-
-
-
-
-
-

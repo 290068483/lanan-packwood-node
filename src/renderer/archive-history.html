@@ -1,269 +1,274 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>归档历史</title>
-  <link rel="stylesheet" href="../styles.css">
-  <style>
-    .archive-history-container {
-      padding: 20px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>归档历史</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <style>
+      .archive-history-container {
+        padding: 20px;
+      }
 
-    .search-area {
-      background-color: #f8f9fa;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-    }
+      .search-area {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
 
-    .search-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
+      .search-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
 
-    .search-row label {
-      width: 100px;
-      margin-right: 10px;
-    }
+      .search-row label {
+        width: 100px;
+        margin-right: 10px;
+      }
 
-    .search-input, .search-select {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
+      .search-input,
+      .search-select {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
 
-    .table-container {
-      margin-bottom: 20px;
-      overflow-x: auto;
-    }
+      .table-container {
+        margin-bottom: 20px;
+        overflow-x: auto;
+      }
 
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-    .data-table th, .data-table td {
-      padding: 12px;
-      border: 1px solid #ddd;
-      text-align: left;
-    }
+      .data-table th,
+      .data-table td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+        color: black;
+      }
 
-    .data-table th {
-      background-color: #f2f2f2;
-    }
+      .data-table th {
+        background-color: #f2f2f2;
+      }
 
-    .data-table tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
+      .data-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
 
-    .data-table tr:hover {
-      background-color: #f1f1f1;
-    }
+      .data-table tr:hover {
+        background-color: #f1f1f1;
+      }
 
-    .no-data {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-    }
+      .no-data {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+      }
 
-    .pagination-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+      .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-    .pagination-info {
-      margin-right: 20px;
-    }
+      .pagination-info {
+        margin-right: 20px;
+      }
 
-    .pagination-controls {
-      display: flex;
-      align-items: center;
-    }
+      .pagination-controls {
+        display: flex;
+        align-items: center;
+      }
 
-    .page-numbers {
-      display: flex;
-      margin: 0 10px;
-    }
+      .page-numbers {
+        display: flex;
+        margin: 0 10px;
+      }
 
-    .page-numbers button {
-      margin: 0 2px;
-    }
+      .page-numbers button {
+        margin: 0 2px;
+      }
 
-    .info-section {
-      margin-bottom: 20px;
-    }
+      .info-section {
+        margin-bottom: 20px;
+      }
 
-    .info-section h3 {
-      margin-bottom: 10px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid #eee;
-    }
+      .info-section h3 {
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #eee;
+      }
 
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 15px;
-    }
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+      }
 
-    .info-item {
-      display: flex;
-    }
+      .info-item {
+        display: flex;
+      }
 
-    .info-item label {
-      width: 100px;
-      font-weight: bold;
-    }
+      .info-item label {
+        width: 100px;
+        font-weight: bold;
+      }
 
-    .info-item.full-width {
-      grid-column: 1 / -1;
-    }
+      .info-item.full-width {
+        grid-column: 1 / -1;
+      }
 
-    .action-buttons {
-      margin-top: 20px;
-      text-align: right;
-    }
+      .action-buttons {
+        margin-top: 20px;
+        text-align: right;
+      }
 
-    .btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-left: 10px;
-    }
+      .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
 
-    .btn-primary {
-      background-color: #007bff;
-      color: white;
-    }
+      .btn-primary {
+        background-color: #007bff;
+        color: white;
+      }
 
-    .btn-info {
-      background-color: #17a2b8;
-      color: white;
-    }
+      .btn-info {
+        background-color: #17a2b8;
+        color: white;
+      }
 
-    .btn-warning {
-      background-color: #ffc107;
-      color: black;
-    }
+      .btn-warning {
+        background-color: #ffc107;
+        color: black;
+      }
 
-    .btn-secondary {
-      background-color: #6c757d;
-      color: white;
-    }
+      .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+      }
 
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.4);
-    }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
 
-    .modal-content {
-      background-color: #fefefe;
-      margin: 5% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 900px;
-      max-height: 80vh;
-      overflow-y: auto;
-      border-radius: 5px;
-    }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 900px;
+        max-height: 80vh;
+        overflow-y: auto;
+        border-radius: 5px;
+      }
 
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
 
-    .modal-header h2 {
-      margin: 0;
-    }
+      .modal-header h2 {
+        margin: 0;
+      }
 
-    .close {
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+      .close {
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
 
-    .close:hover {
-      color: red;
-    }
-  </style>
-</head>
-<body>
-  <div class="archive-history-container">
-    <h1>归档历史</h1>
+      .close:hover {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="archive-history-container">
+      <h1>归档历史</h1>
 
-    <!-- 搜索区域 -->
-    <div class="search-area">
-      <div class="search-row">
-        <label>客户名称:</label>
-        <input type="text" id="archive-customer-name" class="search-input">
-      </div>
-      <div class="search-row">
-        <label>归档日期:</label>
-        <input type="date" id="archive-start-date" class="search-input">
-        <span>至</span>
-        <input type="date" id="archive-end-date" class="search-input">
-      </div>
-      <div class="search-row">
-        <label>操作员:</label>
-        <select id="archive-operator" class="search-select">
-          <option value="">全部</option>
-          <option value="admin">admin</option>
-          <option value="user1">user1</option>
-          <option value="user2">user2</option>
-        </select>
-      </div>
-      <div class="search-row">
-        <button id="search-archive-btn" class="btn btn-primary">搜索</button>
-      </div>
-    </div>
-
-    <!-- 数据表格 -->
-    <div class="table-container">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>客户名称</th>
-            <th>归档日期</th>
-            <th>包数量</th>
-            <th>板件总数</th>
-            <th>操作员</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody id="archive-list-tbody">
-          <!-- 数据将通过JavaScript动态加载 -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 分页控件 -->
-    <div class="pagination-container">
-      <div class="pagination-info">
-        显示第 <span id="page-start">1</span> 至 <span id="page-end">20</span> 条，共 <span id="total-records">0</span> 条记录
-      </div>
-      <div class="pagination-controls">
-        <button id="prev-page-btn" class="btn btn-secondary">上一页</button>
-        <div class="page-numbers" id="page-numbers">
-          <!-- 页码将通过JavaScript动态生成 -->
+      <!-- 搜索区域 -->
+      <div class="search-area">
+        <div class="search-row">
+          <label>客户名称:</label>
+          <input type="text" id="archive-customer-name" class="search-input" />
         </div>
-        <button id="next-page-btn" class="btn btn-secondary">下一页</button>
+        <div class="search-row">
+          <label>归档日期:</label>
+          <input type="date" id="archive-start-date" class="search-input" />
+          <span>至</span>
+          <input type="date" id="archive-end-date" class="search-input" />
+        </div>
+        <div class="search-row">
+          <label>操作员:</label>
+          <select id="archive-operator" class="search-select">
+            <option value="">全部</option>
+            <option value="admin">admin</option>
+            <option value="user1">user1</option>
+            <option value="user2">user2</option>
+          </select>
+        </div>
+        <div class="search-row">
+          <button id="search-archive-btn" class="btn btn-primary">搜索</button>
+        </div>
+      </div>
+
+      <!-- 数据表格 -->
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>客户名称</th>
+              <th>归档日期</th>
+              <th>包数量</th>
+              <th>板件总数</th>
+              <th>操作员</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="archive-list-tbody">
+            <!-- 数据将通过JavaScript动态加载 -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 分页控件 -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          显示第 <span id="page-start">1</span> 至
+          <span id="page-end">20</span> 条，共
+          <span id="total-records">0</span> 条记录
+        </div>
+        <div class="pagination-controls">
+          <button id="prev-page-btn" class="btn btn-secondary">上一页</button>
+          <div class="page-numbers" id="page-numbers">
+            <!-- 页码将通过JavaScript动态生成 -->
+          </div>
+          <button id="next-page-btn" class="btn btn-secondary">下一页</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script src="archive-history.js"></script>
-</body>
+    <script src="archive-history.js"></script>
+  </body>
 </html>
