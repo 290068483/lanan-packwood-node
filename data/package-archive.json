@@ -2,25 +2,51 @@
   {
     "id": 1,
     "archive_id": 2,
-    "pack_seq": "PACK001",
-    "package_weight": 25.5,
-    "package_volume": 0,
-    "created_at": "2025-09-20T08:30:00.000Z"
+    "customer_name": "示例客户",
+    "pack_seq": "001",
+    "package_info": {
+      "quantity": 50,
+      "weight": 25.5
+    }
   },
   {
     "id": 2,
     "archive_id": 2,
-    "pack_seq": "PACK002",
-    "package_weight": 32.0,
-    "package_volume": 0,
-    "created_at": "2025-09-20T08:30:00.000Z"
+    "customer_name": "示例客户",
+    "pack_seq": "002",
+    "package_info": {
+      "quantity": 60,
+      "weight": 30.2
+    }
   },
   {
     "id": 3,
     "archive_id": 2,
-    "pack_seq": "PACK003",
-    "package_weight": 18.7,
-    "package_volume": 0,
-    "created_at": "2025-09-20T08:30:00.000Z"
+    "customer_name": "示例客户",
+    "pack_seq": "003",
+    "package_info": {
+      "quantity": 40,
+      "weight": 20.8
+    }
+  },
+  {
+    "id": 4,
+    "archive_id": 3,
+    "customer_name": "ABC公司",
+    "pack_seq": "A001",
+    "package_info": {
+      "quantity": 80,
+      "weight": 45.3
+    }
+  },
+  {
+    "id": 5,
+    "archive_id": 3,
+    "customer_name": "ABC公司",
+    "pack_seq": "A002",
+    "package_info": {
+      "quantity": 70,
+      "weight": 38.7
+    }
   }
 ]

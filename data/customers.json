@@ -29,49 +29,57 @@
     "archiveDate": null,
     "shipmentDate": null,
     "statusHistory": [],
-    "replacementStatus": "none",
-    "replacementHistory": [],
-    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_(退单)赵月（隔断）#",
-    "createdAt": "2025-09-20T06:00:42.186Z",
-    "updatedAt": "2025-09-20T06:00:42.186Z"
+    "createdAt": "2025-09-19T08:26:17.988Z",
+    "updatedAt": "2025-09-20T06:00:42.186Z",
+    "outputPath": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\customers\\(退单)赵月（隔断）"
   },
   {
     "id": 3,
-    "name": "0、废弃",
-    "status": "未打包",
-    "packProgress": 0,
-    "packedCount": 0,
-    "totalParts": 0,
-    "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:46.252Z",
-    "packDate": null,
+    "name": "示例客户",
+    "status": "已打包",
+    "packProgress": 100,
+    "packedCount": 3,
+    "totalParts": 150,
+    "packSeqs": ["001", "002", "003"],
+    "lastUpdate": "2025-09-20T08:30:00.000Z",
+    "packDate": "2025-09-20T08:30:00.000Z",
     "archiveDate": null,
     "shipmentDate": null,
-    "statusHistory": [],
-    "replacementStatus": "none",
-    "replacementHistory": [],
-    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_0、废弃#",
-    "createdAt": "2025-09-20T06:00:46.252Z",
-    "updatedAt": "2025-09-20T06:00:46.252Z"
+    "statusHistory": [
+      {
+        "status": "已打包",
+        "timestamp": "2025-09-20T08:30:00.000Z",
+        "operator": "test",
+        "remark": "测试数据"
+      }
+    ],
+    "createdAt": "2025-09-20T08:00:00.000Z",
+    "updatedAt": "2025-09-20T08:30:00.000Z",
+    "outputPath": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\customers\\示例客户"
   },
   {
     "id": 4,
-    "name": "GN康桑林",
-    "status": "未打包",
-    "packProgress": 0,
-    "packedCount": 0,
-    "totalParts": 0,
-    "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:48.245Z",
-    "packDate": null,
+    "name": "ABC公司",
+    "status": "已打包",
+    "packProgress": 100,
+    "packedCount": 2,
+    "totalParts": 250,
+    "packSeqs": ["A001", "A002"],
+    "lastUpdate": "2025-09-19T10:15:30.000Z",
+    "packDate": "2025-09-19T10:15:30.000Z",
     "archiveDate": null,
     "shipmentDate": null,
-    "statusHistory": [],
-    "replacementStatus": "none",
-    "replacementHistory": [],
-    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_GN康桑林#",
-    "createdAt": "2025-09-20T06:00:48.245Z",
-    "updatedAt": "2025-09-20T06:00:48.245Z"
+    "statusHistory": [
+      {
+        "status": "已打包",
+        "timestamp": "2025-09-19T10:15:30.000Z",
+        "operator": "test",
+        "remark": "测试数据"
+      }
+    ],
+    "createdAt": "2025-09-19T10:00:00.000Z",
+    "updatedAt": "2025-09-19T10:15:30.000Z",
+    "outputPath": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\customers\\ABC公司"
   },
   {
     "id": 5,
@@ -100,7 +108,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:52.789Z",
+    "lastUpdate": "2025-09-20T06:00:52.918Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -108,8 +116,8 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_MS孔总补柜#",
-    "createdAt": "2025-09-20T06:00:52.789Z",
-    "updatedAt": "2025-09-20T06:00:52.789Z"
+    "createdAt": "2025-09-20T06:00:52.918Z",
+    "updatedAt": "2025-09-20T06:00:52.918Z"
   },
   {
     "id": 7,
@@ -119,7 +127,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:53.293Z",
+    "lastUpdate": "2025-09-20T06:00:53.187Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -127,8 +135,8 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_TZ奥体工装#",
-    "createdAt": "2025-09-20T06:00:53.294Z",
-    "updatedAt": "2025-09-20T06:00:53.294Z"
+    "createdAt": "2025-09-20T06:00:53.187Z",
+    "updatedAt": "2025-09-20T06:00:53.187Z"
   },
   {
     "id": 8,
@@ -138,7 +146,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:00:56.755Z",
+    "lastUpdate": "2025-09-20T06:00:53.440Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -146,8 +154,8 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_WLJ王姐-2#",
-    "createdAt": "2025-09-20T06:00:56.755Z",
-    "updatedAt": "2025-09-20T06:00:56.755Z"
+    "createdAt": "2025-09-20T06:00:53.440Z",
+    "updatedAt": "2025-09-20T06:00:53.440Z"
   },
   {
     "id": 9,
@@ -157,7 +165,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:00.964Z",
+    "lastUpdate": "2025-09-20T06:00:53.697Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -165,8 +173,8 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_付序欢#",
-    "createdAt": "2025-09-20T06:01:00.964Z",
-    "updatedAt": "2025-09-20T06:01:00.964Z"
+    "createdAt": "2025-09-20T06:00:53.697Z",
+    "updatedAt": "2025-09-20T06:00:53.697Z"
   },
   {
     "id": 10,
@@ -176,7 +184,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:01.620Z",
+    "lastUpdate": "2025-09-20T06:00:53.953Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -184,8 +192,8 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_工厂展柜#",
-    "createdAt": "2025-09-20T06:01:01.620Z",
-    "updatedAt": "2025-09-20T06:01:01.620Z"
+    "createdAt": "2025-09-20T06:00:53.953Z",
+    "updatedAt": "2025-09-20T06:00:53.953Z"
   },
   {
     "id": 11,
@@ -195,7 +203,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:06.121Z",
+    "lastUpdate": "2025-09-20T06:00:54.212Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -203,8 +211,8 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_汪廷#",
-    "createdAt": "2025-09-20T06:01:06.121Z",
-    "updatedAt": "2025-09-20T06:01:06.121Z"
+    "createdAt": "2025-09-20T06:00:54.212Z",
+    "updatedAt": "2025-09-20T06:00:54.212Z"
   },
   {
     "id": 12,
@@ -214,7 +222,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:07.611Z",
+    "lastUpdate": "2025-09-20T06:00:54.471Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -222,8 +230,8 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_熊松琴#",
-    "createdAt": "2025-09-20T06:01:07.611Z",
-    "updatedAt": "2025-09-20T06:01:07.611Z"
+    "createdAt": "2025-09-20T06:00:54.471Z",
+    "updatedAt": "2025-09-20T06:00:54.471Z"
   },
   {
     "id": 13,
@@ -233,7 +241,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:11.271Z",
+    "lastUpdate": "2025-09-20T06:00:54.728Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -241,8 +249,8 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_肖妍柔#",
-    "createdAt": "2025-09-20T06:01:11.271Z",
-    "updatedAt": "2025-09-20T06:01:11.271Z"
+    "createdAt": "2025-09-20T06:00:54.728Z",
+    "updatedAt": "2025-09-20T06:00:54.728Z"
   },
   {
     "id": 14,
@@ -252,7 +260,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:13.228Z",
+    "lastUpdate": "2025-09-20T06:00:54.984Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -260,8 +268,8 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_邱海岸#",
-    "createdAt": "2025-09-20T06:01:13.229Z",
-    "updatedAt": "2025-09-20T06:01:13.229Z"
+    "createdAt": "2025-09-20T06:00:54.984Z",
+    "updatedAt": "2025-09-20T06:00:54.984Z"
   },
   {
     "id": 15,
@@ -271,7 +279,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:14.065Z",
+    "lastUpdate": "2025-09-20T06:00:55.241Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -279,8 +287,8 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_魏敏#",
-    "createdAt": "2025-09-20T06:01:14.065Z",
-    "updatedAt": "2025-09-20T06:01:14.065Z"
+    "createdAt": "2025-09-20T06:00:55.241Z",
+    "updatedAt": "2025-09-20T06:00:55.241Z"
   },
   {
     "id": 16,
@@ -290,7 +298,7 @@
     "packedCount": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-20T06:01:14.232Z",
+    "lastUpdate": "2025-09-20T06:00:55.497Z",
     "packDate": null,
     "archiveDate": null,
     "shipmentDate": null,
@@ -298,39 +306,93 @@
     "replacementStatus": "none",
     "replacementHistory": [],
     "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_龙湖西苑（鞋柜）#",
-    "createdAt": "2025-09-20T06:01:14.232Z",
-    "updatedAt": "2025-09-20T06:01:14.232Z"
+    "createdAt": "2025-09-20T06:00:55.497Z",
+    "updatedAt": "2025-09-20T06:00:55.497Z"
   },
   {
     "id": 17,
+    "name": "0、废弃",
+    "status": "未打包",
+    "packProgress": 0,
+    "packedCount": 0,
+    "totalParts": 0,
+    "packSeqs": [],
+    "lastUpdate": "2025-09-20T06:01:34.893Z",
+    "packDate": null,
+    "archiveDate": null,
+    "shipmentDate": null,
+    "statusHistory": [],
+    "replacementStatus": "none",
+    "replacementHistory": [],
+    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_0、废弃#",
+    "createdAt": "2025-09-20T06:01:34.893Z",
+    "updatedAt": "2025-09-20T06:01:34.893Z"
+  },
+  {
+    "id": 18,
+    "name": "GN康桑林",
+    "status": "未打包",
+    "packProgress": 0,
+    "packedCount": 0,
+    "totalParts": 0,
+    "packSeqs": [],
+    "lastUpdate": "2025-09-20T06:01:35.150Z",
+    "packDate": null,
+    "archiveDate": null,
+    "shipmentDate": null,
+    "statusHistory": [],
+    "replacementStatus": "none",
+    "replacementHistory": [],
+    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250920_GN康桑林#",
+    "createdAt": "2025-09-20T06:01:35.150Z",
+    "updatedAt": "2025-09-20T06:01:35.150Z"
+  },
+  {
+    "id": 19,
     "name": "示例客户",
-    "status": "已归档",
+    "status": "已打包",
     "packProgress": 100,
-    "packedCount": 150,
+    "packedCount": 3,
     "totalParts": 150,
-    "packSeqs": ["PACK001", "PACK002", "PACK003"],
+    "packSeqs": ["001", "002", "003"],
     "lastUpdate": "2025-09-20T08:30:00.000Z",
     "packDate": "2025-09-20T08:30:00.000Z",
-    "archiveDate": "2025-09-20T08:30:00.000Z",
+    "archiveDate": null,
     "shipmentDate": null,
     "statusHistory": [
       {
         "status": "已打包",
-        "operator": "system",
-        "remark": "完成打包",
-        "timestamp": "2025-09-20T08:30:00.000Z"
-      },
-      {
-        "status": "已归档",
-        "operator": "admin",
-        "remark": "示例归档备注",
-        "timestamp": "2025-09-20T08:30:00.000Z"
+        "timestamp": "2025-09-20T08:30:00.000Z",
+        "operator": "test",
+        "remark": "测试数据"
       }
     ],
-    "replacementStatus": "none",
-    "replacementHistory": [],
-    "outputPath": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\backup\\示例客户_2025-09-20T08-30-00-000Z.zip",
-    "createdAt": "2025-09-20T08:30:00.000Z",
-    "updatedAt": "2025-09-20T08:30:00.000Z"
+    "createdAt": "2025-09-20T08:00:00.000Z",
+    "updatedAt": "2025-09-20T08:30:00.000Z",
+    "outputPath": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\customers\\示例客户"
+  },
+  {
+    "id": 20,
+    "name": "ABC公司",
+    "status": "已打包",
+    "packProgress": 100,
+    "packedCount": 2,
+    "totalParts": 250,
+    "packSeqs": ["A001", "A002"],
+    "lastUpdate": "2025-09-19T10:15:30.000Z",
+    "packDate": "2025-09-19T10:15:30.000Z",
+    "archiveDate": null,
+    "shipmentDate": null,
+    "statusHistory": [
+      {
+        "status": "已打包",
+        "timestamp": "2025-09-19T10:15:30.000Z",
+        "operator": "test",
+        "remark": "测试数据"
+      }
+    ],
+    "createdAt": "2025-09-19T10:00:00.000Z",
+    "updatedAt": "2025-09-19T10:15:30.000Z",
+    "outputPath": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\customers\\ABC公司"
   }
 ]

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+  <id>A001</id>
+  <customer>ABC公司</customer>
+  <quantity>80</quantity>
+  <weight>45.3</weight>
+</package>

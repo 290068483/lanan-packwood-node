@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomerOrder type="replacement">
+  <CustomerInfo>
+    <ID>1</ID>
+    <Name>测试客户</Name>
+    <Address>测试地址</Address>
+    <Contact>联系人</Contact>
+    <Phone>13800138000</Phone>
+  </CustomerInfo>
+  <Parts>
+    
+    <Part>
+      <ID>part001</ID>
+      <Quantity>2</Quantity>
+      <Description>测试板件1</Description>
+    </Part>
+    <Part>
+      <ID>part002</ID>
+      <Quantity>1</Quantity>
+      <Description>测试板件2</Description>
+    </Part>
+  </Parts>
+  <ReplacementInfo>
+    <ReplacementType>partial</ReplacementType>
+    <OriginalShipmentID>SHIP001</OriginalShipmentID>
+    <MarkedAt>2025-09-22T01:03:05.311Z</MarkedAt>
+    <Reason>测试补件原因</Reason>
+  </ReplacementInfo>
+</CustomerOrder>

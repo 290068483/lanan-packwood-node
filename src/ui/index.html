@@ -1724,14 +1724,15 @@
                 if (isElectron && window.electronAPI) {
                   // Electron环境中恢复归档
                   result = await window.electronAPI.restoreArchive(archiveId);
-                  
-                  if (result.success) {
-                    showNotification(result.message || '归档恢复成功');
-                    // 刷新客户数据
-                    await loadCustomers();
-                  } else {
-                    showNotification(result.message || '归档恢复失败', 'error');
-                  }
+                }
+                
+                if (result.success) {
+                  showNotification(result.message || '归档恢复成功');
+                  // 刷新客户数据
+                  await loadCustomers();
+                } else {
+                  showNotification(result.message || '归档恢复失败', 'error');
+                  console.error('归档恢复失败详情:', result);
                 }
                 
                 showProcessingStatus('');
@@ -1740,6 +1741,7 @@
                 showNotification('恢复归档失败: ' + error.message, 'error');
                 showProcessingStatus('');
               }
+
             });
         } catch (error) {
           console.error('确认恢复归档时出错:', error);
