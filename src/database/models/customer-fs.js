@@ -6,11 +6,40 @@ const fs = require('fs');
 const path = require('path');
 const { CustomerStatus } = require('../../utils/status-manager');
 
-// 数据文件路径
-const dataDir = path.join(__dirname, '../../data');
-const customerDataPath = path.join(dataDir, 'customers.json');
-const panelDataPath = path.join(dataDir, 'panels.json');
-const historyDataPath = path.join(dataDir, 'history.json');
+// 默认数据文件路径
+let dataDir = path.join(__dirname, '../../data');
+let customerDataPath = path.join(dataDir, 'database.json');
+let panelDataPath = path.join(dataDir, 'panels.json');
+let historyDataPath = path.join(dataDir, 'history.json');
+
+/**
+ * 设置数据路径
+ * @param {string} newDataDir - 新的数据目录路径
+ */
+function setDataPath(newDataDir) {
+  dataDir = newDataDir;
+  customerDataPath = path.join(dataDir, 'database.json');
+  panelDataPath = path.join(dataDir, 'panels.json');
+  historyDataPath = path.join(dataDir, 'history.json');
+
+  // 确保数据目录存在
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+
+  // 初始化数据文件
+  if (!fs.existsSync(customerDataPath)) {
+    fs.writeFileSync(customerDataPath, JSON.stringify([]));
+  }
+  if (!fs.existsSync(panelDataPath)) {
+    fs.writeFileSync(panelDataPath, JSON.stringify([]));
+  }
+  if (!fs.existsSync(historyDataPath)) {
+    fs.writeFileSync(historyDataPath, JSON.stringify([]));
+  }
+
+  console.log(`数据路径已设置为: ${dataDir}`);
+}
 
 // 确保数据目录存在
 if (!fs.existsSync(dataDir)) {
@@ -53,7 +82,8 @@ async function createOrUpdateCustomer(customerData) {
       } = customerData;
 
       // 读取现有数据
-      const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      const database = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      const customers = database.customers || [];
       const panelsData = JSON.parse(fs.readFileSync(panelDataPath, 'utf8'));
       const historyData = JSON.parse(fs.readFileSync(historyDataPath, 'utf8'));
 
@@ -118,7 +148,12 @@ async function createOrUpdateCustomer(customerData) {
         }
 
         // 保存数据
-        fs.writeFileSync(customerDataPath, JSON.stringify(customers, null, 2));
+        const databaseToSave = {
+          customers: customers,
+          settings: database.settings || {},
+          history: database.history || []
+        };
+        fs.writeFileSync(customerDataPath, JSON.stringify(databaseToSave, null, 2));
         fs.writeFileSync(panelDataPath, JSON.stringify(panelsData, null, 2));
         fs.writeFileSync(historyDataPath, JSON.stringify(historyData, null, 2));
 
@@ -180,7 +215,12 @@ async function createOrUpdateCustomer(customerData) {
         }
 
         // 保存数据
-        fs.writeFileSync(customerDataPath, JSON.stringify(customers, null, 2));
+        const databaseToSave = {
+          customers: customers,
+          settings: database.settings || {},
+          history: database.history || []
+        };
+        fs.writeFileSync(customerDataPath, JSON.stringify(databaseToSave, null, 2));
         fs.writeFileSync(panelDataPath, JSON.stringify(panelsData, null, 2));
         fs.writeFileSync(historyDataPath, JSON.stringify(historyData, null, 2));
 
@@ -201,7 +241,8 @@ async function createOrUpdateCustomer(customerData) {
 function getCustomerById(id) {
   return new Promise((resolve, reject) => {
     try {
-      const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      const database = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      const customers = database.customers || [];
       const panelsData = JSON.parse(fs.readFileSync(panelDataPath, 'utf8'));
       const historyData = JSON.parse(fs.readFileSync(historyDataPath, 'utf8'));
 
@@ -269,11 +310,12 @@ async function getCustomerByName(name) {
         resolve(null);
         return;
       }
-      
-      const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+
+      const database = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      const customers = database.customers || [];
       console.log(`从文件中读取到 ${customers.length} 个客户`);
       const customer = customers.find(c => c.name === name);
-      
+
       if (!customer) {
         console.warn(`未找到名称为 "${name}" 的客户`);
         console.log(`可用的客户列表:`, customers.map(c => c.name));
@@ -296,7 +338,8 @@ async function getCustomerByName(name) {
 async function getAllCustomers() {
   return new Promise((resolve, reject) => {
     try {
-      const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      const database = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      const customers = database.customers || [];
       const customerPromises = customers.map(c => getCustomerById(c.id));
       Promise.all(customerPromises)
         .then(customers => resolve(customers))
@@ -334,7 +377,8 @@ async function updateCustomerStatus(customer, status, operator = '系统', remar
       } = customer;
 
       // 读取现有数据
-      const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      const database = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      const customers = database.customers || [];
       const historyData = JSON.parse(fs.readFileSync(historyDataPath, 'utf8'));
       const now = new Date().toISOString();
 
@@ -396,7 +440,12 @@ async function updateCustomerStatus(customer, status, operator = '系统', remar
         });
 
         // 保存数据
-        fs.writeFileSync(customerDataPath, JSON.stringify(customers, null, 2));
+        const databaseToSave = {
+          customers: customers,
+          settings: database.settings || {},
+          history: database.history || []
+        };
+        fs.writeFileSync(customerDataPath, JSON.stringify(databaseToSave, null, 2));
         fs.writeFileSync(historyDataPath, JSON.stringify(historyData, null, 2));
 
         // 返回更新后的客户数据
@@ -415,5 +464,6 @@ module.exports = {
   getCustomerById,
   getCustomerByName,
   getAllCustomers,
-  updateCustomerStatus
+  updateCustomerStatus,
+  setDataPath
 };

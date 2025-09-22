@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // 数据库相关
   checkDatabaseConnection: () => ipcRenderer.invoke('check-database-connection'),
+  switchDatabase: (dbType) => ipcRenderer.invoke('switch-database', dbType),
+  getCurrentDbType: () => ipcRenderer.invoke('get-current-database-type'),
 
   // 文件/目录操作相关
   selectDirectory: (title) => ipcRenderer.invoke('select-directory', title),

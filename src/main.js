@@ -1,5 +1,6 @@
 const { exec } = require('child_process');
 const os = require('os');
+const { spawn } = require('child_process');
 
 // 设置控制台编码为UTF-8，解决Windows平台乱码问题
 if (os.platform() === 'win32') {
@@ -13,6 +14,15 @@ if (os.platform() === 'win32') {
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
+
+// Electron相关模块
+let ipcMain = null;
+try {
+  const electron = require('electron');
+  ipcMain = electron.ipcMain;
+} catch (e) {
+  // Electron模块不可用
+}
 
 const { logError, logInfo, logSuccess, logWarning } = require('./utils/logger');
 const { processCustomerData } = require('./utils/customer-data-processor');
@@ -56,6 +66,93 @@ function startServer(port = 3000) {
       return;
     }
 
+    // 获取所有客户数据
+    else if (pathname === '/api/customers' && req.method === 'GET') {
+      (async () => {
+        try {
+          // 引入数据库API
+          const { getAllCustomersAPI } = require('./database/api');
+
+          const allCustomers = await getAllCustomersAPI();
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            success: true,
+            data: allCustomers
+          }));
+        } catch (error) {
+          console.error('获取客户数据时出错:', error);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            success: false,
+            message: `获取客户数据出错: ${error.message}`
+          }));
+        }
+      })();
+    }
+    // 切换数据库
+    else if (pathname === '/api/database/switch' && req.method === 'POST') {
+      (async () => {
+        try {
+          let body = '';
+          req.on('data', chunk => {
+            body += chunk.toString();
+          });
+          req.on('end', async () => {
+            try {
+              const { dbType } = JSON.parse(body);
+
+              // 引入数据库连接
+              const { switchDatabase, getCurrentDbType } = require('./database/connection');
+
+              // 切换数据库
+              switchDatabase(dbType);
+
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({
+                success: true,
+                message: `已切换到${dbType === 'production' ? '生产' : '测试'}数据库`,
+                currentDbType: getCurrentDbType()
+              }));
+            } catch (error) {
+              console.error('切换数据库时出错:', error);
+              res.writeHead(500, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({
+                success: false,
+                message: `切换数据库出错: ${error.message}`
+              }));
+            }
+          });
+        } catch (error) {
+          console.error('切换数据库时出错:', error);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({
+            success: false,
+            message: `切换数据库出错: ${error.message}`
+          }));
+        }
+      })();
+    }
+    // 获取当前数据库类型
+    else if (pathname === '/api/database/current' && req.method === 'GET') {
+      try {
+        // 引入数据库连接
+        const { getCurrentDbType } = require('./database/connection');
+
+        const currentDbType = getCurrentDbType();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: true,
+          currentDbType: currentDbType
+        }));
+      } catch (error) {
+        console.error('获取当前数据库类型时出错:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          message: `获取当前数据库类型出错: ${error.message}`
+        }));
+      }
+    }
     // 打开客户Excel文件
     else if (pathname.startsWith('/api/customers/') && pathname.includes('/open-excel')) {
       if (req.method === 'POST') {
@@ -126,18 +223,97 @@ function startServer(port = 3000) {
     }
   });
 
-  server.listen(port, () => {
+  // 绑定端口前添加诊断日志
+  console.log(`准备启动HTTP服务器，端口: ${port}`);
+  console.log(`当前进程ID: ${process.pid}`);
+  console.log(`运行环境: ${isElectron ? 'Electron' : 'Node.js'}`);
+  console.log(`绑定地址: 0.0.0.0 (同时支持IPv4和IPv6)`);
+
+  // 明确指定绑定0.0.0.0以同时支持IPv4和IPv6
+  server.listen(port, '0.0.0.0', () => {
     console.log(`🚀 HTTP服务器已启动，监听端口 ${port}`);
     logInfo('SYSTEM', 'SERVER', `HTTP服务器已启动，监听端口 ${port}`);
+
+    // 启动成功后尝试获取服务器地址信息
+    try {
+      const address = server.address();
+      console.log(`服务器地址信息:`, address);
+    } catch (e) {
+      console.error('获取服务器地址信息失败:', e);
+    }
   });
 
   // 错误处理
   server.on('error', (error) => {
-    console.error('服务器启动失败:', error);
-    logError('SYSTEM', 'SERVER', `服务器启动失败: ${error.message}`);
+    console.error('服务器启动失败:', error.code || error);
+    console.error('错误详情:', error);
+    logError('SYSTEM', 'SERVER', `服务器启动失败: ${error.message || error}`);
+
+    // 特殊处理端口占用错误
+    if (error.code === 'EADDRINUSE') {
+      console.error(`端口 ${port} 已被占用，请检查是否有其他应用程序正在使用该端口。`);
+    }
+  });
+
+  // 添加服务器连接事件日志
+  server.on('connection', (socket) => {
+    console.log(`🖧 收到新连接: ${socket.remoteAddress}:${socket.remotePort}`);
   });
 
   return server;
+}
+
+// 设置IPC处理程序
+function setupIPCHandlers() {
+  if (!ipcMain) {
+    console.log('Electron IPC不可用，跳过IPC处理程序设置');
+    return;
+  }
+
+  console.log('设置Electron IPC处理程序...');
+
+  // 数据库切换处理
+  ipcMain.handle('switch-database', async (event, dbType) => {
+    try {
+      const { switchDatabase, getCurrentDbType } = require('./database/connection');
+
+      // 切换数据库
+      switchDatabase(dbType);
+
+      return {
+        success: true,
+        message: `已切换到${dbType === 'production' ? '生产' : '测试'}数据库`,
+        currentDbType: getCurrentDbType()
+      };
+    } catch (error) {
+      console.error('切换数据库时出错:', error);
+      return {
+        success: false,
+        message: `切换数据库出错: ${error.message}`
+      };
+    }
+  });
+
+  // 获取当前数据库类型处理
+  ipcMain.handle('get-current-database-type', async () => {
+    try {
+      const { getCurrentDbType } = require('./database/connection');
+
+      const currentDbType = getCurrentDbType();
+      return {
+        success: true,
+        currentDbType: currentDbType
+      };
+    } catch (error) {
+      console.error('获取当前数据库类型时出错:', error);
+      return {
+        success: false,
+        message: `获取当前数据库类型出错: ${error.message}`
+      };
+    }
+  });
+
+  console.log('Electron IPC处理程序设置完成');
 }
 
 // 读取配置文件
@@ -280,17 +456,17 @@ async function processAllCustomers() {
         const processedCustomer = await DataManager.getCustomer(customerDir);
         let finalStatus = customerStatusManager.STATUS.NOT_PACKED;
         let packProgress = 0;
-        
+
         if (processedCustomer) {
           // 获取packages.json文件路径
           const packagesPath = path.join(processedCustomer.outputPath, 'packages.json');
-          
+
           // 读取packages.json数据
           let packagesData = [];
           if (fs.existsSync(packagesPath)) {
             packagesData = PackageDataExtractor.extractCustomerPackageData(packagesPath);
           }
-          
+
           // 检查客户状态
           const statusInfo = customerStatusManager.checkPackStatus(processedCustomer, packagesData);
           finalStatus = statusInfo.status;
@@ -313,23 +489,23 @@ async function processAllCustomers() {
         const processedCustomer = await DataManager.getCustomer(customerDir);
         let finalStatus = customerStatusManager.STATUS.NOT_PACKED;
         let packProgress = 0;
-        
+
         if (processedCustomer) {
           // 获取packages.json文件路径
           const packagesPath = path.join(processedCustomer.outputPath, 'packages.json');
-          
+
           // 读取packages.json数据
           let packagesData = [];
           if (fs.existsSync(packagesPath)) {
             packagesData = PackageDataExtractor.extractCustomerPackageData(packagesPath);
           }
-          
+
           // 检查客户状态
           const statusInfo = customerStatusManager.checkPackStatus(processedCustomer, packagesData);
           finalStatus = statusInfo.status;
           packProgress = statusInfo.packProgress;
         }
-        
+
         DataManager.upsertCustomer({
           name: customerDir,
           status: finalStatus,
@@ -365,22 +541,86 @@ async function processAllCustomers() {
   }
 }
 
+/**
+ * 停止所有现有的Node.js进程（除了当前进程）
+ */
+async function stopExistingNodeProcesses() {
+  return new Promise((resolve, reject) => {
+    console.log('🔄 检查并停止现有的Node.js进程...');
+
+    // Windows平台使用taskkill命令
+    if (os.platform() === 'win32') {
+      // 获取当前进程ID
+      const currentPid = process.pid;
+
+      // 使用PowerShell命令停止除了当前进程外的所有Node.js进程
+      const command = `powershell -Command "Get-Process node | Where-Object {$_.Id -ne ${currentPid}} | Stop-Process -Force"`;
+
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          // 如果没有找到Node.js进程，这不是错误
+          if (stderr.includes('NoProcessFoundForGivenName') || stderr.includes('找不到进程')) {
+            console.log('✅ 没有发现其他运行的Node.js进程');
+            resolve();
+            return;
+          }
+          console.error('停止Node.js进程时出错:', error);
+          reject(error);
+          return;
+        }
+
+        if (stderr) {
+          console.warn('停止Node.js进程时的警告:', stderr);
+        }
+
+        console.log('✅ 已停止所有现有的Node.js进程');
+        resolve();
+      });
+    } else {
+      // Linux/Mac平台使用pkill命令
+      exec(`pkill -f "node.*main.js" || true`, (error, stdout, stderr) => {
+        if (error && !stderr.includes('no process found')) {
+          console.error('停止Node.js进程时出错:', error);
+          reject(error);
+          return;
+        }
+
+        console.log('✅ 已停止所有现有的Node.js进程');
+        resolve();
+      });
+    }
+  });
+}
+
 // 程序入口点
 async function main() {
-  // 如果在Electron环境中，不要立即执行，而是等待UI触发
-  if (isElectron) {
-    console.log(' Electron环境中，等待UI触发处理...');
-    // 在Electron环境中，我们导出函数供UI调用
-    // 同时启动HTTP服务器以支持API请求
+  try {
+    // 首先停止所有现有的Node.js进程
+    await stopExistingNodeProcesses();
+
+    // 等待1秒确保进程完全停止
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // 如果在Electron环境中，不要立即执行，而是等待UI触发
+    if (isElectron) {
+      console.log(' Electron环境中，等待UI触发处理...');
+      // 在Electron环境中，我们导出函数供UI调用
+      // 同时启动HTTP服务器以支持API请求
+      startServer(3000);
+      // 设置IPC处理程序
+      setupIPCHandlers();
+      return;
+    }
+
+    // 在非Electron环境中，直接执行
+    await processAllCustomers();
+
+    // 启动HTTP服务器
     startServer(3000);
-    return;
+  } catch (error) {
+    console.error('程序启动失败:', error);
+    process.exit(1);
   }
-
-  // 在非Electron环境中，直接执行
-  await processAllCustomers();
-
-  // 启动HTTP服务器
-  startServer(3000);
 }
 
 // 只有在直接运行此脚本时才执行main函数

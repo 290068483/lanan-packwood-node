@@ -119,6 +119,10 @@
         color: #2ecc71; /* 绿色 */
       }
 
+      .status-partial-shipped {
+        color: #ff9800; /* 橙色 */
+      }
+
       .status-not-shipped {
         color: #e67e22; /* 橙色 */
       }
@@ -393,6 +397,40 @@
 
       .auto-save-toggle input[type='checkbox'] {
         width: 18px;
+      }
+
+      /* 数据库切换开关样式 */
+      .database-switch {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+        margin-right: 20px;
+      }
+
+      .database-switch label {
+        font-weight: bold;
+        color: #34495e;
+      }
+
+      .database-switch select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        background-color: white;
+        font-size: 14px;
+        cursor: pointer;
+        min-width: 120px;
+      }
+
+      .database-switch select:hover {
+        border-color: #3498db;
+      }
+
+      .database-switch select:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
         height: 18px;
         cursor: pointer;
       }
@@ -678,6 +716,13 @@
         <button id="archiveHistoryBtn" class="archive-button">归档历史</button>
         <button id="restartBtn" class="restart-button">重新启动</button>
         <button id="configBtn" class="config-button">打开路径配置</button>
+        <div class="database-switch">
+          <label for="dbSwitch">数据库:</label>
+          <select id="dbSwitch">
+            <option value="production">生产数据库</option>
+            <option value="test">测试数据库</option>
+          </select>
+        </div>
         <div id="syncStatus" class="sync-status">
           <span class="sync-status-indicator sync-status-idle"></span>
           <span>同步: 空闲</span>
@@ -709,8 +754,33 @@
         <tbody>
           <!-- 数据将通过JavaScript动态填充 -->
         </tbody>
-      </table>
+</div>
+        </div>
+      </div>
+
+    <!-- 出货选择对话框 -->
+    <div id="shipModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>选择出货类型</h2>
+        <div class="ship-options">
+          <div class="ship-option">
+            <h3>全部出货</h3>
+            <p>将客户的所有板件标记为已出货状态</p>
+            <button class="ship-option-btn" data-ship-type="full">全部出货</button>
+          </div>
+          <div class="ship-option">
+            <h3>部分出货</h3>
+            <p>将客户的部分板件标记为已出货状态</p>
+            <button class="ship-option-btn" data-ship-type="partial">部分出货</button>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button type="button" id="cancelShipBtn">取消</button>
+        </div>
+      </div>
     </div>
+
     <!-- 配置弹出层 -->
     <div id="configModal" class="modal">
       <div class="modal-content">
@@ -967,6 +1037,35 @@
         }, 3000);
       }
 
+      // 初始化数据库类型选择器
+      async function initDatabaseSwitch() {
+        try {
+          let currentDbType = 'production'; // 默认生产数据库
+          
+          if (isElectron && window.electronAPI) {
+            // Electron环境中获取当前数据库类型
+            const result = await window.electronAPI.getCurrentDbType();
+            if (result.success) {
+              currentDbType = result.currentDbType;
+            }
+          } else {
+            // Web环境中调用API
+            const response = await fetch('/api/database/current');
+            const result = await response.json();
+            if (result.success) {
+              currentDbType = result.currentDbType;
+            }
+          }
+          
+          const dbSwitch = document.getElementById('dbSwitch');
+          if (dbSwitch) {
+            dbSwitch.value = currentDbType;
+          }
+        } catch (error) {
+          console.error('初始化数据库切换器时出错:', error);
+        }
+      }
+
       // 页面加载完成后初始化
       document.addEventListener('DOMContentLoaded', async () => {
         // 检查数据库连接状态
@@ -998,6 +1097,62 @@
         document
           .getElementById('configBtn')
           .addEventListener('click', openConfigModal);
+        
+        // 绑定数据库切换事件
+        document
+          .getElementById('dbSwitch')
+          .addEventListener('change', async (event) => {
+            const dbType = event.target.value;
+            const originalValue = event.target.value === 'production' ? 'test' : 'production';
+            try {
+              showProcessingStatus('正在切换数据库...');
+              
+              if (isElectron && window.electronAPI) {
+                // Electron环境中调用主进程的数据库切换功能
+                const result = await window.electronAPI.switchDatabase(dbType);
+                if (result.success) {
+                  showNotification(`已切换到${dbType === 'production' ? '生产' : '测试'}数据库`);
+                  // 刷新客户数据
+                  await loadCustomers();
+                } else {
+                  showNotification(`切换数据库失败: ${result.message}`, 'error');
+                  // 恢复原始选择
+                  event.target.value = originalValue;
+                }
+              } else {
+                // Web环境中调用API
+                const response = await fetch('/api/database/switch', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ dbType }),
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                  showNotification(`已切换到${dbType === 'production' ? '生产' : '测试'}数据库`);
+                  // 刷新客户数据
+                  await loadCustomers();
+                } else {
+                  showNotification(`切换数据库失败: ${result.message}`, 'error');
+                  // 恢复原始选择
+                  event.target.value = originalValue;
+                }
+              }
+              
+              showProcessingStatus('');
+            } catch (error) {
+              console.error('切换数据库时出错:', error);
+              showNotification('切换数据库失败: ' + error.message, 'error');
+              // 恢复原始选择
+              event.target.value = originalValue;
+              showProcessingStatus('');
+            }
+          });
+          
+        // 调用初始化函数
+        await initDatabaseSwitch();
 
         // 绑定模态框事件
         document
@@ -1356,8 +1511,11 @@
               case '已归档':
                 statusClass = 'status-archived';
                 break;
-              case '已出货':
+              case '全部出货':
                 statusClass = 'status-shipped';
+                break;
+              case '部分出货':
+                statusClass = 'status-partial-shipped';
                 break;
               case '未出货':
                 statusClass = 'status-not-shipped';
@@ -1384,6 +1542,14 @@
             } else if (customer.status === '已归档') {
               actionButtons = `
                 <button class="action-btn ship-btn" data-customer="${customer.name}">出货</button>
+                <button class="action-btn not-shipped-btn" data-customer="${customer.name}">标记为未出货</button>
+              `;
+            } else if (customer.status === '全部出货') {
+              actionButtons = `
+                <button class="action-btn not-shipped-btn" data-customer="${customer.name}">标记为未出货</button>
+              `;
+            } else if (customer.status === '部分出货') {
+              actionButtons = `
                 <button class="action-btn not-shipped-btn" data-customer="${customer.name}">标记为未出货</button>
               `;
             } else if (customer.status === '未出货') {

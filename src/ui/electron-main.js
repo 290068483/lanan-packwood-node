@@ -559,6 +559,47 @@ ipcMain.handle('sync-data-source', async () => {
   }
 });
 
+// 数据库切换处理
+ipcMain.handle('switch-database', async (event, dbType) => {
+  try {
+    const { switchDatabase, getCurrentDbType } = require('../database/connection');
+
+    // 切换数据库
+    switchDatabase(dbType);
+
+    return {
+      success: true,
+      message: `已切换到${dbType === 'production' ? '生产' : '测试'}数据库`,
+      currentDbType: getCurrentDbType()
+    };
+  } catch (error) {
+    console.error('切换数据库时出错:', error);
+    return {
+      success: false,
+      message: `切换数据库出错: ${error.message}`
+    };
+  }
+});
+
+// 获取当前数据库类型处理
+ipcMain.handle('get-current-database-type', async () => {
+  try {
+    const { getCurrentDbType } = require('../database/connection');
+
+    const currentDbType = getCurrentDbType();
+    return {
+      success: true,
+      currentDbType: currentDbType
+    };
+  } catch (error) {
+    console.error('获取当前数据库类型时出错:', error);
+    return {
+      success: false,
+      message: `获取当前数据库类型出错: ${error.message}`
+    };
+  }
+});
+
 // 处理打开客户Excel文件的请求
 ipcMain.handle('open-customer-excel-file', async (event, customerName) => {
   try {
