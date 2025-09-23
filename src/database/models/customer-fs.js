@@ -12,14 +12,56 @@ const HISTORY_PATH = path.join(__dirname, '../../data/history.json');
  * 客户数据模型 - 文件系统版本
  */
 class CustomerFS {
+  // 静态数据路径，支持多环境配置
+  static dataPath = DATABASE_PATH;
+  static panelsPath = PANELS_PATH;
+  static historyPath = HISTORY_PATH;
+
   /**
    * 构造函数
    */
   constructor() {
-    this.dataPath = DATABASE_PATH;
-    this.panelsPath = PANELS_PATH;
-    this.historyPath = HISTORY_PATH;
+    this.dataPath = CustomerFS.dataPath;
+    this.panelsPath = CustomerFS.panelsPath;
+    this.historyPath = CustomerFS.historyPath;
     this.ensureDataFilesExist();
+  }
+
+  /**
+   * 设置数据路径（静态方法，支持多环境配置）
+   * @param {string} basePath - 基础数据路径
+   */
+  static setDataPath(basePath) {
+    try {
+      // 确保路径存在
+      if (!fs.existsSync(basePath)) {
+        fs.mkdirSync(basePath, { recursive: true });
+        console.log(`✅ 创建数据目录: ${basePath}`);
+      }
+
+      // 更新静态路径
+      CustomerFS.dataPath = path.join(basePath, 'database.json');
+      CustomerFS.panelsPath = path.join(basePath, 'panels.json');
+      CustomerFS.historyPath = path.join(basePath, 'history.json');
+
+      console.log(`✅ 数据路径已更新到: ${basePath}`);
+      return true;
+    } catch (error) {
+      console.error(`❌ 设置数据路径失败: ${error.message}`);
+      return false;
+    }
+  }
+
+  /**
+   * 获取当前数据路径
+   * @returns {Object} 当前数据路径对象
+   */
+  static getCurrentPaths() {
+    return {
+      dataPath: CustomerFS.dataPath,
+      panelsPath: CustomerFS.panelsPath,
+      historyPath: CustomerFS.historyPath
+    };
   }
 
   /**

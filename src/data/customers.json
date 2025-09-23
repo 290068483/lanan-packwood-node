@@ -8,7 +8,7 @@
     "packedParts": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-23T02:05:20.270Z",
+    "lastUpdate": "2025-09-23T02:24:10.204Z",
     "lastPackUpdate": null,
     "lastShipmentUpdate": null,
     "packDate": null,
@@ -17,9 +17,9 @@
     "statusHistory": [],
     "replacementStatus": "none",
     "replacementHistory": [],
-    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250923_(退单)赵月（隔断）#",
+    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local-test\\20250923_(退单)赵月（隔断）",
     "createdAt": "2025-09-22T06:32:40.468Z",
-    "updatedAt": "2025-09-23T02:05:20.270Z",
+    "updatedAt": "2025-09-23T02:24:10.204Z",
     "packedCount": 0
   },
   {
@@ -31,7 +31,7 @@
     "packedParts": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-23T02:05:26.194Z",
+    "lastUpdate": "2025-09-23T02:24:15.403Z",
     "lastPackUpdate": null,
     "lastShipmentUpdate": null,
     "packDate": null,
@@ -40,9 +40,9 @@
     "statusHistory": [],
     "replacementStatus": "none",
     "replacementHistory": [],
-    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250923_0、废弃#",
+    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local-test\\20250923_0、废弃",
     "createdAt": "2025-09-22T06:32:45.153Z",
-    "updatedAt": "2025-09-23T02:05:26.194Z",
+    "updatedAt": "2025-09-23T02:24:15.403Z",
     "packedCount": 0
   },
   {
@@ -54,7 +54,7 @@
     "packedParts": 0,
     "totalParts": 0,
     "packSeqs": [],
-    "lastUpdate": "2025-09-23T02:05:29.600Z",
+    "lastUpdate": "2025-09-23T02:22:41.354Z",
     "lastPackUpdate": null,
     "lastShipmentUpdate": null,
     "packDate": null,
@@ -63,9 +63,9 @@
     "statusHistory": [],
     "replacementStatus": "none",
     "replacementHistory": [],
-    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local\\20250923_GN康桑林#",
+    "outputPath": "C:\\Program Files (x86)\\MPM\\temp\\local-dev\\20250923_GN康桑林",
     "createdAt": "2025-09-22T06:32:47.353Z",
-    "updatedAt": "2025-09-23T02:05:29.600Z",
+    "updatedAt": "2025-09-23T02:22:41.354Z",
     "packedCount": 0
   },
   {

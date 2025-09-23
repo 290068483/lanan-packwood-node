@@ -35,10 +35,13 @@ const DataManager = require('./utils/data-manager');
 const EnhancedFileWatcher = require('./utils/enhanced-file-watcher');
 const customerStatusManager = require('./utils/customer-status-manager');
 const PackageDataExtractor = require('./utils/package-data-extractor');
+const envManager = require('./utils/env-manager');
+const dbConnection = require('./database/connection');
 
 // 添加Electron支持
 let isElectron = false;
 let isDevMode = false;
+let currentEnv = 'production'; // 默认环境
 
 try {
   // 尝试检测Electron环境
@@ -52,6 +55,95 @@ try {
   }
 } catch (e) {
   // Electron环境不可用
+}
+
+/**
+ * 解析命令行参数
+ * @returns {Object} 解析后的参数
+ */
+function parseCommandLineArgs() {
+  const args = process.argv.slice(2);
+  const parsedArgs = {
+    env: 'production',
+    help: false,
+    listEnvs: false,
+    port: 3000
+  };
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+
+    if (arg === '--env' || arg === '-e') {
+      parsedArgs.env = args[i + 1];
+      i++; // 跳过下一个参数
+    } else if (arg === '--help' || arg === '-h') {
+      parsedArgs.help = true;
+    } else if (arg === '--list-envs' || arg === '-l') {
+      parsedArgs.listEnvs = true;
+    } else if (arg === '--port' || arg === '-p') {
+      parsedArgs.port = parseInt(args[i + 1]);
+      i++; // 跳过下一个参数
+    } else if (arg === '--dev') {
+      parsedArgs.env = 'development';
+    } else if (arg === '--test') {
+      parsedArgs.env = 'testing';
+    } else if (arg === '--prod') {
+      parsedArgs.env = 'production';
+    }
+  }
+
+  return parsedArgs;
+}
+
+/**
+ * 显示帮助信息
+ */
+function showHelp() {
+  console.log(`\n🚀 Pack Node 应用程序\n`);
+  console.log(`用法: node src/main.js [选项]\n`);
+  console.log(`选项:`);
+  console.log(`  --env, -e <环境>     指定运行环境 (development|production|testing)`);
+  console.log(`  --dev               使用开发环境`);
+  console.log(`  --test              使用测试环境`);
+  console.log(`  --prod              使用生产环境 (默认)`);
+  console.log(`  --port, -p <端口>   指定HTTP服务器端口 (默认: 3000)`);
+  console.log(`  --list-envs, -l     列出所有可用环境`);
+  console.log(`  --help, -h          显示帮助信息\n`);
+  console.log(`示例:`);
+  console.log(`  node src/main.js --env development`);
+  console.log(`  node src/main.js --test --port 8080`);
+  console.log(`  node src/main.js --dev\n`);
+}
+
+/**
+ * 初始化环境配置
+ * @param {string} env - 环境名称
+ */
+function initializeEnvironment(env) {
+  try {
+    console.log(`🔄 正在初始化${env}环境...`);
+
+    // 加载环境配置
+    const config = envManager.loadEnvironment(env);
+    currentEnv = env;
+
+    // 初始化数据库连接
+    dbConnection.initializeDefaultConnection(env);
+
+    console.log(`✅ ${config.name}初始化完成`);
+
+    // 如果是测试环境，显示测试数据信息
+    if (envManager.isTesting() && config.testData) {
+      console.log(`🧪 测试数据: ${config.testData.description}`);
+      console.log(`📊 客户状态: ${config.testData.customerStates.join(', ')}`);
+      console.log(`🔧 面板状态: ${config.testData.panelStates.join(', ')}`);
+    }
+
+    return config;
+  } catch (error) {
+    console.error(`❌ 初始化环境失败: ${error.message}`);
+    throw error;
+  }
 }
 
 // 创建HTTP服务器
@@ -311,9 +403,8 @@ function setupIPCHandlers() {
   });
 }
 
-// 读取配置文件
-const configPath = path.join(__dirname, '../config.json');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+// 全局配置对象，将在环境初始化后设置
+let config = null;
 
 // 根据配置确定客户目录命名方式
 function getCustomerDirectoryName(customerName) {
@@ -342,6 +433,11 @@ function getCustomerDirectoryName(customerName) {
 // 初始化并启动增强的文件监控器
 let fileWatcher = null;
 function initFileWatcher() {
+  if (!config) {
+    console.warn('⚠️ 配置未加载，无法初始化文件监控器');
+    return;
+  }
+
   if (fileWatcher) {
     fileWatcher.stop();
   }
@@ -397,14 +493,17 @@ function initFileWatcher() {
   }
 }
 
-// 初始化文件监控器
-initFileWatcher();
+// 文件监控器将在环境初始化后启动
 
 /**
  * 处理所有客户数据
  */
 async function processAllCustomers() {
   try {
+    if (!config) {
+      throw new Error('配置未加载，无法处理客户数据');
+    }
+
     // 确保源目录存在
     const sourceBaseDir = config.sourcePath;
     if (!fs.existsSync(sourceBaseDir)) {
@@ -532,6 +631,13 @@ async function processAllCustomers() {
  */
 async function stopExistingNodeProcesses() {
   return new Promise((resolve, reject) => {
+    // 在开发环境下跳过进程停止
+    if (isDevMode || currentEnv === 'development') {
+      console.log('🔄 开发环境，跳过停止现有进程步骤');
+      resolve();
+      return;
+    }
+
     console.log('🔄 检查并停止现有的Node.js进程...');
 
     // Windows平台使用taskkill命令
@@ -581,8 +687,31 @@ async function stopExistingNodeProcesses() {
 // 程序入口点
 async function main() {
   try {
+    // 解析命令行参数
+    const args = parseCommandLineArgs();
+
+    // 显示帮助信息
+    if (args.help) {
+      showHelp();
+      return;
+    }
+
+    // 列出可用环境
+    if (args.listEnvs) {
+      console.log('\n🌍 可用环境:');
+      const envs = envManager.getAvailableEnvironments();
+      envs.forEach(env => {
+        console.log(`  - ${env}`);
+      });
+      console.log('');
+      return;
+    }
+
+    // 初始化环境配置
+    config = initializeEnvironment(args.env);
+
     // 在开发模式下，跳过停止现有进程的步骤
-    if (!isDevMode) {
+    if (!isDevMode && args.env !== 'development') {
       // 首先停止所有现有的Node.js进程
       await stopExistingNodeProcesses();
 
@@ -592,12 +721,15 @@ async function main() {
       console.log('开发模式，跳过停止现有进程步骤');
     }
 
+    // 初始化文件监控器
+    initFileWatcher();
+
     // 如果在Electron环境中且不是开发模式，不要立即执行，而是等待UI触发
     if (isElectron && !isDevMode) {
-      console.log(' Electron环境中，等待UI触发处理...');
+      console.log('🖥️  Electron环境中，等待UI触发处理...');
       // 在Electron环境中，我们导出函数供UI调用
       // 同时启动HTTP服务器以支持API请求
-      startServer(3000);
+      startServer(args.port);
       // 设置IPC处理程序（如果可用）
       if (ipcMain) {
         setupIPCHandlers();
@@ -609,9 +741,9 @@ async function main() {
     await processAllCustomers();
 
     // 启动HTTP服务器
-    startServer(3000);
+    startServer(args.port);
   } catch (error) {
-    console.error('程序启动失败:', error);
+    console.error('❌ 程序启动失败:', error);
     process.exit(1);
   }
 }
@@ -619,7 +751,7 @@ async function main() {
 // 只有在直接运行此脚本时才执行main函数
 if (require.main === module) {
   main().catch(error => {
-    console.error('程序执行出错:', error);
+    console.error('❌ 程序执行出错:', error);
     process.exit(1);
   });
 }
@@ -628,7 +760,10 @@ if (require.main === module) {
 module.exports = {
   processAllCustomers,
   initFileWatcher,
-  startServer
+  startServer,
+  initializeEnvironment,
+  getCurrentEnv: () => currentEnv,
+  getCurrentConfig: () => config
 };
 
 /**

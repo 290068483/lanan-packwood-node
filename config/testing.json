@@ -1,0 +1,57 @@
+{
+  "env": "testing",
+  "name": "测试环境",
+  "database": {
+    "type": "file",
+    "path": "../data-test",
+    "description": "测试环境数据库，包含全客户状态数据用于测试"
+  },
+  "basePath": {
+    "workspace": "c:/Users/Administrator/Desktop/pack-node-1.0",
+    "projectStorage": "C:/Program Files (x86)/MPM/temp/local-test"
+  },
+  "sourcePath": "//A6/蓝岸文件/1、客户总文件/3、生产/1、正单",
+  "localPath": "C:/Program Files (x86)/MPM/temp/local-test",
+  "networkPath": "//c1/mpm/temp/local/test",
+  "targetFileName": "打包明细-test.xlsx",
+  "workerPackagesPath": "D:/backup_data/backup-test",
+  "customerPackedPath": "D:/backup_data/backup-test",
+  "autoSave": {
+    "enabled": true,
+    "changeDetection": "当packages.json数据发生变化时，自动保存已打包的数据",
+    "saveMode": "onChange",
+    "intervalMinutes": 5,
+    "keepTime": 0,
+    "compress": false
+  },
+  "autoSaveCustomerPath": "D:/backup_data/backup-test",
+  "autoSaveWorkerPath": "D:/backup_data/backup-test",
+  "customFileNameFomat": "250901 {customerName}-test",
+  "enableNetworkSync": false,
+  "outputXmlName": "250901 {customerName}-test.xml",
+  "outputXmlPath": "${basePath.projectStorage}/{customerName}/srcFiles/250901 {customerName}-test.xml",
+  "xmlStructureTemplate": {
+    "Root": {
+      "Cabinet": "{cabinets}"
+    }
+  },
+  "autoSavePath": "C:\\Users\\Administrator\\Documents\\PackNodeAutoSaves-test",
+  "logLevel": "debug",
+  "features": {
+    "hotReload": true,
+    "debugMode": true,
+    "mockData": true,
+    "fullCustomerData": true,
+    "testScenarios": {
+      "allCustomerStates": true,
+      "edgeCases": true,
+      "performanceTest": true
+    }
+  },
+  "testData": {
+    "description": "包含全客户状态数据，覆盖所有业务场景",
+    "customerStates": ["新客户", "进行中", "已完成", "已暂停", "已取消"],
+    "panelStates": ["待处理", "处理中", "已完成", "异常"],
+    "mockDataEnabled": true
+  }
+}

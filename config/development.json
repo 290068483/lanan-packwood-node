@@ -1,0 +1,45 @@
+{
+  "env": "development",
+  "name": "开发环境",
+  "database": {
+    "type": "file",
+    "path": "../data-dev",
+    "description": "开发环境数据库，用于日常开发和调试"
+  },
+  "basePath": {
+    "workspace": "c:/Users/Administrator/Desktop/pack-node-1.0",
+    "projectStorage": "C:/Program Files (x86)/MPM/temp/local-dev"
+  },
+  "sourcePath": "//A6/蓝岸文件/1、客户总文件/3、生产/1、正单",
+  "localPath": "C:/Program Files (x86)/MPM/temp/local-dev",
+  "networkPath": "//c1/mpm/temp/local/dev",
+  "targetFileName": "打包明细-dev.xlsx",
+  "workerPackagesPath": "D:/backup_data/backup-dev",
+  "customerPackedPath": "D:/backup_data/backup-dev",
+  "autoSave": {
+    "enabled": true,
+    "changeDetection": "当packages.json数据发生变化时，自动保存已打包的数据",
+    "saveMode": "onChange",
+    "intervalMinutes": 5,
+    "keepTime": 0,
+    "compress": false
+  },
+  "autoSaveCustomerPath": "D:/backup_data/backup-dev",
+  "autoSaveWorkerPath": "D:/backup_data/backup-dev",
+  "customFileNameFomat": "250901 {customerName}#-dev",
+  "enableNetworkSync": false,
+  "outputXmlName": "250901 {customerName}-dev.xml",
+  "outputXmlPath": "${basePath.projectStorage}/{customerName}/srcFiles/250901 {customerName}-dev.xml",
+  "xmlStructureTemplate": {
+    "Root": {
+      "Cabinet": "{cabinets}"
+    }
+  },
+  "autoSavePath": "C:\\Users\\Administrator\\Documents\\PackNodeAutoSaves-dev",
+  "logLevel": "debug",
+  "features": {
+    "hotReload": true,
+    "debugMode": true,
+    "mockData": true
+  }
+}

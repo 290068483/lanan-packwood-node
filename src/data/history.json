@@ -1990,5 +1990,85 @@
     "remark": "客户数据处理完成",
     "timestamp": "2025-09-23T02:06:31.515Z",
     "createdAt": "2025-09-23T02:06:31.516Z"
+  },
+  {
+    "customerId": 1,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-23T02:22:32.408Z",
+    "createdAt": "2025-09-23T02:22:32.408Z"
+  },
+  {
+    "customerId": 1,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-23T02:22:32.408Z",
+    "createdAt": "2025-09-23T02:22:32.408Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-23T02:22:38.119Z",
+    "createdAt": "2025-09-23T02:22:38.120Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-23T02:22:38.119Z",
+    "createdAt": "2025-09-23T02:22:38.120Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-23T02:22:41.352Z",
+    "createdAt": "2025-09-23T02:22:41.352Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-23T02:22:41.352Z",
+    "createdAt": "2025-09-23T02:22:41.352Z"
+  },
+  {
+    "customerId": 1,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-23T02:24:10.202Z",
+    "createdAt": "2025-09-23T02:24:10.202Z"
+  },
+  {
+    "customerId": 1,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-23T02:24:10.202Z",
+    "createdAt": "2025-09-23T02:24:10.202Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-23T02:24:15.401Z",
+    "createdAt": "2025-09-23T02:24:15.402Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-23T02:24:15.401Z",
+    "createdAt": "2025-09-23T02:24:15.402Z"
   }
 ]
