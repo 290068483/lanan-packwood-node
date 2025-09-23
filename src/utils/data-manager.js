@@ -38,7 +38,7 @@ async function checkConnection() {
     const customerExists = fs.existsSync(customerDataPath);
     const panelExists = fs.existsSync(panelDataPath);
     const historyExists = fs.existsSync(historyDataPath);
-    
+
     if (customerExists && panelExists && historyExists) {
       return {
         connected: true,
@@ -242,7 +242,7 @@ async function getCustomerById(id) {
     try {
       const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
       const panelsData = JSON.parse(fs.readFileSync(panelDataPath, 'utf8'));
-      
+
       const customer = customers.find(c => c.id == id);
       if (!customer) {
         resolve(null);
@@ -281,7 +281,7 @@ async function getCustomer(name) {
     try {
       const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
       const panelsData = JSON.parse(fs.readFileSync(panelDataPath, 'utf8'));
-      
+
       const customer = customers.find(c => c.name === name);
       if (!customer) {
         resolve(null);
@@ -319,7 +319,7 @@ async function getAllCustomers() {
     try {
       const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
       const panelsData = JSON.parse(fs.readFileSync(panelDataPath, 'utf8'));
-      
+
       // 为每个客户添加面板数据
       const customersWithPanels = customers.map(customer => {
         const customerPanels = panelsData.filter(p => p.customerId == customer.id);
@@ -358,18 +358,64 @@ async function deleteCustomer(id) {
       const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
       const panelsData = JSON.parse(fs.readFileSync(panelDataPath, 'utf8'));
       const initialLength = customers.length;
-      
+
       // 过滤掉要删除的客户
       const filteredCustomers = customers.filter(c => c.id != id);
-      
+
       // 删除相关的面板数据
       const filteredPanels = panelsData.filter(p => p.customerId != id);
-      
+
       // 保存数据
       fs.writeFileSync(customerDataPath, JSON.stringify(filteredCustomers, null, 2));
       fs.writeFileSync(panelDataPath, JSON.stringify(filteredPanels, null, 2));
-      
+
       resolve(filteredCustomers.length < initialLength);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+/**
+ * 更新客户状态
+ * @param {string} customerName - 客户名称
+ * @param {string} status - 新状态
+ * @param {string} remark - 备注
+ * @returns {Promise<boolean>} 是否更新成功
+ */
+async function updateCustomerStatus(customerName, status, remark) {
+  return new Promise((resolve, reject) => {
+    try {
+      const customers = JSON.parse(fs.readFileSync(customerDataPath, 'utf8'));
+      const customer = customers.find(c => c.name === customerName);
+
+      if (!customer) {
+        resolve(false);
+        return;
+      }
+
+      // 更新客户状态
+      customer.status = status;
+      customer.updatedAt = new Date().toISOString();
+
+      // 添加状态历史记录
+      const historyData = JSON.parse(fs.existsSync(historyDataPath) ?
+        fs.readFileSync(historyDataPath, 'utf8') : '[]');
+
+      historyData.push({
+        customerId: customer.id,
+        status: status,
+        operator: 'system',
+        remark: remark || '',
+        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      });
+
+      // 保存数据
+      fs.writeFileSync(customerDataPath, JSON.stringify(customers, null, 2));
+      fs.writeFileSync(historyDataPath, JSON.stringify(historyData, null, 2));
+
+      resolve(true);
     } catch (error) {
       reject(error);
     }
@@ -382,5 +428,6 @@ module.exports = {
   getCustomer,
   getAllCustomers,
   deleteCustomer,
-  checkConnection
+  checkConnection,
+  updateCustomerStatus
 };

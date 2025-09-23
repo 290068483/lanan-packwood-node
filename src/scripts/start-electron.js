@@ -62,6 +62,19 @@ if (process.versions.electron) {
             console.error('初始化归档处理程序失败:', error);
         }
 
+        // 导入并初始化IPC处理器
+        try {
+            const { setupIpcHandlers } = require('../ui/electron-main');
+            if (setupIpcHandlers && typeof setupIpcHandlers === 'function') {
+                setupIpcHandlers(mainWindow);
+                console.log('[ELECTRON] IPC处理器初始化完成');
+            } else {
+                console.log('[ELECTRON] IPC处理器已在模块加载时自动注册');
+            }
+        } catch (error) {
+            console.error('初始化IPC处理器失败:', error);
+        }
+
         app.on('activate', () => {
             if (BrowserWindow.getAllWindows().length === 0) {
                 createWindow();

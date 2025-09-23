@@ -16,10 +16,18 @@ if (process.platform === 'win32') {
 app.setPath('userData', path.join(app.getPath('appData'), 'PackNode'));
 
 // 导入功能模块
-const { processAllCustomers } = require('../main');
 const configManager = require('../utils/config-manager');
 const DataManager = require('../utils/data-manager');
 const { initArchiveHandlers } = require('../main-archive'); // 添加这一行
+
+// 延迟导入main模块以避免循环依赖
+let processAllCustomers = null;
+function getProcessAllCustomers() {
+  if (!processAllCustomers) {
+    processAllCustomers = require('../main').processAllCustomers;
+  }
+  return processAllCustomers;
+}
 
 // 禁用安全警告
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
@@ -102,546 +110,600 @@ process.on('unhandledRejection', (reason, promise) => {
   }
 });
 
-// IPC 处理程序
-// 获取所有客户数据
-ipcMain.handle('get-customers', async () => {
-  try {
-    const customers = await DataManager.getAllCustomers();
-    return customers;
-  } catch (error) {
-    console.error('获取客户数据时出错:', error);
-    return [];
-  }
-});
+// IPC 处理程序将在setupIpcHandlers函数中注册
 
-ipcMain.handle('add-customer', async (event, customer) => {
-  try {
-    await DataManager.upsertCustomer(customer);
-    return { success: true };
-  } catch (error) {
-    console.error('添加客户数据失败:', error);
-    return { success: false, error: `添加客户数据失败: ${error.message}` };
-  }
-});
 
-// 更新客户状态
-ipcMain.handle('update-customer-status', async (_event, customerName, status, remark) => {
-  try {
-    await DataManager.updateCustomerStatus(customerName, status, remark);
-    return { success: true };
-  } catch (error) {
-    console.error('更新客户状态时出错:', error);
-    throw error;
-  }
-});
 
-// 获取客户详细信息
-ipcMain.handle('get-customer-details', async (event, customerName) => {
-  try {
-    // 读取配置
-    const configPath = path.join(__dirname, '../../config.json');
-    if (!fs.existsSync(configPath)) {
-      return { success: false, error: '配置文件不存在' };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 导出IPC处理器设置函数，供其他模块使用
+function setupIpcHandlers(window) {
+  // 设置window引用
+  if (window) {
+    mainWindow = window;
+  }
+
+  // 获取所有客户数据
+  ipcMain.handle('get-customers', async () => {
+    try {
+      const customers = await DataManager.getAllCustomers();
+      return customers;
+    } catch (error) {
+      console.error('获取客户数据时出错:', error);
+      return [];
     }
+  });
 
-    const configContent = fs.readFileSync(configPath, 'utf8');
-    const config = JSON.parse(configContent);
-
-    // 检查源路径是否存在
-    const sourcePath = config.sourcePath;
-    if (!sourcePath) {
-      return { success: false, error: '未配置源路径' };
+  // 添加客户
+  ipcMain.handle('add-customer', async (event, customer) => {
+    try {
+      await DataManager.upsertCustomer(customer);
+      return { success: true };
+    } catch (error) {
+      console.error('添加客户数据失败:', error);
+      return { success: false, error: `添加客户数据失败: ${error.message}` };
     }
+  });
 
-    // 构建客户目录路径 - 根据实际目录命名规则调整
-    // 客户目录通常以日期开头，后跟客户名称和#号
-    const customerDirName = `250901_${customerName}#`; // 使用当前日期作为前缀
-    const customerDirPath = path.join(sourcePath, customerDirName);
+  // 更新客户状态
+  ipcMain.handle('update-customer-status', async (_event, customerName, status, remark) => {
+    try {
+      await DataManager.updateCustomerStatus(customerName, status, remark);
+      return { success: true };
+    } catch (error) {
+      console.error('更新客户状态时出错:', error);
+      throw error;
+    }
+  });
 
-    // 如果目录不存在，尝试查找匹配的客户目录
-    if (!fs.existsSync(customerDirPath) || !fs.statSync(customerDirPath).isDirectory()) {
-      // 查找匹配的客户目录
-      const dirs = fs.readdirSync(sourcePath)
-        .filter(dir => {
-          const fullPath = path.join(sourcePath, dir);
-          return fs.statSync(fullPath).isDirectory() && dir.includes(customerName);
-        });
-
-      if (dirs.length > 0) {
-        // 使用第一个匹配的目录
-        customerDirName = dirs[0];
-        customerDirPath = path.join(sourcePath, customerDirName);
-      } else {
-        return { success: false, error: '客户目录不存在' };
+  // 获取客户详细信息
+  ipcMain.handle('get-customer-details', async (event, customerName) => {
+    try {
+      // 读取配置
+      const configPath = path.join(__dirname, '../../config.json');
+      if (!fs.existsSync(configPath)) {
+        return { success: false, error: '配置文件不存在' };
       }
-    }
 
-    // 检查客户目录是否存在
-    if (!fs.existsSync(customerDirPath) || !fs.statSync(customerDirPath).isDirectory()) {
-      return { success: false, error: '客户目录不存在' };
-    }
+      const configContent = fs.readFileSync(configPath, 'utf8');
+      const config = JSON.parse(configContent);
 
-    // 检查是否有packages.json文件
-    const packagesPath = path.join(customerDirPath, 'packages.json');
-    let packagesData = [];
-    let packProgress = 0;
-    let packSeqs = [];
-    let status = '未打包';
+      // 检查源路径是否存在
+      const sourcePath = config.sourcePath;
+      if (!sourcePath) {
+        return { success: false, error: '未配置源路径' };
+      }
 
-    if (fs.existsSync(packagesPath)) {
-      packagesData = JSON.parse(fs.readFileSync(packagesPath, 'utf8'));
+      // 构建客户目录路径 - 根据实际目录命名规则调整
+      // 客户目录通常以日期开头，后跟客户名称和#号
+      const customerDirName = `250901_${customerName}#`; // 使用当前日期作为前缀
+      const customerDirPath = path.join(sourcePath, customerDirName);
 
-      // 计算打包进度
-      if (Array.isArray(packagesData)) {
-        // 获取所有partIDs
-        const allPartIDs = [];
-        packagesData.forEach(pkg => {
-          if (pkg.partIDs && Array.isArray(pkg.partIDs)) {
-            allPartIDs.push(...pkg.partIDs);
-          }
-        });
+      // 如果目录不存在，尝试查找匹配的客户目录
+      if (!fs.existsSync(customerDirPath) || !fs.statSync(customerDirPath).isDirectory()) {
+        // 查找匹配的客户目录
+        const dirs = fs.readdirSync(sourcePath)
+          .filter(dir => {
+            const fullPath = path.join(sourcePath, dir);
+            return fs.statSync(fullPath).isDirectory() && dir.includes(customerName);
+          });
 
-        // 获取包号
-        packSeqs = packagesData.map(pkg => pkg.packSeq || '').filter(seq => seq);
-
-        // 假设客户数据中所有板件都需要打包
-        // 这里需要根据实际情况调整
-        const totalParts = allPartIDs.length;
-        packProgress = totalParts > 0 ? Math.round(100) : 0; // 假设所有板件都已打包
-
-        // 确定客户状态
-        if (packProgress === 100) {
-          status = '已打包';
-        } else if (packProgress > 0) {
-          status = '正在处理';
+        if (dirs.length > 0) {
+          // 使用第一个匹配的目录
+          customerDirName = dirs[0];
+          customerDirPath = path.join(sourcePath, customerDirName);
+        } else {
+          return { success: false, error: '客户目录不存在' };
         }
       }
+
+      // 检查客户目录是否存在
+      if (!fs.existsSync(customerDirPath) || !fs.statSync(customerDirPath).isDirectory()) {
+        return { success: false, error: '客户目录不存在' };
+      }
+
+      // 检查是否有packages.json文件
+      const packagesPath = path.join(customerDirPath, 'packages.json');
+      let packagesData = [];
+      let packProgress = 0;
+      let packSeqs = [];
+      let status = '未打包';
+
+      if (fs.existsSync(packagesPath)) {
+        packagesData = JSON.parse(fs.readFileSync(packagesPath, 'utf8'));
+
+        // 计算打包进度
+        if (Array.isArray(packagesData)) {
+          // 获取所有partIDs
+          const allPartIDs = [];
+          packagesData.forEach(pkg => {
+            if (pkg.partIDs && Array.isArray(pkg.partIDs)) {
+              allPartIDs.push(...pkg.partIDs);
+            }
+          });
+
+          // 获取包号
+          packSeqs = packagesData.map(pkg => pkg.packSeq || '').filter(seq => seq);
+
+          // 假设客户数据中所有板件都需要打包
+          // 这里需要根据实际情况调整
+          const totalParts = allPartIDs.length;
+          packProgress = totalParts > 0 ? Math.round(100) : 0; // 假设所有板件都已打包
+
+          // 确定客户状态
+          if (packProgress === 100) {
+            status = '已打包';
+          } else if (packProgress > 0) {
+            status = '正在处理';
+          }
+        }
+      }
+
+      return {
+        success: true,
+        details: {
+          name: customerName,
+          status,
+          packProgress,
+          packSeqs,
+          lastUpdate: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      console.error('获取客户详细信息出错:', error);
+      return { success: false, error: `获取客户详细信息出错: ${error.message}` };
+    }
+  });
+
+  // 获取配置
+  ipcMain.handle('get-config', async () => {
+    try {
+      return configManager.getConfig();
+    } catch (error) {
+      console.error('获取配置时出错:', error);
+      throw error;
+    }
+  });
+
+  // 保存配置
+  ipcMain.handle('save-config', async (_event, config) => {
+    try {
+      await configManager.saveConfigWithMerge(config);
+      return { success: true };
+    } catch (error) {
+      console.error('保存配置时出错:', error);
+      throw error;
+    }
+  });
+
+  // 文件/目录操作处理程序
+  // 选择目录
+  ipcMain.handle('select-directory', async () => {
+    try {
+      const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openDirectory']
+      });
+
+      if (!result.canceled && result.filePaths.length > 0) {
+        return result.filePaths[0];
+      }
+      return null;
+    } catch (error) {
+      console.error('选择目录时出错:', error);
+      throw error;
+    }
+  });
+
+  // 打开目录
+  ipcMain.handle('open-directory', async (event, dirPath) => {
+    if (!fs.existsSync(dirPath)) {
+      return { success: false, error: '目录不存在' };
     }
 
-    return {
-      success: true,
-      details: {
-        name: customerName,
-        status,
-        packProgress,
-        packSeqs,
-        lastUpdate: new Date().toISOString()
+    // 在 Windows 上打开目录
+    exec(`start "" "${dirPath}"`, (error) => {
+      if (error) {
+        console.error('打开目录失败:', error);
+        return { success: false, error: error.message };
       }
-    };
-  } catch (error) {
-    console.error('获取客户详细信息出错:', error);
-    return { success: false, error: `获取客户详细信息出错: ${error.message}` };
-  }
-});
-
-
-// 获取配置
-ipcMain.handle('get-config', async () => {
-  try {
-    return configManager.getConfig();
-  } catch (error) {
-    console.error('获取配置时出错:', error);
-    throw error;
-  }
-});
-
-// 保存配置
-ipcMain.handle('save-config', async (_event, config) => {
-  try {
-    await configManager.saveConfigWithMerge(config);
-    return { success: true };
-  } catch (error) {
-    console.error('保存配置时出错:', error);
-    throw error;
-  }
-});
-
-// 文件/目录操作处理程序
-// 选择目录
-ipcMain.handle('select-directory', async () => {
-  try {
-    const result = await dialog.showOpenDialog(mainWindow, {
-      properties: ['openDirectory']
+      return { success: true };
     });
 
-    if (!result.canceled && result.filePaths.length > 0) {
-      return result.filePaths[0];
-    }
-    return null;
-  } catch (error) {
-    console.error('选择目录时出错:', error);
-    throw error;
-  }
-});
-
-ipcMain.handle('open-directory', async (event, dirPath) => {
-  if (!fs.existsSync(dirPath)) {
-    return { success: false, error: '目录不存在' };
-  }
-
-  // 在 Windows 上打开目录
-  exec(`start "" "${dirPath}"`, (error) => {
-    if (error) {
-      console.error('打开目录失败:', error);
-      return { success: false, error: error.message };
-    }
     return { success: true };
   });
 
-  return { success: true };
-});
-
-// 处理控制相关处理程序
-ipcMain.handle('start-processing', async () => {
-  try {
-    if (isProcessing) {
-      return { success: false, message: '处理已在进行中' };
-    }
-
-    isProcessing = true;
-    if (mainWindow) {
-      mainWindow.webContents.send('processing-status', { status: 'started' });
-    }
-
-    // 调用主程序的处理函数
-    const result = await processAllCustomers();
-
-    isProcessing = false;
-    if (mainWindow) {
-      mainWindow.webContents.send('processing-status', { status: 'completed', result });
-    }
-
-    return { success: true, message: '处理完成', result };
-  } catch (error) {
-    console.error('启动处理失败:', error);
-    isProcessing = false;
-    if (mainWindow) {
-      mainWindow.webContents.send('processing-status', { status: 'error', error: error.message });
-    }
-    return { success: false, error: `启动处理失败: ${error.message}` };
-  }
-});
-
-ipcMain.handle('stop-processing', async () => {
-  try {
-    // 这里应该实现停止处理逻辑
-    isProcessing = false;
-    if (mainWindow) {
-      mainWindow.webContents.send('processing-status', { status: 'stopped' });
-    }
-    return { success: true, message: '停止处理' };
-  } catch (error) {
-    console.error('停止处理失败:', error);
-    return { success: false, error: `停止处理失败: ${error.message}` };
-  }
-});
-
-// 客户状态管理相关处理程序
-ipcMain.handle('archive-customer', async (event, customerName) => {
-  try {
-    const customerStatusManager = require('../utils/customer-status-manager');
-    const customerData = await DataManager.getCustomer(customerName);
-
-    if (!customerData) {
-      return { success: false, message: '客户不存在' };
-    }
-
-    // 归档客户
-    const updatedData = customerStatusManager.archiveCustomer(customerData, 'Electron', '通过界面归档');
-
-    // 保存更新后的数据
-    await DataManager.upsertCustomer(updatedData);
-
-    return { success: true, message: '客户归档成功', status: updatedData.status };
-  } catch (error) {
-    console.error('归档客户失败:', error);
-    return { success: false, message: `归档客户失败: ${error.message}` };
-  }
-});
-
-ipcMain.handle('ship-customer', async (event, customerName) => {
-  try {
-    const customerStatusManager = require('../utils/customer-status-manager');
-    const customerData = await DataManager.getCustomer(customerName);
-
-    if (!customerData) {
-      return { success: false, message: '客户不存在' };
-    }
-
-    // 出货客户
-    const updatedData = customerStatusManager.shipCustomer(customerData, 'Electron', '通过界面出货');
-
-    // 保存更新后的数据
-    await DataManager.upsertCustomer(updatedData);
-
-    return { success: true, message: '客户出货成功', status: updatedData.status };
-  } catch (error) {
-    console.error('出货客户失败:', error);
-    return { success: false, message: `出货客户失败: ${error.message}` };
-  }
-});
-
-ipcMain.handle('partial-ship-customer', async (event, customerName) => {
-  try {
-    const customerStatusManager = require('../utils/customer-status-manager');
-    const customerData = await DataManager.getCustomer(customerName);
-
-    if (!customerData) {
-      return { success: false, message: '客户不存在' };
-    }
-
-    // 部分出货客户
-    const updatedData = customerStatusManager.partialShipCustomer(customerData, 'Electron', '通过界面部分出货');
-
-    // 保存更新后的数据
-    await DataManager.upsertCustomer(updatedData);
-
-    return { success: true, message: '客户部分出货成功', status: updatedData.status };
-  } catch (error) {
-    console.error('部分出货客户失败:', error);
-    return { success: false, message: `部分出货客户失败: ${error.message}` };
-  }
-});
-
-ipcMain.handle('mark-customer-not-shipped', async (event, customerName) => {
-  try {
-    const customerStatusManager = require('../utils/customer-status-manager');
-    const customerData = await DataManager.getCustomer(customerName);
-
-    if (!customerData) {
-      return { success: false, message: '客户不存在' };
-    }
-
-    // 标记客户为未出货
-    const updatedData = customerStatusManager.markCustomerNotShipped(customerData, 'Electron', '通过界面标记为未出货');
-
-    // 保存更新后的数据
-    await DataManager.upsertCustomer(updatedData);
-
-    return { success: true, message: '客户已标记为未出货', status: updatedData.status };
-  } catch (error) {
-    console.error('标记客户为未出货失败:', error);
-    return { success: false, message: `标记客户为未出货失败: ${error.message}` };
-  }
-});
-
-ipcMain.handle('check-customer-status', async (event, customerName) => {
-  try {
-    const customerStatusManager = require('../utils/customer-status-manager');
-    const PackageDataExtractor = require('../utils/package-data-extractor');
-
-    // 获取客户数据
-    const customerData = await DataManager.getCustomer(customerName);
-
-    if (!customerData) {
-      return { success: false, message: '客户不存在' };
-    }
-
-    // 获取packages.json文件路径
-    const packagesPath = path.join(customerData.outputPath, 'packages.json');
-
-    // 读取packages.json数据
-    let packagesData = [];
-    if (fs.existsSync(packagesPath)) {
-      packagesData = PackageDataExtractor.extractCustomerPackageData(packagesPath);
-    }
-
-    // 检查客户状态
-    const statusInfo = customerStatusManager.checkPackStatus(customerData, packagesData);
-
-    // 更新客户状态
-    const updatedData = customerStatusManager.updateCustomerStatus(
-      customerData,
-      statusInfo,
-      'Electron',
-      'Electron检查状态'
-    );
-
-    // 保存更新后的数据
-    await DataManager.upsertCustomer(updatedData);
-
-    return {
-      success: true,
-      status: statusInfo.status,
-      packedCount: statusInfo.packedCount,
-      totalParts: statusInfo.totalParts,
-      packProgress: statusInfo.packProgress,
-      packSeqs: statusInfo.packSeqs,
-      timestamp: statusInfo.timestamp
-    };
-  } catch (error) {
-    console.error('检查客户状态失败:', error);
-    return { success: false, message: `检查客户状态失败: ${error.message}` };
-  }
-});
-
-// 自动保存相关处理程序
-ipcMain.handle('start-auto-save-customer', async () => {
-  // 这里应该实现客户数据自动保存逻辑
-  return { success: true, message: '已启动客户数据自动保存' };
-});
-
-ipcMain.handle('start-auto-save-worker', async () => {
-  // 这里应该实现工人数据自动保存逻辑
-  return { success: true, message: '已启动工人数据自动保存' };
-});
-
-ipcMain.handle('view-auto-save-data', async () => {
-  // 这里应该实现查看自动保存数据的逻辑
-  return { success: true, message: '查看自动保存数据' };
-});
-
-// 检查数据库连接状态
-ipcMain.handle('check-database-connection', async () => {
-  try {
-    const result = await DataManager.checkConnection();
-    return result;
-  } catch (error) {
-    console.error('检查数据库连接状态时出错:', error);
-    return {
-      connected: false,
-      status: 'error',
-      message: `检查数据库连接失败: ${error.message}`
-    };
-  }
-});
-
-// 获取历史记录
-ipcMain.handle('get-history-records', async (event, limit = 10) => {
-  try {
-    // 从数据管理器获取历史记录
-    const history = DataManager.getHistoryRecords(limit);
-    return history;
-  } catch (error) {
-    console.error('获取历史记录时出错:', error);
-    throw error;
-  }
-});
-
-// 重新启动应用程序
-ipcMain.handle('restart-application', async () => {
-  try {
-    // 尝试关闭可能占用端口的服务
-    // 这里可以添加特定的端口释放逻辑
-
-    // 关闭所有窗口
-    if (mainWindow) {
-      mainWindow.close();
-    }
-
-    // 使用更可靠的重启方法
-    app.relaunch();
-    app.exit(0);
-
-    // 不会执行到这里，但为了代码完整性保留返回
-    return { success: true, message: '应用程序正在重新启动...' };
-  } catch (error) {
-    console.error('重新启动应用程序时出错:', error);
-    // 即使出现错误也尝试重启
+  // 处理控制相关处理程序
+  // 启动处理
+  ipcMain.handle('start-processing', async () => {
     try {
-      app.relaunch();
-      app.exit(0);
-    } catch (retryError) {
-      console.error('重新启动重试失败:', retryError);
-      return { success: false, error: `重新启动失败: ${error.message}` };
+      if (isProcessing) {
+        return { success: false, message: '处理已在进行中' };
+      }
+
+      isProcessing = true;
+      if (mainWindow) {
+        mainWindow.webContents.send('processing-status', { status: 'started' });
+      }
+
+      // 调用主程序的处理函数
+      const result = await getProcessAllCustomers();
+
+      isProcessing = false;
+      if (mainWindow) {
+        mainWindow.webContents.send('processing-status', { status: 'completed', result });
+      }
+
+      return { success: true, message: '处理完成', result };
+    } catch (error) {
+      console.error('启动处理失败:', error);
+      isProcessing = false;
+      if (mainWindow) {
+        mainWindow.webContents.send('processing-status', { status: 'error', error: error.message });
+      }
+      return { success: false, error: `启动处理失败: ${error.message}` };
     }
-  }
-});
+  });
 
-// 同步数据源到数据库
-ipcMain.handle('sync-data-source', async () => {
-  try {
-    const result = await processAllCustomers();
-    return result;
-  } catch (error) {
-    console.error('同步数据源时出错:', error);
-    throw error;
-  }
-});
-
-// 数据库切换处理
-ipcMain.handle('switch-database', async (event, dbType) => {
-  try {
-    const { switchDatabase, getCurrentDbType } = require('../database/connection');
-
-    // 切换数据库
-    switchDatabase(dbType);
-
-    return {
-      success: true,
-      message: `已切换到${dbType === 'production' ? '生产' : '测试'}数据库`,
-      currentDbType: getCurrentDbType()
-    };
-  } catch (error) {
-    console.error('切换数据库时出错:', error);
-    return {
-      success: false,
-      message: `切换数据库出错: ${error.message}`
-    };
-  }
-});
-
-// 获取当前数据库类型处理
-ipcMain.handle('get-current-database-type', async () => {
-  try {
-    const { getCurrentDbType } = require('../database/connection');
-
-    const currentDbType = getCurrentDbType();
-    return {
-      success: true,
-      currentDbType: currentDbType
-    };
-  } catch (error) {
-    console.error('获取当前数据库类型时出错:', error);
-    return {
-      success: false,
-      message: `获取当前数据库类型出错: ${error.message}`
-    };
-  }
-});
-
-// 处理打开客户Excel文件的请求
-ipcMain.handle('open-customer-excel-file', async (event, customerName) => {
-  try {
-    // 获取配置
-    const config = configManager.getConfig();
-
-    // 从数据管理器获取客户信息
-    const { getCustomer } = require('../utils/data-manager');
-    const customerData = await getCustomer(customerName);
-
-    if (!customerData) {
-      return { success: false, message: '客户不存在' };
+  // 停止处理
+  ipcMain.handle('stop-processing', async () => {
+    try {
+      // 这里应该实现停止处理逻辑
+      isProcessing = false;
+      if (mainWindow) {
+        mainWindow.webContents.send('processing-status', { status: 'stopped' });
+      }
+      return { success: true, message: '停止处理' };
+    } catch (error) {
+      console.error('停止处理失败:', error);
+      return { success: false, error: `停止处理失败: ${error.message}` };
     }
+  });
 
-    // 构建客户输出目录路径
-    const customerOutputDir = customerData.outputPath;
+  // 客户状态管理相关处理程序
+  // 注意：archive-customer处理器已在main-archive.js中注册，这里不再重复注册
 
-    // 查找Excel文件
-    let excelFile = null;
-    if (fs.existsSync(customerOutputDir)) {
-      const files = fs.readdirSync(customerOutputDir);
-      // 查找xlsx或xls文件
-      const excelFiles = files.filter(file =>
-        file.endsWith('.xlsx') || file.endsWith('.xls')
+  // 出货客户
+  ipcMain.handle('ship-customer', async (event, customerName) => {
+    try {
+      const customerStatusManager = require('../utils/customer-status-manager');
+      const customerData = await DataManager.getCustomer(customerName);
+
+      if (!customerData) {
+        return { success: false, message: '客户不存在' };
+      }
+
+      // 出货客户
+      const updatedData = customerStatusManager.shipCustomer(customerData, 'Electron', '通过界面出货');
+
+      // 保存更新后的数据
+      await DataManager.upsertCustomer(updatedData);
+
+      return { success: true, message: '客户出货成功', status: updatedData.status };
+    } catch (error) {
+      console.error('出货客户失败:', error);
+      return { success: false, message: `出货客户失败: ${error.message}` };
+    }
+  });
+
+  // 部分出货客户
+  ipcMain.handle('partial-ship-customer', async (event, customerName) => {
+    try {
+      const customerStatusManager = require('../utils/customer-status-manager');
+      const customerData = await DataManager.getCustomer(customerName);
+
+      if (!customerData) {
+        return { success: false, message: '客户不存在' };
+      }
+
+      // 部分出货客户
+      const updatedData = customerStatusManager.partialShipCustomer(customerData, 'Electron', '通过界面部分出货');
+
+      // 保存更新后的数据
+      await DataManager.upsertCustomer(updatedData);
+
+      return { success: true, message: '客户部分出货成功', status: updatedData.status };
+    } catch (error) {
+      console.error('部分出货客户失败:', error);
+      return { success: false, message: `部分出货客户失败: ${error.message}` };
+    }
+  });
+
+  // 标记客户为未出货
+  ipcMain.handle('mark-customer-not-shipped', async (event, customerName) => {
+    try {
+      const customerStatusManager = require('../utils/customer-status-manager');
+      const customerData = await DataManager.getCustomer(customerName);
+
+      if (!customerData) {
+        return { success: false, message: '客户不存在' };
+      }
+
+      // 标记客户为未出货
+      const updatedData = customerStatusManager.markCustomerNotShipped(customerData, 'Electron', '通过界面标记为未出货');
+
+      // 保存更新后的数据
+      await DataManager.upsertCustomer(updatedData);
+
+      return { success: true, message: '客户已标记为未出货', status: updatedData.status };
+    } catch (error) {
+      console.error('标记客户为未出货失败:', error);
+      return { success: false, message: `标记客户为未出货失败: ${error.message}` };
+    }
+  });
+
+  // 检查客户状态
+  ipcMain.handle('check-customer-status', async (event, customerName) => {
+    try {
+      const customerStatusManager = require('../utils/customer-status-manager');
+      const PackageDataExtractor = require('../utils/package-data-extractor');
+
+      // 获取客户数据
+      const customerData = await DataManager.getCustomer(customerName);
+
+      if (!customerData) {
+        return { success: false, message: '客户不存在' };
+      }
+
+      // 获取packages.json文件路径
+      const packagesPath = path.join(customerData.outputPath, 'packages.json');
+
+      // 读取packages.json数据
+      let packagesData = [];
+      if (fs.existsSync(packagesPath)) {
+        packagesData = PackageDataExtractor.extractCustomerPackageData(packagesPath);
+      }
+
+      // 检查客户状态
+      const statusInfo = customerStatusManager.checkPackStatus(customerData, packagesData);
+
+      // 更新客户状态
+      const updatedData = customerStatusManager.updateCustomerStatus(
+        customerData,
+        statusInfo,
+        'Electron',
+        'Electron检查状态'
       );
 
-      if (excelFiles.length > 0) {
-        // 优先选择xlsx文件，如果没有则选择第一个xls文件
-        excelFile = excelFiles.find(file => file.endsWith('.xlsx')) || excelFiles[0];
-        excelFile = path.join(customerOutputDir, excelFile);
+      // 保存更新后的数据
+      await DataManager.upsertCustomer(updatedData);
+
+      return {
+        success: true,
+        status: statusInfo.status,
+        packedCount: statusInfo.packedCount,
+        totalParts: statusInfo.totalParts,
+        packProgress: statusInfo.packProgress,
+        packSeqs: statusInfo.packSeqs,
+        timestamp: statusInfo.timestamp
+      };
+    } catch (error) {
+      console.error('检查客户状态失败:', error);
+      return { success: false, message: `检查客户状态失败: ${error.message}` };
+    }
+  });
+
+  // 自动保存相关处理程序
+  // 启动客户数据自动保存
+  ipcMain.handle('start-auto-save-customer', async () => {
+    // 这里应该实现客户数据自动保存逻辑
+    return { success: true, message: '已启动客户数据自动保存' };
+  });
+
+  // 启动工人数据自动保存
+  ipcMain.handle('start-auto-save-worker', async () => {
+    // 这里应该实现工人数据自动保存逻辑
+    return { success: true, message: '已启动工人数据自动保存' };
+  });
+
+  // 查看自动保存数据
+  ipcMain.handle('view-auto-save-data', async () => {
+    // 这里应该实现查看自动保存数据的逻辑
+    return { success: true, message: '查看自动保存数据' };
+  });
+
+  // 检查数据库连接状态
+  ipcMain.handle('check-database-connection', async () => {
+    try {
+      const result = await DataManager.checkConnection();
+      return result;
+    } catch (error) {
+      console.error('检查数据库连接状态时出错:', error);
+      return {
+        connected: false,
+        status: 'error',
+        message: `检查数据库连接失败: ${error.message}`
+      };
+    }
+  });
+
+  // 获取历史记录
+  ipcMain.handle('get-history-records', async (event, limit = 10) => {
+    try {
+      // 从数据管理器获取历史记录
+      const history = DataManager.getHistoryRecords(limit);
+      return history;
+    } catch (error) {
+      console.error('获取历史记录时出错:', error);
+      throw error;
+    }
+  });
+
+  // 重新启动应用程序
+  ipcMain.handle('restart-application', async () => {
+    try {
+      // 尝试关闭可能占用端口的服务
+      // 这里可以添加特定的端口释放逻辑
+
+      // 关闭所有窗口
+      if (mainWindow) {
+        mainWindow.close();
+      }
+
+      // 使用更可靠的重启方法
+      app.relaunch();
+      app.exit(0);
+
+      // 不会执行到这里，但为了代码完整性保留返回
+      return { success: true, message: '应用程序正在重新启动...' };
+    } catch (error) {
+      console.error('重新启动应用程序时出错:', error);
+      // 即使出现错误也尝试重启
+      try {
+        app.relaunch();
+        app.exit(0);
+      } catch (retryError) {
+        console.error('重新启动重试失败:', retryError);
+        return { success: false, error: `重新启动失败: ${error.message}` };
       }
     }
+  });
 
-    if (excelFile && fs.existsSync(excelFile)) {
-      // 打开Excel文件
-      await shell.openPath(excelFile);
-      return { success: true, message: '板件明细Excel文件已打开' };
-    } else {
-      return { success: false, message: '未找到客户的板件明细Excel文件' };
+  // 同步数据源到数据库
+  ipcMain.handle('sync-data-source', async () => {
+    try {
+      const result = await getProcessAllCustomers();
+      return result;
+    } catch (error) {
+      console.error('同步数据源时出错:', error);
+      throw error;
     }
-  } catch (error) {
-    console.error('打开客户板件明细Excel文件时出错:', error);
-    return { success: false, message: `打开Excel文件出错: ${error.message}` };
-  }
-});
+  });
+
+  // 数据库切换处理
+  ipcMain.handle('switch-database', async (event, dbType) => {
+    try {
+      const { switchDatabase, getCurrentDbType } = require('../database/connection');
+
+      // 切换数据库
+      switchDatabase(dbType);
+
+      return {
+        success: true,
+        message: `已切换到${dbType === 'production' ? '生产' : '测试'}数据库`,
+        currentDbType: getCurrentDbType()
+      };
+    } catch (error) {
+      console.error('切换数据库时出错:', error);
+      return {
+        success: false,
+        message: `切换数据库出错: ${error.message}`
+      };
+    }
+  });
+
+  // 获取当前数据库类型处理
+  ipcMain.handle('get-current-database-type', async () => {
+    try {
+      const { getCurrentDbType } = require('../database/connection');
+
+      const currentDbType = getCurrentDbType();
+      return {
+        success: true,
+        currentDbType: currentDbType
+      };
+    } catch (error) {
+      console.error('获取当前数据库类型时出错:', error);
+      return {
+        success: false,
+        message: `获取当前数据库类型出错: ${error.message}`
+      };
+    }
+  });
+
+  // 处理打开客户Excel文件的请求
+  ipcMain.handle('open-customer-excel-file', async (event, customerName) => {
+    try {
+      // 获取配置
+      const config = configManager.getConfig();
+
+      // 从数据管理器获取客户信息
+      const { getCustomer } = require('../utils/data-manager');
+      const customerData = await getCustomer(customerName);
+
+      if (!customerData) {
+        return { success: false, message: '客户不存在' };
+      }
+
+      // 构建客户输出目录路径
+      const customerOutputDir = customerData.outputPath;
+
+      // 查找Excel文件
+      let excelFile = null;
+      if (fs.existsSync(customerOutputDir)) {
+        const files = fs.readdirSync(customerOutputDir);
+        // 查找xlsx或xls文件
+        const excelFiles = files.filter(file =>
+          file.endsWith('.xlsx') || file.endsWith('.xls')
+        );
+
+        if (excelFiles.length > 0) {
+          // 优先选择xlsx文件，如果没有则选择第一个xls文件
+          excelFile = excelFiles.find(file => file.endsWith('.xlsx')) || excelFiles[0];
+          excelFile = path.join(customerOutputDir, excelFile);
+        }
+      }
+
+      if (excelFile && fs.existsSync(excelFile)) {
+        // 打开Excel文件
+        await shell.openPath(excelFile);
+        return { success: true, message: '板件明细Excel文件已打开' };
+      } else {
+        return { success: false, message: '未找到客户的板件明细Excel文件' };
+      }
+    } catch (error) {
+      console.error('打开客户板件明细Excel文件时出错:', error);
+      return { success: false, message: `打开Excel文件出错: ${error.message}` };
+    }
+  });
+
+  console.log('[IPC] 所有处理器已注册完成');
+}
+
+module.exports = {
+  setupIpcHandlers
+};
