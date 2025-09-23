@@ -710,6 +710,7 @@ if (require.main === module) {
 
 // 导出供其他模块使用
 module.exports = {
+  setupIPCHandlers,
   processAllCustomers,
   initFileWatcher,
   startServer,
@@ -722,9 +723,72 @@ module.exports = {
  * 设置IPC处理程序（Electron环境）
  */
 function setupIPCHandlers() {
-  if (!ipcMain) return;
+  // 如果ipcMain不可用，创建一个模拟对象用于测试
+  if (!ipcMain) {
+    console.log('Electron IPC不可用，创建模拟IPC处理程序用于测试...');
 
-  console.log('设置IPC处理程序...');
+    // 创建模拟的ipcMain对象
+    ipcMain = {
+      handlers: new Map(),
+      handle: function (channel, handler) {
+        console.log(`[MOCK] 注册IPC处理器: ${channel}`);
+        this.handlers.set(channel, handler);
+      },
+      invoke: async function (channel, ...args) {
+        const handler = this.handlers.get(channel);
+        if (!handler) {
+          throw new Error(`No handler registered for '${channel}'`);
+        }
+        return await handler(null, ...args);
+      }
+    };
+
+    // 将模拟对象设置为全局变量，以便测试脚本访问
+    global.ipcMain = ipcMain;
+  }
+
+  console.log('设置Electron IPC处理程序...');
+
+  // 数据库切换处理
+  ipcMain.handle('switch-database', async (event, dbType) => {
+    try {
+      const { switchDatabase, getCurrentDbType } = require('./database/connection');
+
+      // 切换数据库
+      switchDatabase(dbType);
+
+      return {
+        success: true,
+        message: `已切换到${dbType === 'production' ? '生产' : '测试'}数据库`,
+        currentDbType: getCurrentDbType()
+      };
+    } catch (error) {
+      console.error('切换数据库时出错:', error);
+      return {
+        success: false,
+        message: `切换数据库出错: ${error.message}`
+      };
+    }
+  });
+
+  // 获取当前数据库类型处理
+  ipcMain.handle('get-current-database-type', async () => {
+    try {
+      const { getCurrentDbType } = require('./database/connection');
+
+      const currentDbType = getCurrentDbType();
+      return {
+        success: true,
+        currentDbType: currentDbType
+      };
+    } catch (error) {
+      console.error('获取当前数据库类型时出错:', error);
+      return {
+        success: false,
+        message: `获取当前数据库类型出错: ${error.message}`
+      };
+    }
+  });
 
   // 处理来自UI的请求
   ipcMain.handle('process-all-customers', async () => {

@@ -26,8 +26,10 @@ function switchDatabase(env) {
     currentDbType = env;
     // 修复路径计算问题：确保正确解析相对路径到项目根目录
     const projectRoot = path.join(__dirname, '../../');
-    // 如果配置路径是相对路径（以../开头），则相对于项目根目录解析
-    if (config.database.path.startsWith('../')) {
+    // 如果配置路径是相对路径（以./或../开头），则相对于项目根目录解析
+    if (config.database.path.startsWith('./')) {
+      currentDbPath = path.resolve(projectRoot, config.database.path.substring(2));
+    } else if (config.database.path.startsWith('../')) {
       currentDbPath = path.resolve(projectRoot, config.database.path.substring(3));
     } else {
       currentDbPath = path.resolve(projectRoot, config.database.path);
@@ -86,8 +88,10 @@ function getDatabasePath(env) {
     const config = envManager.loadEnvironment(env);
     // 修复路径计算问题：确保正确解析相对路径到项目根目录
     const projectRoot = path.join(__dirname, '../../');
-    // 如果配置路径是相对路径（以../开头），则相对于项目根目录解析
-    if (config.database.path.startsWith('../')) {
+    // 如果配置路径是相对路径（以./或../开头），则相对于项目根目录解析
+    if (config.database.path.startsWith('./')) {
+      return path.resolve(projectRoot, config.database.path.substring(2));
+    } else if (config.database.path.startsWith('../')) {
       return path.resolve(projectRoot, config.database.path.substring(3));
     } else {
       return path.resolve(projectRoot, config.database.path);

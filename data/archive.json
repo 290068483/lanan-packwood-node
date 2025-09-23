@@ -31,5 +31,16 @@
     "total_parts_count": 250,
     "archive_user": "user1",
     "remark": "重要客户数据"
+  },
+  {
+    "id": 4,
+    "customer_name": "测试归档客户",
+    "customer_address": "测试地址",
+    "archive_date": "2025-09-23T08:26:18.033Z",
+    "backup_path": "C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\backup\\测试归档客户_2025-09-23T08-26-18-017Z.zip",
+    "packages_count": 1,
+    "total_parts_count": 2,
+    "archive_user": "测试用户",
+    "remark": "测试归档"
   }
 ]

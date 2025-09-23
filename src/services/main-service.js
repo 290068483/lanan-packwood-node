@@ -19,6 +19,7 @@ if (process.platform === 'win32') {
 }
 
 const configPath = path.join(__dirname, '../../config.json');
+const configSyncPath = path.join(__dirname, '../../config-sync.json');
 const CustomerStatusManager = require('../utils/customer-status-manager');
 const { CustomerStatus } = require('../utils/status-manager');
 const {
@@ -27,6 +28,8 @@ const {
   updateCustomerStatusAPI,
   getCustomersByStatusAPI
 } = require('../database/api');
+const DataSyncService = require('./data-sync-service');
+const { getCurrentDbType } = require('../database/connection');
 
 // 读取配置文件
 let config = {};
@@ -35,6 +38,101 @@ if (fs.existsSync(configPath)) {
 } else {
   console.error('配置文件不存在:', configPath);
   process.exit(1);
+}
+
+// 读取同步配置文件
+let syncConfig = {};
+if (fs.existsSync(configSyncPath)) {
+  syncConfig = JSON.parse(fs.readFileSync(configSyncPath, 'utf8'));
+} else {
+  console.error('同步配置文件不存在:', configSyncPath);
+  process.exit(1);
+}
+
+// 初始化数据同步服务
+let dataSyncService = null;
+
+// 只在正式环境中启用数据同步服务
+if (syncConfig.dataSync && syncConfig.dataSync.enabled) {
+  const currentDbType = getCurrentDbType();
+
+  if (currentDbType === 'production') {
+    console.log('当前环境为生产环境，启用数据同步服务');
+
+    // 初始化数据同步服务
+    DataSyncService.initialize(
+      syncConfig.dataSync.sourcePath,
+      syncConfig.dataSync.localPath
+    );
+
+    // 创建数据同步服务实例
+    dataSyncService = {
+      start: () => {
+        if (syncConfig.dataSync.enableFileWatch) {
+          DataSyncService.startWatching();
+        }
+      },
+      stop: () => {
+        DataSyncService.stopWatching();
+      },
+      getStatus: () => {
+        return {
+          enabled: syncConfig.dataSync.enabled,
+          isWatching: syncConfig.dataSync.enableFileWatch,
+          sourcePath: syncConfig.dataSync.sourcePath,
+          localPath: syncConfig.dataSync.localPath,
+          databasePath: syncConfig.dataSync.databasePath
+        };
+      }
+    };
+
+    // 启动数据同步服务
+    dataSyncService.start();
+  } else {
+    console.log('当前环境为测试环境，禁用数据同步服务');
+
+    // 创建一个空的同步服务实例
+    dataSyncService = {
+      start: () => {
+        console.log('测试环境：数据同步服务已禁用');
+      },
+      stop: () => {
+        console.log('测试环境：数据同步服务已禁用');
+      },
+      getStatus: () => {
+        return {
+          enabled: false,
+          isWatching: false,
+          sourcePath: '',
+          localPath: '',
+          databasePath: '',
+          message: '测试环境：数据同步服务已禁用'
+        };
+      }
+    };
+  }
+} else {
+  console.log('数据同步服务未启用');
+
+  // 创建一个空的同步服务实例
+  dataSyncService = {
+    start: () => {
+      console.log('数据同步服务未启用');
+    },
+    stop: () => {
+      console.log('数据同步服务未启用');
+    },
+    getStatus: () => {
+      return {
+        enabled: false,
+        isWatching: false,
+        sourcePath: '',
+        localPath: '',
+        databasePath: '',
+        message: '数据同步服务未启用'
+      };
+    }
+  };
 }
 
 // 创建客户状态管理器

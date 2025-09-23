@@ -1,0 +1,51 @@
+{
+  "env": "production",
+  "name": "生产环境",
+  "baseUrl": "production",
+  "database": {
+    "type": "file",
+    "path": "./data",
+    "description": "生产环境数据库，存储正式业务数据"
+  },
+  "basePath": {
+    "workspace": "c:/Users/Administrator/Desktop/pack-node-1.0",
+    "projectStorage": "C:/Program Files (x86)/MPM/temp/local"
+  },
+  "api": {
+    "baseUrl": "https://api.example.com",
+    "timeout": 10000
+  },
+  "sourcePath": "//A6/蓝岸文件/1、客户总文件/3、生产/1、正单",
+  "localPath": "C:/Program Files (x86)/MPM/temp/local",
+  "networkPath": "//c1/mpm/temp/local",
+  "targetFileName": "打包明细.xlsx",
+  "workerPackagesPath": "D:/backup_data/backup",
+  "customerPackedPath": "D:/backup_data/backup",
+  "autoSave": {
+    "enabled": true,
+    "changeDetection": "当packages.json数据发生变化时，自动保存已打包的数据",
+    "saveMode": "onChange",
+    "intervalMinutes": 5,
+    "keepTime": 0,
+    "compress": false
+  },
+  "autoSaveCustomerPath": "D:/backup_data/backup",
+  "autoSaveWorkerPath": "D:/backup_data/backup",
+  "customFileNameFomat": "250901 {customerName}",
+  "enableNetworkSync": true,
+  "outputXmlName": "250901 {customerName}.xml",
+  "outputXmlPath": "${basePath.projectStorage}/{customerName}/srcFiles/250901 {customerName}.xml",
+  "xmlStructureTemplate": {
+    "Root": {
+      "Cabinet": "{cabinets}"
+    }
+  },
+  "autoSavePath": "C:\\Users\\Administrator\\Documents\\PackNodeAutoSaves",
+  "logLevel": "info",
+  "features": {
+    "hotReload": false,
+    "debugMode": false,
+    "mockData": false,
+    "devTools": false
+  }
+}

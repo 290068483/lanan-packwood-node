@@ -1111,7 +1111,7 @@
           .getElementById('dbSwitch')
           .addEventListener('change', async (event) => {
             const dbType = event.target.value;
-            const originalValue = event.target.value === 'production' ? 'test' : 'production';
+            const originalValue = event.target.value;
             try {
               showProcessingStatus('正在切换数据库...');
               

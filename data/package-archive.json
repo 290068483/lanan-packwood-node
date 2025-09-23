@@ -48,5 +48,11 @@
       "quantity": 70,
       "weight": 38.7
     }
+  },
+  {
+    "id": 6,
+    "archive_id": 4,
+    "package_weight": 0,
+    "created_at": "2025-09-23T08:26:18.033Z"
   }
 ]

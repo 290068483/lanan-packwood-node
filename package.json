@@ -22,7 +22,12 @@
     "electron-pack": "electron-builder --win",
     "electron-dist": "electron-builder --win --publish never",
     "sync": "node src/services/main-service.js",
-    "start-main": "ts-node -r tsconfig-paths/register src/main.ts"
+    "start-main": "ts-node -r tsconfig-paths/register src/main.ts",
+    "env:dev": "node scripts/switch-env.js development",
+    "env:prod": "node scripts/switch-env.js production",
+    "env:test": "node scripts/switch-env.js testing",
+    "env:current": "node scripts/switch-env.js --current",
+    "env:help": "node scripts/switch-env.js --help"
   },
   "engines": {
     "node": ">=18.0.0 <20.0.0"

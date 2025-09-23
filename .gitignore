@@ -42,3 +42,111 @@ fomat-xml/
 # 临时测试文件夹
 src/temp-pack/
 coverage/
+
+# 环境配置文件
+.env
+.env.local
+.env.production
+.env.development
+.env.testing
+
+# 本地数据目录
+data-dev/
+data-test/
+data-staging/
+
+# 本地存储目录
+storage/
+storage-dev/
+storage-test/
+storage-staging/
+
+# 备份目录
+backup/
+backup-dev/
+backup-test/
+backup-staging/
+
+# 自动保存目录
+autosaves/
+autosaves-dev/
+autosaves-test/
+autosaves-staging/
+
+# 缓存目录
+cache/
+temp/
+
+# 操作系统生成的文件
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# 包管理器锁文件
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 构建输出
+dist/
+build/
+out/
+
+# 运行时文件
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+.env.production
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port

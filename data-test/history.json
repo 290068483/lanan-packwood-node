@@ -1,1 +1,4602 @@
-[]
+[
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:26.357Z",
+    "createdAt": "2025-09-20T07:36:26.357Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:26.357Z",
+    "createdAt": "2025-09-20T07:36:26.357Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:28.483Z",
+    "createdAt": "2025-09-20T07:36:28.484Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:28.483Z",
+    "createdAt": "2025-09-20T07:36:28.484Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:29.543Z",
+    "createdAt": "2025-09-20T07:36:29.543Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:29.543Z",
+    "createdAt": "2025-09-20T07:36:29.543Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:31.928Z",
+    "createdAt": "2025-09-20T07:36:31.928Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:31.928Z",
+    "createdAt": "2025-09-20T07:36:31.928Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:32.005Z",
+    "createdAt": "2025-09-20T07:36:32.005Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:32.005Z",
+    "createdAt": "2025-09-20T07:36:32.005Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:32.262Z",
+    "createdAt": "2025-09-20T07:36:32.262Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:32.262Z",
+    "createdAt": "2025-09-20T07:36:32.262Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:34.140Z",
+    "createdAt": "2025-09-20T07:36:34.140Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:34.140Z",
+    "createdAt": "2025-09-20T07:36:34.140Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:36.697Z",
+    "createdAt": "2025-09-20T07:36:36.697Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:36.697Z",
+    "createdAt": "2025-09-20T07:36:36.697Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:37.076Z",
+    "createdAt": "2025-09-20T07:36:37.076Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:37.076Z",
+    "createdAt": "2025-09-20T07:36:37.076Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:39.902Z",
+    "createdAt": "2025-09-20T07:36:39.902Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:39.902Z",
+    "createdAt": "2025-09-20T07:36:39.902Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:40.830Z",
+    "createdAt": "2025-09-20T07:36:40.830Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:40.830Z",
+    "createdAt": "2025-09-20T07:36:40.830Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:43.156Z",
+    "createdAt": "2025-09-20T07:36:43.156Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:43.156Z",
+    "createdAt": "2025-09-20T07:36:43.156Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:44.387Z",
+    "createdAt": "2025-09-20T07:36:44.387Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:44.387Z",
+    "createdAt": "2025-09-20T07:36:44.387Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:44.915Z",
+    "createdAt": "2025-09-20T07:36:44.916Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:44.915Z",
+    "createdAt": "2025-09-20T07:36:44.916Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T07:36:45.043Z",
+    "createdAt": "2025-09-20T07:36:45.044Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T07:36:45.043Z",
+    "createdAt": "2025-09-20T07:36:45.044Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:30.114Z",
+    "createdAt": "2025-09-20T08:42:30.115Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:30.114Z",
+    "createdAt": "2025-09-20T08:42:30.115Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:32.386Z",
+    "createdAt": "2025-09-20T08:42:32.386Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:32.386Z",
+    "createdAt": "2025-09-20T08:42:32.386Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:33.460Z",
+    "createdAt": "2025-09-20T08:42:33.460Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:33.460Z",
+    "createdAt": "2025-09-20T08:42:33.460Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:35.903Z",
+    "createdAt": "2025-09-20T08:42:35.904Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:35.903Z",
+    "createdAt": "2025-09-20T08:42:35.904Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:35.976Z",
+    "createdAt": "2025-09-20T08:42:35.976Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:35.976Z",
+    "createdAt": "2025-09-20T08:42:35.976Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:36.239Z",
+    "createdAt": "2025-09-20T08:42:36.239Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:36.239Z",
+    "createdAt": "2025-09-20T08:42:36.239Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:38.193Z",
+    "createdAt": "2025-09-20T08:42:38.193Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:38.193Z",
+    "createdAt": "2025-09-20T08:42:38.193Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:40.854Z",
+    "createdAt": "2025-09-20T08:42:40.854Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:40.854Z",
+    "createdAt": "2025-09-20T08:42:40.854Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:41.221Z",
+    "createdAt": "2025-09-20T08:42:41.221Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:41.221Z",
+    "createdAt": "2025-09-20T08:42:41.221Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:44.237Z",
+    "createdAt": "2025-09-20T08:42:44.237Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:44.237Z",
+    "createdAt": "2025-09-20T08:42:44.237Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:45.204Z",
+    "createdAt": "2025-09-20T08:42:45.204Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:45.204Z",
+    "createdAt": "2025-09-20T08:42:45.204Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:47.619Z",
+    "createdAt": "2025-09-20T08:42:47.619Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:47.619Z",
+    "createdAt": "2025-09-20T08:42:47.619Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:48.845Z",
+    "createdAt": "2025-09-20T08:42:48.845Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:48.845Z",
+    "createdAt": "2025-09-20T08:42:48.845Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:49.389Z",
+    "createdAt": "2025-09-20T08:42:49.389Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:49.389Z",
+    "createdAt": "2025-09-20T08:42:49.389Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:42:49.516Z",
+    "createdAt": "2025-09-20T08:42:49.516Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:42:49.516Z",
+    "createdAt": "2025-09-20T08:42:49.516Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:04.061Z",
+    "createdAt": "2025-09-20T08:49:04.061Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:04.061Z",
+    "createdAt": "2025-09-20T08:49:04.061Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:06.385Z",
+    "createdAt": "2025-09-20T08:49:06.385Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:06.385Z",
+    "createdAt": "2025-09-20T08:49:06.385Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:07.512Z",
+    "createdAt": "2025-09-20T08:49:07.512Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:07.512Z",
+    "createdAt": "2025-09-20T08:49:07.512Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:10.054Z",
+    "createdAt": "2025-09-20T08:49:10.054Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:10.054Z",
+    "createdAt": "2025-09-20T08:49:10.054Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:10.155Z",
+    "createdAt": "2025-09-20T08:49:10.155Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:10.155Z",
+    "createdAt": "2025-09-20T08:49:10.155Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:10.437Z",
+    "createdAt": "2025-09-20T08:49:10.437Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:10.437Z",
+    "createdAt": "2025-09-20T08:49:10.437Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:12.438Z",
+    "createdAt": "2025-09-20T08:49:12.438Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:12.438Z",
+    "createdAt": "2025-09-20T08:49:12.438Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:15.155Z",
+    "createdAt": "2025-09-20T08:49:15.155Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:15.155Z",
+    "createdAt": "2025-09-20T08:49:15.155Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:15.561Z",
+    "createdAt": "2025-09-20T08:49:15.562Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:15.561Z",
+    "createdAt": "2025-09-20T08:49:15.562Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:18.578Z",
+    "createdAt": "2025-09-20T08:49:18.578Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:18.578Z",
+    "createdAt": "2025-09-20T08:49:18.578Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:19.575Z",
+    "createdAt": "2025-09-20T08:49:19.575Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:19.575Z",
+    "createdAt": "2025-09-20T08:49:19.575Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:22.059Z",
+    "createdAt": "2025-09-20T08:49:22.059Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:22.059Z",
+    "createdAt": "2025-09-20T08:49:22.059Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:23.331Z",
+    "createdAt": "2025-09-20T08:49:23.331Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:23.331Z",
+    "createdAt": "2025-09-20T08:49:23.331Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:23.912Z",
+    "createdAt": "2025-09-20T08:49:23.912Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:23.912Z",
+    "createdAt": "2025-09-20T08:49:23.912Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T08:49:24.055Z",
+    "createdAt": "2025-09-20T08:49:24.055Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T08:49:24.055Z",
+    "createdAt": "2025-09-20T08:49:24.055Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:12.714Z",
+    "createdAt": "2025-09-20T09:00:12.714Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:12.714Z",
+    "createdAt": "2025-09-20T09:00:12.714Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:15.870Z",
+    "createdAt": "2025-09-20T09:00:15.870Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:15.870Z",
+    "createdAt": "2025-09-20T09:00:15.870Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:17.448Z",
+    "createdAt": "2025-09-20T09:00:17.448Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:17.448Z",
+    "createdAt": "2025-09-20T09:00:17.448Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:21.013Z",
+    "createdAt": "2025-09-20T09:00:21.013Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:21.013Z",
+    "createdAt": "2025-09-20T09:00:21.013Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:21.109Z",
+    "createdAt": "2025-09-20T09:00:21.109Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:21.109Z",
+    "createdAt": "2025-09-20T09:00:21.109Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:21.455Z",
+    "createdAt": "2025-09-20T09:00:21.455Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:21.455Z",
+    "createdAt": "2025-09-20T09:00:21.455Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:24.275Z",
+    "createdAt": "2025-09-20T09:00:24.276Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:24.275Z",
+    "createdAt": "2025-09-20T09:00:24.276Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:27.944Z",
+    "createdAt": "2025-09-20T09:00:27.944Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:27.944Z",
+    "createdAt": "2025-09-20T09:00:27.944Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:28.438Z",
+    "createdAt": "2025-09-20T09:00:28.438Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:28.438Z",
+    "createdAt": "2025-09-20T09:00:28.438Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:32.635Z",
+    "createdAt": "2025-09-20T09:00:32.636Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:32.635Z",
+    "createdAt": "2025-09-20T09:00:32.636Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:33.985Z",
+    "createdAt": "2025-09-20T09:00:33.986Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:33.985Z",
+    "createdAt": "2025-09-20T09:00:33.986Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:37.386Z",
+    "createdAt": "2025-09-20T09:00:37.387Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:37.386Z",
+    "createdAt": "2025-09-20T09:00:37.387Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:39.091Z",
+    "createdAt": "2025-09-20T09:00:39.092Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:39.091Z",
+    "createdAt": "2025-09-20T09:00:39.092Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:39.825Z",
+    "createdAt": "2025-09-20T09:00:39.826Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:39.825Z",
+    "createdAt": "2025-09-20T09:00:39.826Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:00:39.998Z",
+    "createdAt": "2025-09-20T09:00:39.999Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:00:39.998Z",
+    "createdAt": "2025-09-20T09:00:39.999Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:28:45.108Z",
+    "createdAt": "2025-09-20T09:28:45.109Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:28:45.108Z",
+    "createdAt": "2025-09-20T09:28:45.109Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:28:47.264Z",
+    "createdAt": "2025-09-20T09:28:47.264Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:28:47.264Z",
+    "createdAt": "2025-09-20T09:28:47.264Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:28:48.341Z",
+    "createdAt": "2025-09-20T09:28:48.341Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:28:48.341Z",
+    "createdAt": "2025-09-20T09:28:48.341Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:28:50.803Z",
+    "createdAt": "2025-09-20T09:28:50.803Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:28:50.803Z",
+    "createdAt": "2025-09-20T09:28:50.803Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:28:50.884Z",
+    "createdAt": "2025-09-20T09:28:50.884Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:28:50.884Z",
+    "createdAt": "2025-09-20T09:28:50.884Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:28:51.145Z",
+    "createdAt": "2025-09-20T09:28:51.145Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:28:51.145Z",
+    "createdAt": "2025-09-20T09:28:51.145Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:28:53.046Z",
+    "createdAt": "2025-09-20T09:28:53.046Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:28:53.046Z",
+    "createdAt": "2025-09-20T09:28:53.046Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:28:55.629Z",
+    "createdAt": "2025-09-20T09:28:55.629Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:28:55.629Z",
+    "createdAt": "2025-09-20T09:28:55.629Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:28:55.994Z",
+    "createdAt": "2025-09-20T09:28:55.994Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:28:55.994Z",
+    "createdAt": "2025-09-20T09:28:55.994Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:28:58.966Z",
+    "createdAt": "2025-09-20T09:28:58.966Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:28:58.966Z",
+    "createdAt": "2025-09-20T09:28:58.966Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:29:00.249Z",
+    "createdAt": "2025-09-20T09:29:00.249Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:29:00.249Z",
+    "createdAt": "2025-09-20T09:29:00.249Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:29:02.582Z",
+    "createdAt": "2025-09-20T09:29:02.582Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:29:02.582Z",
+    "createdAt": "2025-09-20T09:29:02.582Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:29:03.783Z",
+    "createdAt": "2025-09-20T09:29:03.783Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:29:03.783Z",
+    "createdAt": "2025-09-20T09:29:03.783Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:29:04.313Z",
+    "createdAt": "2025-09-20T09:29:04.313Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:29:04.313Z",
+    "createdAt": "2025-09-20T09:29:04.313Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T09:29:04.450Z",
+    "createdAt": "2025-09-20T09:29:04.450Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T09:29:04.450Z",
+    "createdAt": "2025-09-20T09:29:04.450Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:38:41.551Z",
+    "createdAt": "2025-09-20T11:38:41.551Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:38:41.551Z",
+    "createdAt": "2025-09-20T11:38:41.551Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:38:44.788Z",
+    "createdAt": "2025-09-20T11:38:44.788Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:38:44.788Z",
+    "createdAt": "2025-09-20T11:38:44.788Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:38:46.268Z",
+    "createdAt": "2025-09-20T11:38:46.268Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:38:46.268Z",
+    "createdAt": "2025-09-20T11:38:46.268Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:38:49.286Z",
+    "createdAt": "2025-09-20T11:38:49.286Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:38:49.286Z",
+    "createdAt": "2025-09-20T11:38:49.286Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:38:49.497Z",
+    "createdAt": "2025-09-20T11:38:49.497Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:38:49.497Z",
+    "createdAt": "2025-09-20T11:38:49.497Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:38:49.932Z",
+    "createdAt": "2025-09-20T11:38:49.932Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:38:49.932Z",
+    "createdAt": "2025-09-20T11:38:49.932Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:38:52.373Z",
+    "createdAt": "2025-09-20T11:38:52.374Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:38:52.373Z",
+    "createdAt": "2025-09-20T11:38:52.374Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:38:55.612Z",
+    "createdAt": "2025-09-20T11:38:55.613Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:38:55.612Z",
+    "createdAt": "2025-09-20T11:38:55.613Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:38:56.210Z",
+    "createdAt": "2025-09-20T11:38:56.211Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:38:56.210Z",
+    "createdAt": "2025-09-20T11:38:56.211Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:38:59.884Z",
+    "createdAt": "2025-09-20T11:38:59.884Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:38:59.884Z",
+    "createdAt": "2025-09-20T11:38:59.884Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:39:01.144Z",
+    "createdAt": "2025-09-20T11:39:01.145Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:39:01.144Z",
+    "createdAt": "2025-09-20T11:39:01.145Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:39:03.981Z",
+    "createdAt": "2025-09-20T11:39:03.981Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:39:03.981Z",
+    "createdAt": "2025-09-20T11:39:03.981Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:39:05.545Z",
+    "createdAt": "2025-09-20T11:39:05.545Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:39:05.545Z",
+    "createdAt": "2025-09-20T11:39:05.545Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:39:06.350Z",
+    "createdAt": "2025-09-20T11:39:06.350Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:39:06.350Z",
+    "createdAt": "2025-09-20T11:39:06.350Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:39:06.595Z",
+    "createdAt": "2025-09-20T11:39:06.596Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:39:06.595Z",
+    "createdAt": "2025-09-20T11:39:06.596Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:42:45.179Z",
+    "createdAt": "2025-09-20T11:42:45.180Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:42:45.179Z",
+    "createdAt": "2025-09-20T11:42:45.180Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:42:47.444Z",
+    "createdAt": "2025-09-20T11:42:47.445Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:42:47.444Z",
+    "createdAt": "2025-09-20T11:42:47.445Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:42:48.526Z",
+    "createdAt": "2025-09-20T11:42:48.527Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:42:48.526Z",
+    "createdAt": "2025-09-20T11:42:48.527Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:42:50.937Z",
+    "createdAt": "2025-09-20T11:42:50.937Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:42:50.937Z",
+    "createdAt": "2025-09-20T11:42:50.937Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:42:51.035Z",
+    "createdAt": "2025-09-20T11:42:51.036Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:42:51.035Z",
+    "createdAt": "2025-09-20T11:42:51.036Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:42:51.307Z",
+    "createdAt": "2025-09-20T11:42:51.308Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:42:51.307Z",
+    "createdAt": "2025-09-20T11:42:51.308Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:42:53.298Z",
+    "createdAt": "2025-09-20T11:42:53.298Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:42:53.298Z",
+    "createdAt": "2025-09-20T11:42:53.298Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:42:55.896Z",
+    "createdAt": "2025-09-20T11:42:55.896Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:42:55.896Z",
+    "createdAt": "2025-09-20T11:42:55.896Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:42:56.294Z",
+    "createdAt": "2025-09-20T11:42:56.295Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:42:56.294Z",
+    "createdAt": "2025-09-20T11:42:56.295Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:42:59.211Z",
+    "createdAt": "2025-09-20T11:42:59.211Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:42:59.211Z",
+    "createdAt": "2025-09-20T11:42:59.211Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:43:00.201Z",
+    "createdAt": "2025-09-20T11:43:00.201Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:43:00.201Z",
+    "createdAt": "2025-09-20T11:43:00.201Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:43:02.740Z",
+    "createdAt": "2025-09-20T11:43:02.740Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:43:02.740Z",
+    "createdAt": "2025-09-20T11:43:02.740Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:43:03.942Z",
+    "createdAt": "2025-09-20T11:43:03.942Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:43:03.942Z",
+    "createdAt": "2025-09-20T11:43:03.942Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:43:04.463Z",
+    "createdAt": "2025-09-20T11:43:04.463Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:43:04.463Z",
+    "createdAt": "2025-09-20T11:43:04.463Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-20T11:43:04.599Z",
+    "createdAt": "2025-09-20T11:43:04.599Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-20T11:43:04.599Z",
+    "createdAt": "2025-09-20T11:43:04.599Z"
+  },
+  {
+    "customerId": 1,
+    "status": "已打包",
+    "operator": "system",
+    "remark": "从归档恢复",
+    "timestamp": "2025-09-19T08:51:44.588Z",
+    "createdAt": "2025-09-22T01:28:16.489Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:11.023Z",
+    "createdAt": "2025-09-22T01:31:11.023Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:11.023Z",
+    "createdAt": "2025-09-22T01:31:11.023Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:16.410Z",
+    "createdAt": "2025-09-22T01:31:16.410Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:16.410Z",
+    "createdAt": "2025-09-22T01:31:16.410Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:19.161Z",
+    "createdAt": "2025-09-22T01:31:19.161Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:19.161Z",
+    "createdAt": "2025-09-22T01:31:19.161Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:24.993Z",
+    "createdAt": "2025-09-22T01:31:24.993Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:24.993Z",
+    "createdAt": "2025-09-22T01:31:24.993Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:25.344Z",
+    "createdAt": "2025-09-22T01:31:25.345Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:25.344Z",
+    "createdAt": "2025-09-22T01:31:25.345Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:26.214Z",
+    "createdAt": "2025-09-22T01:31:26.215Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:26.214Z",
+    "createdAt": "2025-09-22T01:31:26.215Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:31.041Z",
+    "createdAt": "2025-09-22T01:31:31.041Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:31.041Z",
+    "createdAt": "2025-09-22T01:31:31.041Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:37.154Z",
+    "createdAt": "2025-09-22T01:31:37.154Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:37.154Z",
+    "createdAt": "2025-09-22T01:31:37.154Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:38.233Z",
+    "createdAt": "2025-09-22T01:31:38.233Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:38.233Z",
+    "createdAt": "2025-09-22T01:31:38.233Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:45.134Z",
+    "createdAt": "2025-09-22T01:31:45.134Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:45.134Z",
+    "createdAt": "2025-09-22T01:31:45.134Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:47.502Z",
+    "createdAt": "2025-09-22T01:31:47.502Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:47.502Z",
+    "createdAt": "2025-09-22T01:31:47.502Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:52.991Z",
+    "createdAt": "2025-09-22T01:31:52.992Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:52.991Z",
+    "createdAt": "2025-09-22T01:31:52.992Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:55.855Z",
+    "createdAt": "2025-09-22T01:31:55.855Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:55.855Z",
+    "createdAt": "2025-09-22T01:31:55.855Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:57.287Z",
+    "createdAt": "2025-09-22T01:31:57.287Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:57.287Z",
+    "createdAt": "2025-09-22T01:31:57.287Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T01:31:57.857Z",
+    "createdAt": "2025-09-22T01:31:57.857Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T01:31:57.857Z",
+    "createdAt": "2025-09-22T01:31:57.857Z"
+  },
+  {
+    "customerId": 1,
+    "status": "已打包",
+    "operator": "system",
+    "remark": "已归档到 C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\backup\\测试客户_2025-09-20T07-17-43-388Z.zip",
+    "timestamp": "2025-09-19T08:51:44.588Z",
+    "createdAt": "2025-09-22T01:37:46.058Z"
+  },
+  {
+    "customerId": 1,
+    "status": "已归档",
+    "operator": "system",
+    "remark": "已归档到 C:\\Users\\Administrator\\Desktop\\pack-node-1.0\\data\\backup\\测试客户_2025-09-20T07-17-43-388Z.zip",
+    "timestamp": "2025-09-19T08:51:44.588Z",
+    "createdAt": "2025-09-22T01:37:46.058Z"
+  },
+  {
+    "customerId": 1,
+    "status": "已归档",
+    "operator": "system",
+    "remark": "从归档恢复",
+    "timestamp": "2025-09-19T08:51:44.588Z",
+    "createdAt": "2025-09-22T01:37:46.058Z"
+  },
+  {
+    "customerId": 1,
+    "status": "全部出货",
+    "operator": "Electron",
+    "remark": "通过界面出货",
+    "timestamp": "2025-09-22T01:37:46.057Z",
+    "createdAt": "2025-09-22T01:37:46.058Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:12.695Z",
+    "createdAt": "2025-09-22T03:17:12.696Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:12.695Z",
+    "createdAt": "2025-09-22T03:17:12.696Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:17.839Z",
+    "createdAt": "2025-09-22T03:17:17.839Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:17.839Z",
+    "createdAt": "2025-09-22T03:17:17.839Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:20.539Z",
+    "createdAt": "2025-09-22T03:17:20.539Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:20.539Z",
+    "createdAt": "2025-09-22T03:17:20.539Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:26.927Z",
+    "createdAt": "2025-09-22T03:17:26.927Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:26.927Z",
+    "createdAt": "2025-09-22T03:17:26.927Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:27.737Z",
+    "createdAt": "2025-09-22T03:17:27.737Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:27.737Z",
+    "createdAt": "2025-09-22T03:17:27.737Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:29.275Z",
+    "createdAt": "2025-09-22T03:17:29.275Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:29.275Z",
+    "createdAt": "2025-09-22T03:17:29.275Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:34.269Z",
+    "createdAt": "2025-09-22T03:17:34.269Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:34.269Z",
+    "createdAt": "2025-09-22T03:17:34.269Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:40.934Z",
+    "createdAt": "2025-09-22T03:17:40.935Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:40.934Z",
+    "createdAt": "2025-09-22T03:17:40.935Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:42.035Z",
+    "createdAt": "2025-09-22T03:17:42.035Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:42.035Z",
+    "createdAt": "2025-09-22T03:17:42.035Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:49.115Z",
+    "createdAt": "2025-09-22T03:17:49.116Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:49.115Z",
+    "createdAt": "2025-09-22T03:17:49.116Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:17:51.391Z",
+    "createdAt": "2025-09-22T03:17:51.391Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:17:51.391Z",
+    "createdAt": "2025-09-22T03:17:51.391Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:18:00.070Z",
+    "createdAt": "2025-09-22T03:18:00.070Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:18:00.070Z",
+    "createdAt": "2025-09-22T03:18:00.070Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:18:03.158Z",
+    "createdAt": "2025-09-22T03:18:03.159Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:18:03.158Z",
+    "createdAt": "2025-09-22T03:18:03.159Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:18:04.512Z",
+    "createdAt": "2025-09-22T03:18:04.513Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:18:04.512Z",
+    "createdAt": "2025-09-22T03:18:04.513Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:18:05.035Z",
+    "createdAt": "2025-09-22T03:18:05.035Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:18:05.035Z",
+    "createdAt": "2025-09-22T03:18:05.035Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:24:49.497Z",
+    "createdAt": "2025-09-22T03:24:49.498Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:24:49.497Z",
+    "createdAt": "2025-09-22T03:24:49.498Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:24:53.850Z",
+    "createdAt": "2025-09-22T03:24:53.851Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:24:53.850Z",
+    "createdAt": "2025-09-22T03:24:53.851Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:24:56.170Z",
+    "createdAt": "2025-09-22T03:24:56.170Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:24:56.170Z",
+    "createdAt": "2025-09-22T03:24:56.170Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:01.349Z",
+    "createdAt": "2025-09-22T03:25:01.349Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:01.349Z",
+    "createdAt": "2025-09-22T03:25:01.349Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:01.602Z",
+    "createdAt": "2025-09-22T03:25:01.602Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:01.602Z",
+    "createdAt": "2025-09-22T03:25:01.602Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:02.223Z",
+    "createdAt": "2025-09-22T03:25:02.223Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:02.223Z",
+    "createdAt": "2025-09-22T03:25:02.223Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:06.870Z",
+    "createdAt": "2025-09-22T03:25:06.871Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:06.870Z",
+    "createdAt": "2025-09-22T03:25:06.871Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:13.549Z",
+    "createdAt": "2025-09-22T03:25:13.549Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:13.549Z",
+    "createdAt": "2025-09-22T03:25:13.549Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:14.747Z",
+    "createdAt": "2025-09-22T03:25:14.747Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:14.747Z",
+    "createdAt": "2025-09-22T03:25:14.747Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:22.694Z",
+    "createdAt": "2025-09-22T03:25:22.694Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:22.694Z",
+    "createdAt": "2025-09-22T03:25:22.694Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:25.346Z",
+    "createdAt": "2025-09-22T03:25:25.346Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:25.346Z",
+    "createdAt": "2025-09-22T03:25:25.346Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:30.846Z",
+    "createdAt": "2025-09-22T03:25:30.846Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:30.846Z",
+    "createdAt": "2025-09-22T03:25:30.846Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:34.358Z",
+    "createdAt": "2025-09-22T03:25:34.359Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:34.358Z",
+    "createdAt": "2025-09-22T03:25:34.359Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:36.486Z",
+    "createdAt": "2025-09-22T03:25:36.487Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:36.486Z",
+    "createdAt": "2025-09-22T03:25:36.487Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:37.768Z",
+    "createdAt": "2025-09-22T03:25:37.769Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:37.768Z",
+    "createdAt": "2025-09-22T03:25:37.769Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:48.669Z",
+    "createdAt": "2025-09-22T03:25:48.670Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:48.669Z",
+    "createdAt": "2025-09-22T03:25:48.670Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:25:54.854Z",
+    "createdAt": "2025-09-22T03:25:54.855Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:25:54.854Z",
+    "createdAt": "2025-09-22T03:25:54.855Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:00.617Z",
+    "createdAt": "2025-09-22T03:26:00.618Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:00.617Z",
+    "createdAt": "2025-09-22T03:26:00.618Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:08.566Z",
+    "createdAt": "2025-09-22T03:26:08.566Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:08.566Z",
+    "createdAt": "2025-09-22T03:26:08.566Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:09.332Z",
+    "createdAt": "2025-09-22T03:26:09.332Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:09.332Z",
+    "createdAt": "2025-09-22T03:26:09.332Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:10.058Z",
+    "createdAt": "2025-09-22T03:26:10.058Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:10.058Z",
+    "createdAt": "2025-09-22T03:26:10.058Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:15.065Z",
+    "createdAt": "2025-09-22T03:26:15.065Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:15.065Z",
+    "createdAt": "2025-09-22T03:26:15.065Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:22.870Z",
+    "createdAt": "2025-09-22T03:26:22.871Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:22.870Z",
+    "createdAt": "2025-09-22T03:26:22.871Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:24.031Z",
+    "createdAt": "2025-09-22T03:26:24.031Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:24.031Z",
+    "createdAt": "2025-09-22T03:26:24.031Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:31.709Z",
+    "createdAt": "2025-09-22T03:26:31.710Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:31.709Z",
+    "createdAt": "2025-09-22T03:26:31.710Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:35.053Z",
+    "createdAt": "2025-09-22T03:26:35.054Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:35.053Z",
+    "createdAt": "2025-09-22T03:26:35.054Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:40.644Z",
+    "createdAt": "2025-09-22T03:26:40.644Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:40.644Z",
+    "createdAt": "2025-09-22T03:26:40.644Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:44.136Z",
+    "createdAt": "2025-09-22T03:26:44.137Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:44.136Z",
+    "createdAt": "2025-09-22T03:26:44.137Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:45.353Z",
+    "createdAt": "2025-09-22T03:26:45.354Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:45.353Z",
+    "createdAt": "2025-09-22T03:26:45.354Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:26:46.637Z",
+    "createdAt": "2025-09-22T03:26:46.638Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:26:46.637Z",
+    "createdAt": "2025-09-22T03:26:46.638Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:27:17.863Z",
+    "createdAt": "2025-09-22T03:27:17.864Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:27:17.863Z",
+    "createdAt": "2025-09-22T03:27:17.864Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:27:23.114Z",
+    "createdAt": "2025-09-22T03:27:23.115Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:27:23.114Z",
+    "createdAt": "2025-09-22T03:27:23.115Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:27:26.653Z",
+    "createdAt": "2025-09-22T03:27:26.653Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:27:26.653Z",
+    "createdAt": "2025-09-22T03:27:26.653Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:27:32.806Z",
+    "createdAt": "2025-09-22T03:27:32.806Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:27:32.806Z",
+    "createdAt": "2025-09-22T03:27:32.806Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:27:35.435Z",
+    "createdAt": "2025-09-22T03:27:35.435Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:27:35.435Z",
+    "createdAt": "2025-09-22T03:27:35.435Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:27:36.458Z",
+    "createdAt": "2025-09-22T03:27:36.459Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:27:36.458Z",
+    "createdAt": "2025-09-22T03:27:36.459Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:27:45.423Z",
+    "createdAt": "2025-09-22T03:27:45.424Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:27:45.423Z",
+    "createdAt": "2025-09-22T03:27:45.424Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:27:54.778Z",
+    "createdAt": "2025-09-22T03:27:54.778Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:27:54.778Z",
+    "createdAt": "2025-09-22T03:27:54.778Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:27:56.384Z",
+    "createdAt": "2025-09-22T03:27:56.385Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:27:56.384Z",
+    "createdAt": "2025-09-22T03:27:56.385Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:28:07.487Z",
+    "createdAt": "2025-09-22T03:28:07.488Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:28:07.487Z",
+    "createdAt": "2025-09-22T03:28:07.488Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:28:10.482Z",
+    "createdAt": "2025-09-22T03:28:10.482Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:28:10.482Z",
+    "createdAt": "2025-09-22T03:28:10.482Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:28:18.233Z",
+    "createdAt": "2025-09-22T03:28:18.234Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:28:18.233Z",
+    "createdAt": "2025-09-22T03:28:18.234Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:28:22.535Z",
+    "createdAt": "2025-09-22T03:28:22.536Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:28:22.535Z",
+    "createdAt": "2025-09-22T03:28:22.536Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:28:27.962Z",
+    "createdAt": "2025-09-22T03:28:27.963Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:28:27.962Z",
+    "createdAt": "2025-09-22T03:28:27.963Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:28:28.827Z",
+    "createdAt": "2025-09-22T03:28:28.828Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:28:28.827Z",
+    "createdAt": "2025-09-22T03:28:28.828Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:18.815Z",
+    "createdAt": "2025-09-22T03:29:18.816Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:18.815Z",
+    "createdAt": "2025-09-22T03:29:18.816Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:23.432Z",
+    "createdAt": "2025-09-22T03:29:23.433Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:23.432Z",
+    "createdAt": "2025-09-22T03:29:23.433Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:26.260Z",
+    "createdAt": "2025-09-22T03:29:26.260Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:26.260Z",
+    "createdAt": "2025-09-22T03:29:26.260Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:31.679Z",
+    "createdAt": "2025-09-22T03:29:31.679Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:31.679Z",
+    "createdAt": "2025-09-22T03:29:31.679Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:32.021Z",
+    "createdAt": "2025-09-22T03:29:32.021Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:32.021Z",
+    "createdAt": "2025-09-22T03:29:32.021Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:32.719Z",
+    "createdAt": "2025-09-22T03:29:32.719Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:32.719Z",
+    "createdAt": "2025-09-22T03:29:32.719Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:37.588Z",
+    "createdAt": "2025-09-22T03:29:37.589Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:37.588Z",
+    "createdAt": "2025-09-22T03:29:37.589Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:43.545Z",
+    "createdAt": "2025-09-22T03:29:43.545Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:43.545Z",
+    "createdAt": "2025-09-22T03:29:43.545Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:44.545Z",
+    "createdAt": "2025-09-22T03:29:44.545Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:44.545Z",
+    "createdAt": "2025-09-22T03:29:44.545Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:51.523Z",
+    "createdAt": "2025-09-22T03:29:51.524Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:51.523Z",
+    "createdAt": "2025-09-22T03:29:51.524Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:29:54.614Z",
+    "createdAt": "2025-09-22T03:29:54.615Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:29:54.614Z",
+    "createdAt": "2025-09-22T03:29:54.615Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:30:00.000Z",
+    "createdAt": "2025-09-22T03:30:00.000Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:30:00.000Z",
+    "createdAt": "2025-09-22T03:30:00.000Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:30:02.859Z",
+    "createdAt": "2025-09-22T03:30:02.860Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:30:02.859Z",
+    "createdAt": "2025-09-22T03:30:02.860Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:30:04.332Z",
+    "createdAt": "2025-09-22T03:30:04.333Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:30:04.332Z",
+    "createdAt": "2025-09-22T03:30:04.333Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:30:04.734Z",
+    "createdAt": "2025-09-22T03:30:04.735Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:30:04.734Z",
+    "createdAt": "2025-09-22T03:30:04.735Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:27.195Z",
+    "createdAt": "2025-09-22T03:32:27.196Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:27.195Z",
+    "createdAt": "2025-09-22T03:32:27.196Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:31.112Z",
+    "createdAt": "2025-09-22T03:32:31.112Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:31.112Z",
+    "createdAt": "2025-09-22T03:32:31.112Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:33.193Z",
+    "createdAt": "2025-09-22T03:32:33.193Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:33.193Z",
+    "createdAt": "2025-09-22T03:32:33.193Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:38.390Z",
+    "createdAt": "2025-09-22T03:32:38.390Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:38.390Z",
+    "createdAt": "2025-09-22T03:32:38.390Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:38.627Z",
+    "createdAt": "2025-09-22T03:32:38.628Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:38.627Z",
+    "createdAt": "2025-09-22T03:32:38.628Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:39.220Z",
+    "createdAt": "2025-09-22T03:32:39.221Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:39.220Z",
+    "createdAt": "2025-09-22T03:32:39.221Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:42.970Z",
+    "createdAt": "2025-09-22T03:32:42.973Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:42.970Z",
+    "createdAt": "2025-09-22T03:32:42.973Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:47.708Z",
+    "createdAt": "2025-09-22T03:32:47.708Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:47.708Z",
+    "createdAt": "2025-09-22T03:32:47.708Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:48.552Z",
+    "createdAt": "2025-09-22T03:32:48.552Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:48.552Z",
+    "createdAt": "2025-09-22T03:32:48.552Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:54.035Z",
+    "createdAt": "2025-09-22T03:32:54.043Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:54.035Z",
+    "createdAt": "2025-09-22T03:32:54.043Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:32:56.061Z",
+    "createdAt": "2025-09-22T03:32:56.061Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:32:56.061Z",
+    "createdAt": "2025-09-22T03:32:56.061Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:33:01.162Z",
+    "createdAt": "2025-09-22T03:33:01.162Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:33:01.162Z",
+    "createdAt": "2025-09-22T03:33:01.162Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:33:03.461Z",
+    "createdAt": "2025-09-22T03:33:03.462Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:33:03.461Z",
+    "createdAt": "2025-09-22T03:33:03.462Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:33:04.563Z",
+    "createdAt": "2025-09-22T03:33:04.563Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:33:04.563Z",
+    "createdAt": "2025-09-22T03:33:04.563Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:33:05.005Z",
+    "createdAt": "2025-09-22T03:33:05.006Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:33:05.005Z",
+    "createdAt": "2025-09-22T03:33:05.006Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:34:35.652Z",
+    "createdAt": "2025-09-22T03:34:35.653Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:34:35.652Z",
+    "createdAt": "2025-09-22T03:34:35.653Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:34:39.726Z",
+    "createdAt": "2025-09-22T03:34:39.727Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:34:39.726Z",
+    "createdAt": "2025-09-22T03:34:39.727Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:34:42.149Z",
+    "createdAt": "2025-09-22T03:34:42.149Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:34:42.149Z",
+    "createdAt": "2025-09-22T03:34:42.149Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:34:47.338Z",
+    "createdAt": "2025-09-22T03:34:47.338Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:34:47.338Z",
+    "createdAt": "2025-09-22T03:34:47.338Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:34:49.833Z",
+    "createdAt": "2025-09-22T03:34:49.834Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:34:49.833Z",
+    "createdAt": "2025-09-22T03:34:49.834Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:34:50.617Z",
+    "createdAt": "2025-09-22T03:34:50.617Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:34:50.617Z",
+    "createdAt": "2025-09-22T03:34:50.617Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:34:54.942Z",
+    "createdAt": "2025-09-22T03:34:54.942Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:34:54.941Z",
+    "createdAt": "2025-09-22T03:34:54.942Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:35:01.183Z",
+    "createdAt": "2025-09-22T03:35:01.184Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:35:01.183Z",
+    "createdAt": "2025-09-22T03:35:01.184Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:35:06.129Z",
+    "createdAt": "2025-09-22T03:35:06.130Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:35:06.129Z",
+    "createdAt": "2025-09-22T03:35:06.130Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:35:21.066Z",
+    "createdAt": "2025-09-22T03:35:21.068Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:35:21.066Z",
+    "createdAt": "2025-09-22T03:35:21.068Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:35:23.453Z",
+    "createdAt": "2025-09-22T03:35:23.455Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:35:23.453Z",
+    "createdAt": "2025-09-22T03:35:23.455Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:35:28.483Z",
+    "createdAt": "2025-09-22T03:35:28.483Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:35:28.483Z",
+    "createdAt": "2025-09-22T03:35:28.483Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:35:32.921Z",
+    "createdAt": "2025-09-22T03:35:32.922Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:35:32.921Z",
+    "createdAt": "2025-09-22T03:35:32.922Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:35:36.417Z",
+    "createdAt": "2025-09-22T03:35:36.417Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:35:36.417Z",
+    "createdAt": "2025-09-22T03:35:36.417Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:35:36.773Z",
+    "createdAt": "2025-09-22T03:35:36.774Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:35:36.773Z",
+    "createdAt": "2025-09-22T03:35:36.774Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:38:25.109Z",
+    "createdAt": "2025-09-22T03:38:25.110Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:38:25.109Z",
+    "createdAt": "2025-09-22T03:38:25.110Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:38:36.086Z",
+    "createdAt": "2025-09-22T03:38:36.086Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:38:36.085Z",
+    "createdAt": "2025-09-22T03:38:36.086Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:38:40.355Z",
+    "createdAt": "2025-09-22T03:38:40.356Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:38:40.355Z",
+    "createdAt": "2025-09-22T03:38:40.356Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:38:48.377Z",
+    "createdAt": "2025-09-22T03:38:48.377Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:38:48.377Z",
+    "createdAt": "2025-09-22T03:38:48.377Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:38:48.718Z",
+    "createdAt": "2025-09-22T03:38:48.719Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:38:48.718Z",
+    "createdAt": "2025-09-22T03:38:48.719Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:38:49.455Z",
+    "createdAt": "2025-09-22T03:38:49.456Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:38:49.455Z",
+    "createdAt": "2025-09-22T03:38:49.456Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:38:54.259Z",
+    "createdAt": "2025-09-22T03:38:54.260Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:38:54.259Z",
+    "createdAt": "2025-09-22T03:38:54.260Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:39:00.422Z",
+    "createdAt": "2025-09-22T03:39:00.422Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:39:00.422Z",
+    "createdAt": "2025-09-22T03:39:00.422Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:39:01.408Z",
+    "createdAt": "2025-09-22T03:39:01.408Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:39:01.408Z",
+    "createdAt": "2025-09-22T03:39:01.408Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:39:08.348Z",
+    "createdAt": "2025-09-22T03:39:08.349Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:39:08.348Z",
+    "createdAt": "2025-09-22T03:39:08.349Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:39:10.657Z",
+    "createdAt": "2025-09-22T03:39:10.658Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:39:10.657Z",
+    "createdAt": "2025-09-22T03:39:10.658Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:39:16.114Z",
+    "createdAt": "2025-09-22T03:39:16.114Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:39:16.114Z",
+    "createdAt": "2025-09-22T03:39:16.114Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:39:19.221Z",
+    "createdAt": "2025-09-22T03:39:19.222Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:39:19.221Z",
+    "createdAt": "2025-09-22T03:39:19.222Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:39:20.361Z",
+    "createdAt": "2025-09-22T03:39:20.362Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:39:20.361Z",
+    "createdAt": "2025-09-22T03:39:20.362Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:39:20.878Z",
+    "createdAt": "2025-09-22T03:39:20.878Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:39:20.878Z",
+    "createdAt": "2025-09-22T03:39:20.878Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:00.074Z",
+    "createdAt": "2025-09-22T03:55:00.075Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:00.074Z",
+    "createdAt": "2025-09-22T03:55:00.075Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:04.845Z",
+    "createdAt": "2025-09-22T03:55:04.846Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:04.845Z",
+    "createdAt": "2025-09-22T03:55:04.846Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:11.940Z",
+    "createdAt": "2025-09-22T03:55:11.940Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:11.939Z",
+    "createdAt": "2025-09-22T03:55:11.940Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:17.975Z",
+    "createdAt": "2025-09-22T03:55:17.975Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:17.975Z",
+    "createdAt": "2025-09-22T03:55:17.975Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:18.905Z",
+    "createdAt": "2025-09-22T03:55:18.905Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:18.905Z",
+    "createdAt": "2025-09-22T03:55:18.905Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:19.641Z",
+    "createdAt": "2025-09-22T03:55:19.642Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:19.641Z",
+    "createdAt": "2025-09-22T03:55:19.642Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:24.532Z",
+    "createdAt": "2025-09-22T03:55:24.533Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:24.532Z",
+    "createdAt": "2025-09-22T03:55:24.533Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:30.999Z",
+    "createdAt": "2025-09-22T03:55:30.999Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:30.999Z",
+    "createdAt": "2025-09-22T03:55:30.999Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:31.947Z",
+    "createdAt": "2025-09-22T03:55:31.947Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:31.947Z",
+    "createdAt": "2025-09-22T03:55:31.947Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:38.790Z",
+    "createdAt": "2025-09-22T03:55:38.791Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:38.790Z",
+    "createdAt": "2025-09-22T03:55:38.791Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:41.222Z",
+    "createdAt": "2025-09-22T03:55:41.223Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:41.222Z",
+    "createdAt": "2025-09-22T03:55:41.223Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:46.533Z",
+    "createdAt": "2025-09-22T03:55:46.533Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:46.533Z",
+    "createdAt": "2025-09-22T03:55:46.533Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:49.378Z",
+    "createdAt": "2025-09-22T03:55:49.378Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:49.378Z",
+    "createdAt": "2025-09-22T03:55:49.378Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:50.595Z",
+    "createdAt": "2025-09-22T03:55:50.596Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:50.595Z",
+    "createdAt": "2025-09-22T03:55:50.596Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T03:55:51.011Z",
+    "createdAt": "2025-09-22T03:55:51.012Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T03:55:51.011Z",
+    "createdAt": "2025-09-22T03:55:51.012Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:07:26.702Z",
+    "createdAt": "2025-09-22T04:07:26.703Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:07:26.702Z",
+    "createdAt": "2025-09-22T04:07:26.703Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:07:31.303Z",
+    "createdAt": "2025-09-22T04:07:31.304Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:07:31.303Z",
+    "createdAt": "2025-09-22T04:07:31.304Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:07:34.194Z",
+    "createdAt": "2025-09-22T04:07:34.194Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:07:34.194Z",
+    "createdAt": "2025-09-22T04:07:34.194Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:07:39.847Z",
+    "createdAt": "2025-09-22T04:07:39.848Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:07:39.847Z",
+    "createdAt": "2025-09-22T04:07:39.848Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:07:40.175Z",
+    "createdAt": "2025-09-22T04:07:40.177Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:07:40.175Z",
+    "createdAt": "2025-09-22T04:07:40.177Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:07:40.800Z",
+    "createdAt": "2025-09-22T04:07:40.800Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:07:40.800Z",
+    "createdAt": "2025-09-22T04:07:40.800Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:07:45.433Z",
+    "createdAt": "2025-09-22T04:07:45.435Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:07:45.433Z",
+    "createdAt": "2025-09-22T04:07:45.435Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:07:51.775Z",
+    "createdAt": "2025-09-22T04:07:51.776Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:07:51.775Z",
+    "createdAt": "2025-09-22T04:07:51.776Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:07:52.822Z",
+    "createdAt": "2025-09-22T04:07:52.823Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:07:52.822Z",
+    "createdAt": "2025-09-22T04:07:52.823Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:08:00.010Z",
+    "createdAt": "2025-09-22T04:08:00.012Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:08:00.010Z",
+    "createdAt": "2025-09-22T04:08:00.012Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:08:02.163Z",
+    "createdAt": "2025-09-22T04:08:02.164Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:08:02.163Z",
+    "createdAt": "2025-09-22T04:08:02.164Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:08:07.095Z",
+    "createdAt": "2025-09-22T04:08:07.096Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:08:07.095Z",
+    "createdAt": "2025-09-22T04:08:07.096Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:08:09.719Z",
+    "createdAt": "2025-09-22T04:08:09.719Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:08:09.719Z",
+    "createdAt": "2025-09-22T04:08:09.719Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:08:10.895Z",
+    "createdAt": "2025-09-22T04:08:10.895Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:08:10.895Z",
+    "createdAt": "2025-09-22T04:08:10.895Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T04:08:11.313Z",
+    "createdAt": "2025-09-22T04:08:11.314Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T04:08:11.313Z",
+    "createdAt": "2025-09-22T04:08:11.314Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:54:35.776Z",
+    "createdAt": "2025-09-22T05:54:35.777Z"
+  },
+  {
+    "customerId": 2,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:54:35.776Z",
+    "createdAt": "2025-09-22T05:54:35.777Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:54:45.158Z",
+    "createdAt": "2025-09-22T05:54:45.159Z"
+  },
+  {
+    "customerId": 3,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:54:45.158Z",
+    "createdAt": "2025-09-22T05:54:45.159Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:54:51.781Z",
+    "createdAt": "2025-09-22T05:54:51.783Z"
+  },
+  {
+    "customerId": 4,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:54:51.781Z",
+    "createdAt": "2025-09-22T05:54:51.783Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:55:00.697Z",
+    "createdAt": "2025-09-22T05:55:00.697Z"
+  },
+  {
+    "customerId": 5,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:55:00.696Z",
+    "createdAt": "2025-09-22T05:55:00.697Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:55:01.015Z",
+    "createdAt": "2025-09-22T05:55:01.016Z"
+  },
+  {
+    "customerId": 6,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:55:01.015Z",
+    "createdAt": "2025-09-22T05:55:01.016Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:55:01.781Z",
+    "createdAt": "2025-09-22T05:55:01.781Z"
+  },
+  {
+    "customerId": 7,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:55:01.781Z",
+    "createdAt": "2025-09-22T05:55:01.781Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:55:07.210Z",
+    "createdAt": "2025-09-22T05:55:07.212Z"
+  },
+  {
+    "customerId": 8,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:55:07.210Z",
+    "createdAt": "2025-09-22T05:55:07.212Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:55:17.085Z",
+    "createdAt": "2025-09-22T05:55:17.085Z"
+  },
+  {
+    "customerId": 9,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:55:17.085Z",
+    "createdAt": "2025-09-22T05:55:17.085Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:55:18.075Z",
+    "createdAt": "2025-09-22T05:55:18.076Z"
+  },
+  {
+    "customerId": 10,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:55:18.075Z",
+    "createdAt": "2025-09-22T05:55:18.076Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:55:31.417Z",
+    "createdAt": "2025-09-22T05:55:31.418Z"
+  },
+  {
+    "customerId": 11,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:55:31.417Z",
+    "createdAt": "2025-09-22T05:55:31.418Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:55:35.983Z",
+    "createdAt": "2025-09-22T05:55:35.983Z"
+  },
+  {
+    "customerId": 12,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:55:35.983Z",
+    "createdAt": "2025-09-22T05:55:35.983Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:55:50.805Z",
+    "createdAt": "2025-09-22T05:55:50.806Z"
+  },
+  {
+    "customerId": 13,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:55:50.805Z",
+    "createdAt": "2025-09-22T05:55:50.806Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:55:59.752Z",
+    "createdAt": "2025-09-22T05:55:59.753Z"
+  },
+  {
+    "customerId": 14,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:55:59.752Z",
+    "createdAt": "2025-09-22T05:55:59.753Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:56:04.622Z",
+    "createdAt": "2025-09-22T05:56:04.623Z"
+  },
+  {
+    "customerId": 15,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:56:04.622Z",
+    "createdAt": "2025-09-22T05:56:04.623Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "初始状态",
+    "timestamp": "2025-09-22T05:56:13.486Z",
+    "createdAt": "2025-09-22T05:56:13.487Z"
+  },
+  {
+    "customerId": 16,
+    "status": "未打包",
+    "operator": "系统",
+    "remark": "客户数据处理完成",
+    "timestamp": "2025-09-22T05:56:13.486Z",
+    "createdAt": "2025-09-22T05:56:13.487Z"
+  }
+]

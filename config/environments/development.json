@@ -1,0 +1,51 @@
+{
+  "env": "development",
+  "name": "开发环境",
+  "baseUrl": "development",
+  "database": {
+    "type": "file",
+    "path": "./data",
+    "description": "开发环境数据库，用于日常开发调试"
+  },
+  "basePath": {
+    "workspace": "./",
+    "projectStorage": "./storage/dev"
+  },
+  "api": {
+    "baseUrl": "http://localhost:3000",
+    "timeout": 5000
+  },
+  "sourcePath": "./data/source",
+  "localPath": "./storage/local",
+  "networkPath": "./storage/network",
+  "targetFileName": "打包明细-dev.xlsx",
+  "workerPackagesPath": "./backup/worker-dev",
+  "customerPackedPath": "./backup/customer-dev",
+  "autoSave": {
+    "enabled": true,
+    "changeDetection": "当packages.json数据发生变化时，自动保存已打包的数据",
+    "saveMode": "onChange",
+    "intervalMinutes": 5,
+    "keepTime": 0,
+    "compress": false
+  },
+  "autoSaveCustomerPath": "./backup/customer-dev",
+  "autoSaveWorkerPath": "./backup/worker-dev",
+  "customFileNameFomat": "250901 {customerName}-dev",
+  "enableNetworkSync": false,
+  "outputXmlName": "250901 {customerName}-dev.xml",
+  "outputXmlPath": "./storage/dev/{customerName}/srcFiles/250901 {customerName}-dev.xml",
+  "xmlStructureTemplate": {
+    "Root": {
+      "Cabinet": "{cabinets}"
+    }
+  },
+  "autoSavePath": "./autosaves/dev",
+  "logLevel": "debug",
+  "features": {
+    "hotReload": true,
+    "debugMode": true,
+    "mockData": true,
+    "devTools": true
+  }
+}

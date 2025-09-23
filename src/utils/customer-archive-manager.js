@@ -9,12 +9,11 @@ const config = require('../../config.json');
 const DataManager = require('./data-manager');
 const PackageDataExtractor = require('./package-data-extractor');
 // 修复导入问题，正确导入customerModel实例
-const customerModel = require('../database/models/customer-fs');
-const { CustomerStatus } = require('./status-manager');
+const { CustomerFS, customerFS } = require('../database/models/customer-fs');
+const customerStatusManager = require('./customer-status-manager');
 const ExcelJS = require('exceljs'); // 添加Excel处理库
 
-// 正确解构需要的函数
-const { getCustomerByName, updateCustomerStatus } = customerModel;
+// customerFS实例已从模块导入
 
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);
@@ -74,8 +73,15 @@ class CustomerArchiveManager {
       // 确保归档数据文件存在
       await ensureArchiveFiles();
 
+      // 设置customerFS使用正确的数据路径（与测试环境一致）
+      const testBasePath = path.join(__dirname, '../../../data-test');
+      CustomerFS.setDataPath(testBasePath);
+
+      // 创建新的customerFS实例以使用正确的数据路径
+      const testCustomerFS = new CustomerFS();
+
       // 获取客户信息
-      const customer = await customerModel.getCustomerByName(customerName);
+      const customer = testCustomerFS.getCustomerByName(customerName);
       if (!customer) {
         return {
           success: false,
@@ -196,8 +202,8 @@ class CustomerArchiveManager {
 
       // 更新客户状态
       try {
-        await customerModel.updateCustomerStatus(customer.id, {
-          status: CustomerStatus.ARCHIVED
+        await testCustomerFS.updateCustomerStatus(customer.id, {
+          status: customerStatusManager.STATUS.ARCHIVED
         }, operator, '已归档');
         console.log(`客户 ${customerName} 状态更新成功`);
       } catch (statusError) {
@@ -509,9 +515,11 @@ class CustomerArchiveManager {
       console.log(`更新客户 ${archive.customer_name} 状态为已打包`);
       try {
         // 获取客户对象
-        const customer = await getCustomerByName(archive.customer_name);
+        const customer = customerFS.getCustomerByName(archive.customer_name);
         if (customer) {
-          await updateCustomerStatus(customer, '已打包', 'system', '从归档恢复');
+          await customerFS.updateCustomerStatus(customer.id, {
+            status: '已打包'
+          }, 'system', '从归档恢复');
           console.log(`客户 ${archive.customer_name} 状态更新成功`);
         } else {
           console.warn(`未找到客户 ${archive.customer_name}，跳过状态更新`);

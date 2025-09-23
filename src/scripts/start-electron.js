@@ -249,6 +249,30 @@ if (process.versions.electron) {
         });
         console.log('[ELECTRON] IPC处理器 ship-customer 注册完成');
 
+        // 数据库切换处理
+        ipcMain.handle('switch-database', async (event, dbType) => {
+            console.log('[IPC] 处理 switch-database 请求');
+            try {
+                const { switchDatabase, getCurrentDbType } = require('../database/connection');
+
+                // 切换数据库
+                switchDatabase(dbType);
+
+                return {
+                    success: true,
+                    message: `已切换到${dbType === 'production' ? '生产' : '测试'}数据库`,
+                    currentDbType: getCurrentDbType()
+                };
+            } catch (error) {
+                console.error('切换数据库时出错:', error);
+                return {
+                    success: false,
+                    message: `切换数据库出错: ${error.message}`
+                };
+            }
+        });
+        console.log('[ELECTRON] IPC处理器 switch-database 注册完成');
+
         console.log('[ELECTRON] 所有IPC处理器注册完成');
     }
 

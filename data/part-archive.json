@@ -68,5 +68,19 @@
     "part_id": "A002-02",
     "part_name": "部件D",
     "part_quantity": 35
+  },
+  {
+    "id": 11,
+    "package_id": 6,
+    "part_id": "part-001",
+    "part_name": "",
+    "part_quantity": 1
+  },
+  {
+    "id": 12,
+    "package_id": 6,
+    "part_id": "part-002",
+    "part_name": "",
+    "part_quantity": 1
   }
 ]
