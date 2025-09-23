@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+    <id>001</id>
+    <customerName>测试客户-已打包</customerName>
+    <status>已完成</status>
+    <packProgress>100</packProgress>
+    <totalParts>5</totalParts>
+    <packedParts>5</packedParts>
+    <createTime>2025-09-22T01:33:04.178Z</createTime>
+    <updateTime>2025-09-22T02:03:04.178Z</updateTime>
+    <parts>
+        <part id="1" status="已完成" />
+        <part id="2" status="已完成" />
+        <part id="3" status="已完成" />
+        <part id="4" status="已完成" />
+        <part id="5" status="已完成" />
+    </parts>
+</package>

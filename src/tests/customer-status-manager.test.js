@@ -265,6 +265,80 @@ describe('CustomerStatusManager', () => {
                 customerStatusManager.updateShipmentStatus(customerData, '全部出货', '测试用户');
             }).toThrow('未打包的客户不能进行出货操作');
         });
+
+        // 关键测试：验证出货状态更新时不会影响客户状态
+        it('出货状态更新时应该保持客户状态不变 - 全部出货', () => {
+            const originalStatus = customerData.status;
+            const result = customerStatusManager.updateShipmentStatus(customerData, '全部出货', '测试用户');
+
+            // 客户状态应该保持不变
+            expect(result.status).toEqual(originalStatus);
+            expect(result.status).toEqual('已打包');
+
+            // 只有出货状态应该被更新
+            expect(result.shipmentStatus).toEqual('全部出货');
+            expect(result.shipmentStatus).not.toEqual(customerData.shipmentStatus);
+        });
+
+        it('出货状态更新时应该保持客户状态不变 - 部分出货', () => {
+            const originalStatus = customerData.status;
+            const result = customerStatusManager.updateShipmentStatus(customerData, '部分出货', '测试用户');
+
+            // 客户状态应该保持不变
+            expect(result.status).toEqual(originalStatus);
+            expect(result.status).toEqual('已打包');
+
+            // 只有出货状态应该被更新
+            expect(result.shipmentStatus).toEqual('部分出货');
+            expect(result.shipmentStatus).not.toEqual(customerData.shipmentStatus);
+        });
+
+        it('出货状态更新时应该保持客户状态不变 - 标记为未出货', () => {
+            customerData.shipmentStatus = '全部出货';
+            const originalStatus = customerData.status;
+            const result = customerStatusManager.updateShipmentStatus(customerData, '未出货', '测试用户');
+
+            // 客户状态应该保持不变
+            expect(result.status).toEqual(originalStatus);
+            expect(result.status).toEqual('已打包');
+
+            // 只有出货状态应该被更新
+            expect(result.shipmentStatus).toEqual('未出货');
+            expect(result.shipmentStatus).not.toEqual('全部出货');
+        });
+
+        it('不同客户状态下的出货操作都应该保持客户状态不变', () => {
+            const testCases = [
+                { status: '正在处理', description: '正在处理状态' },
+                { status: '已打包', description: '已打包状态' },
+                { status: '已归档', description: '已归档状态' }
+            ];
+
+            testCases.forEach(({ status, description }) => {
+                customerData.status = status;
+                const originalStatus = customerData.status;
+                const result = customerStatusManager.updateShipmentStatus(customerData, '全部出货', '测试用户');
+
+                expect(result.status).toEqual(originalStatus, `${description}下客户状态应该保持不变`);
+                expect(result.shipmentStatus).toEqual('全部出货', `${description}下出货状态应该正确更新`);
+            });
+        });
+
+        it('出货状态更新应该保持其他字段不变', () => {
+            const originalData = { ...customerData };
+            const result = customerStatusManager.updateShipmentStatus(customerData, '全部出货', '测试用户');
+
+            // 除了出货状态和时间戳，其他字段应该保持不变
+            expect(result.name).toEqual(originalData.name);
+            expect(result.packedParts).toEqual(originalData.packedParts);
+            expect(result.totalParts).toEqual(originalData.totalParts);
+            expect(result.packProgress).toEqual(originalData.packProgress);
+            expect(result.packSeqs).toEqual(originalData.packSeqs);
+
+            // 只有出货状态和时间戳应该改变
+            expect(result.shipmentStatus).not.toEqual(originalData.shipmentStatus);
+            expect(result.lastShipmentUpdate).not.toEqual(originalData.lastShipmentUpdate);
+        });
     });
 
     describe('状态颜色方法', () => {

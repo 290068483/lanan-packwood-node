@@ -115,9 +115,14 @@ function handleApiRequest(req, res, parsedUrl) {
     else if (pathname === '/api/customers') {
         if (req.method === 'GET') {
             // 获取所有客户
-            const customers = DataManager.getAllCustomers();
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(customers));
+            DataManager.getAllCustomers().then(customers => {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(customers));
+            }).catch(error => {
+                console.error('获取客户数据失败:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '获取客户数据失败: ' + error.message }));
+            });
         } else if (req.method === 'POST') {
             // 添加客户
             let body = '';

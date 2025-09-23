@@ -98,33 +98,58 @@
         border-radius: 3px;
       }
 
-      /* 客户状态样式 */
+      /* 状态处理样式 - 统一使用一组定义 */
       .status-not-packed {
-        color: #95a5a6; /* 灰色 */
+        color: white;
+        background-color: #95a5a6;
+        border: 1px solid #7f8c8d;
       }
 
       .status-in-progress {
-        color: #3498db; /* 蓝色 */
+        color: white;
+        background-color: #3498db;
+        border: 1px solid #2980b9;
       }
 
       .status-packed {
-        color: #f1c40f; /* 黄色 */
+        color: #2c3e50;
+        background-color: #f1c40f;
+        border: 1px solid #f39c12;
       }
 
       .status-archived {
-        color: #9b59b6; /* 紫色 */
+        color: white;
+        background-color: #9b59b6;
+        border: 1px solid #8e44ad;
       }
 
       .status-shipped {
-        color: #2ecc71; /* 绿色 */
+        color: white;
+        background-color: #2ecc71;
+        border: 1px solid #27ae60;
       }
 
       .status-partial-shipped {
-        color: #ff9800; /* 橙色 */
+        color: white;
+        background-color: #ff9800;
+        border: 1px solid #e67e22;
       }
 
       .status-not-shipped {
-        color: #e67e22; /* 橙色 */
+        color: white;
+        background-color: #e74c3c;
+        border: 1px solid #c0392b;
+      }
+
+      /* 状态文字显示样式 */
+      .status-text {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        text-align: center;
+        min-width: 60px;
+        display: inline-block;
       }
 
       /* 双状态显示样式 */
@@ -137,21 +162,6 @@
       .core-status {
         font-weight: bold;
         min-width: 60px;
-      }
-
-      .status-icons {
-        display: flex;
-        gap: 4px;
-      }
-
-      .status-icon {
-        font-size: 16px;
-        cursor: pointer;
-        transition: transform 0.2s ease;
-      }
-
-      .status-icon:hover {
-        transform: scale(1.2);
       }
 
       /* 操作按钮样式 */
@@ -232,36 +242,6 @@
 
       .status-error {
         color: #e74c3c;
-        font-weight: bold;
-      }
-
-      .status-not-packed {
-        color: #888888;
-        font-weight: bold;
-      }
-
-      .status-in-progress {
-        color: #2196f3;
-        font-weight: bold;
-      }
-
-      .status-packed {
-        color: #ffc107;
-        font-weight: bold;
-      }
-
-      .status-archived {
-        color: #9c27b0;
-        font-weight: bold;
-      }
-
-      .status-shipped {
-        color: #4caf50;
-        font-weight: bold;
-      }
-
-      .status-not-shipped {
-        color: #ff9800;
         font-weight: bold;
       }
 
@@ -772,6 +752,7 @@
           <tr>
             <th>客户名称</th>
             <th>客户状态</th>
+            <th>出货状态</th>
             <th id="progressHeader" style="display: none;">打包进度</th>
             <th>包号</th>
             <th>操作</th>
@@ -1353,7 +1334,10 @@
         // 出货选择按钮事件
         document.addEventListener('click', async event => {
           if (event.target.classList.contains('ship-option-btn')) {
-            const shipType = event.target.dataset.shipType;
+            // 获取出货类型，使用getAttribute确保能正确获取属性值
+            const shipType = event.target.getAttribute('data-ship-type');
+            console.log('获取到的出货类型:', shipType); // 调试信息
+            
             const shipModal = document.getElementById('shipModal');
             const customerName = shipModal.dataset.customerName;
 
@@ -1362,6 +1346,13 @@
 
             if (!customerName) {
               showNotification('客户信息无效', 'error');
+              return;
+            }
+            
+            // 验证出货类型
+            if (!shipType || (shipType !== 'full' && shipType !== 'partial')) {
+              console.error('无效的出货类型:', shipType); // 调试信息
+              showNotification('无效的出货类型', 'error');
               return;
             }
 
@@ -1531,101 +1522,79 @@
             const row = document.createElement('tr');
 
             // 双状态显示：核心问题状态 + 流程状态图标序列
-            let statusClass = 'status-not-packed';
+            let coreStatusClass = 'status-not-packed';
             let coreStatus = customer.status; // 核心问题状态
-            let shipmentStatus = customer.shipmentStatus || '未出货'; // 出货状态
+            let shipmentStatus = customer.shipmentStatus; // 出货状态
             
-            // 确定核心问题状态（优先显示需要关注的状态）
-            if (customer.status === '未打包') {
-              coreStatus = '未打包';
-              statusClass = 'status-not-packed';
-            } else if (customer.status === '正在处理') {
-              coreStatus = '正在处理';
-              statusClass = 'status-in-progress';
-            } else if (customer.status === '已打包') {
-              // 已打包状态下，检查出货状态
-              if (customer.shipmentStatus === '部分出货') {
-                coreStatus = '部分出货';
-                statusClass = 'status-partial-shipped';
-              } else if (customer.shipmentStatus === '未出货') {
+            // 如果客户状态本身就是出货状态，则客户状态显示该状态，出货状态显示实际出货状态
+            if (customer.status === '全部出货' || customer.status === '部分出货' || customer.status === '未出货') {
+              coreStatus = customer.status;
+              // 设置对应的状态类
+              if (customer.status === '全部出货') {
+                coreStatusClass = 'status-shipped';
+              } else if (customer.status === '部分出货') {
+                coreStatusClass = 'status-partial-shipped';
+              } else if (customer.status === '未出货') {
+                coreStatusClass = 'status-not-shipped';
+              }
+              // 出货状态显示实际出货状态，如果为空则设置为'未出货'
+              shipmentStatus = shipmentStatus || '未出货';
+            } else {
+              // 对于其他状态，设置默认的出货状态
+              shipmentStatus = shipmentStatus || '未出货';
+              
+              // 确定核心问题状态（优先显示需要关注的状态）
+              if (customer.status === '未打包') {
+                coreStatus = '未打包';
+                coreStatusClass = 'status-not-packed';
+              } else if (customer.status === '正在处理') {
+                coreStatus = '正在处理';
+                coreStatusClass = 'status-in-progress';
+              } else if (customer.status === '已打包') {
+                // 已打包状态下，保持客户状态为'已打包'
                 coreStatus = '已打包';
-                statusClass = 'status-packed';
-              } else if (customer.shipmentStatus === '全部出货') {
-                coreStatus = '全部出货';
-                statusClass = 'status-shipped';
-              }
-            } else if (customer.status === '已归档') {
-              // 已归档状态下，检查出货状态
-              if (customer.shipmentStatus === '部分出货') {
-                coreStatus = '部分出货';
-                statusClass = 'status-partial-shipped';
-              } else if (customer.shipmentStatus === '未出货') {
+                coreStatusClass = 'status-packed';
+              } else if (customer.status === '已归档') {
+                // 已归档状态下，保持客户状态为'已归档'
                 coreStatus = '已归档';
-                statusClass = 'status-archived';
-              } else if (customer.shipmentStatus === '全部出货') {
-                coreStatus = '全部出货';
-                statusClass = 'status-shipped';
+                coreStatusClass = 'status-archived';
               }
             }
 
-            // 获取状态图标
-            function getStatusIcon(status) {
+            // 获取状态对应的CSS类名
+            function getStatusClass(status) {
               switch (status) {
                 case '未打包':
-                  return '📦';
+                  return 'status-not-packed';
                 case '正在处理':
-                  return '📦';
+                  return 'status-in-progress';
                 case '已打包':
-                  return '📦';
+                  return 'status-packed';
                 case '已归档':
-                  return '📦';
+                  return 'status-archived';
                 case '全部出货':
-                  return '🚚';
+                  return 'status-shipped';
                 case '部分出货':
-                  return '🚚';
+                  return 'status-partial-shipped';
                 case '未出货':
-                  return '🚚';
+                  return 'status-not-shipped';
                 default:
-                  return '📦';
+                  return 'status-not-packed';
               }
             }
 
-            // 获取状态颜色
-            function getStatusColor(status) {
-              switch (status) {
-                case '未打包':
-                  return '#888888';
-                case '正在处理':
-                  return '#2196F3';
-                case '已打包':
-                  return '#FFC107';
-                case '已归档':
-                  return '#9C27B0';
-                case '全部出货':
-                  return '#4CAF50';
-                case '部分出货':
-                  return '#FFCA28';
-                case '未出货':
-                  return '#888888';
-                default:
-                  return '#888888';
-              }
-            }
+            // 构建状态显示HTML - 使用文字+边框+背景颜色+字体颜色
+            const finalStatusClass = getStatusClass(coreStatus);
+            const shipmentStatusClass = getStatusClass(shipmentStatus);
 
-            // 构建双状态显示HTML
-            const statusIcon = getStatusIcon(customer.status);
-            const shipmentIcon = getStatusIcon(shipmentStatus);
-            const statusColor = getStatusColor(customer.status);
-            const shipmentColor = getStatusColor(shipmentStatus);
-
+            // 客户状态显示 - 文字+边框+背景颜色+字体颜色
             const statusDisplay = `
-              <div class="dual-status-container">
-                <div class="core-status ${statusClass}">${coreStatus}</div>
-                <div class="status-icons">
-                  <span class="status-icon" style="color: ${statusColor}" title="打包状态: ${customer.status}">${statusIcon}</span>
-                  <span class="status-icon" style="color: ${shipmentColor}" title="出货状态: ${shipmentStatus}">${shipmentIcon}</span>
-                </div>
-              </div>
+              <span class="status-text ${finalStatusClass}" title="客户状态: ${coreStatus}">${coreStatus}</span>
+            `;
+
+            // 出货状态显示 - 文字+边框+背景颜色+字体颜色
+            const shipmentStatusDisplay = `
+              <span class="status-text ${shipmentStatusClass}" title="出货状态: ${shipmentStatus}">${shipmentStatus}</span>
             `;
 
             // 格式化最后更新时间
@@ -1667,6 +1636,7 @@
             row.innerHTML = `
               <td>${customer.name}</td>
               <td>${statusDisplay}</td>
+              <td>${shipmentStatusDisplay}</td>
               <td style="display: ${customer.status === '正在处理' ? '' : 'none'};">
                 ${customer.status === '正在处理' ? `
                   <div class="progress-container">

@@ -631,56 +631,8 @@ async function processAllCustomers() {
  */
 async function stopExistingNodeProcesses() {
   return new Promise((resolve, reject) => {
-    // 在开发环境下跳过进程停止
-    if (isDevMode || currentEnv === 'development') {
-      console.log('🔄 开发环境，跳过停止现有进程步骤');
-      resolve();
-      return;
-    }
-
-    console.log('🔄 检查并停止现有的Node.js进程...');
-
-    // Windows平台使用taskkill命令
-    if (os.platform() === 'win32') {
-      // 获取当前进程ID
-      const currentPid = process.pid;
-
-      // 使用PowerShell命令停止除了当前进程外的所有Node.js进程
-      const command = `powershell -Command "Get-Process node | Where-Object {$_.Id -ne ${currentPid}} | Stop-Process -Force"`;
-
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          // 如果没有找到Node.js进程，这不是错误
-          if (stderr.includes('NoProcessFoundForGivenName') || stderr.includes('找不到进程')) {
-            console.log('✅ 没有发现其他运行的Node.js进程');
-            resolve();
-            return;
-          }
-          console.error('停止Node.js进程时出错:', error);
-          reject(error);
-          return;
-        }
-
-        if (stderr) {
-          console.warn('停止Node.js进程时的警告:', stderr);
-        }
-
-        console.log('✅ 已停止所有现有的Node.js进程');
-        resolve();
-      });
-    } else {
-      // Linux/Mac平台使用pkill命令
-      exec(`pkill -f "node.*main.js" || true`, (error, stdout, stderr) => {
-        if (error && !stderr.includes('no process found')) {
-          console.error('停止Node.js进程时出错:', error);
-          reject(error);
-          return;
-        }
-
-        console.log('✅ 已停止所有现有的Node.js进程');
-        resolve();
-      });
-    }
+    console.log('🔄 跳过停止现有进程步骤');
+    resolve();
   });
 }
 

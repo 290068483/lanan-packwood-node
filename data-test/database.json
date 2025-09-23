@@ -1,0 +1,221 @@
+{
+  "customers": [
+    {
+      "name": "测试客户-未打包",
+      "sourcePath": "C:\\test\\source\\unpacked",
+      "outputPath": "C:\\test\\output\\unpacked",
+      "status": "未打包",
+      "packProgress": 0,
+      "lastUpdate": "2025-09-22T03:03:04.178Z",
+      "success": true,
+      "statusHistory": [
+        {
+          "status": "未打包",
+          "timestamp": "2025-09-22T03:03:04.178Z",
+          "operator": "系统",
+          "remark": "初始状态"
+        }
+      ],
+      "packedParts": 0,
+      "totalParts": 10,
+      "packSeqs": [],
+      "lastPackCheck": "2025-09-22T03:03:04.178Z"
+    },
+    {
+      "name": "测试客户-正在处理",
+      "sourcePath": "C:\\test\\source\\processing",
+      "outputPath": "C:\\test\\output\\processing",
+      "status": "正在处理",
+      "packProgress": 50,
+      "lastUpdate": "2025-09-22T03:03:04.178Z",
+      "success": true,
+      "statusHistory": [
+        {
+          "status": "未打包",
+          "timestamp": "2025-09-22T02:03:04.178Z",
+          "operator": "系统",
+          "remark": "初始状态"
+        },
+        {
+          "status": "正在处理",
+          "previousStatus": "未打包",
+          "timestamp": "2025-09-22T02:33:04.178Z",
+          "operator": "系统",
+          "remark": "开始处理",
+          "packProgress": 50,
+          "packedParts": 5,
+          "totalParts": 10
+        }
+      ],
+      "packedParts": 5,
+      "totalParts": 10,
+      "packSeqs": ["001"],
+      "lastPackCheck": "2025-09-22T03:03:04.178Z"
+    },
+    {
+      "name": "测试客户-已打包",
+      "sourcePath": "C:\\test\\source\\packed",
+      "outputPath": "C:\\test\\output\\packed",
+      "status": "已打包",
+      "packProgress": 100,
+      "lastUpdate": "2025-09-22T03:03:04.178Z",
+      "success": true,
+      "statusHistory": [
+        {
+          "status": "未打包",
+          "timestamp": "2025-09-22T01:03:04.178Z",
+          "operator": "系统",
+          "remark": "初始状态"
+        },
+        {
+          "status": "正在处理",
+          "previousStatus": "未打包",
+          "timestamp": "2025-09-22T01:33:04.178Z",
+          "operator": "系统",
+          "remark": "开始处理",
+          "packProgress": 50,
+          "packedParts": 5,
+          "totalParts": 10
+        },
+        {
+          "status": "已打包",
+          "previousStatus": "正在处理",
+          "timestamp": "2025-09-22T02:03:04.178Z",
+          "operator": "系统",
+          "remark": "打包完成",
+          "packProgress": 100,
+          "packedParts": 10,
+          "totalParts": 10
+        }
+      ],
+      "packedParts": 10,
+      "totalParts": 10,
+      "packSeqs": ["001", "002"],
+      "lastPackCheck": "2025-09-22T03:03:04.178Z",
+      "packDate": "2025-09-22T02:03:04.178Z"
+    },
+    {
+      "name": "测试客户-已归档",
+      "sourcePath": "C:\\test\\source\\archived",
+      "outputPath": "C:\\test\\output\\archived",
+      "status": "已归档",
+      "packProgress": 100,
+      "lastUpdate": "2025-09-22T03:03:04.178Z",
+      "success": true,
+      "statusHistory": [
+        {
+          "status": "未打包",
+          "timestamp": "2025-09-22T00:03:04.178Z",
+          "operator": "系统",
+          "remark": "初始状态"
+        },
+        {
+          "status": "正在处理",
+          "previousStatus": "未打包",
+          "timestamp": "2025-09-22T00:33:04.178Z",
+          "operator": "系统",
+          "remark": "开始处理",
+          "packProgress": 50,
+          "packedParts": 5,
+          "totalParts": 10
+        },
+        {
+          "status": "已打包",
+          "previousStatus": "正在处理",
+          "timestamp": "2025-09-22T01:03:04.178Z",
+          "operator": "系统",
+          "remark": "打包完成",
+          "packProgress": 100,
+          "packedParts": 10,
+          "totalParts": 10
+        },
+        {
+          "status": "已归档",
+          "previousStatus": "已打包",
+          "timestamp": "2025-09-22T02:03:04.178Z",
+          "operator": "系统",
+          "remark": "归档完成",
+          "packProgress": 100,
+          "packedParts": 10,
+          "totalParts": 10
+        }
+      ],
+      "packedParts": 10,
+      "totalParts": 10,
+      "packSeqs": ["001", "002"],
+      "lastPackCheck": "2025-09-22T01:03:04.178Z",
+      "packDate": "2025-09-22T01:03:04.178Z",
+      "archiveDate": "2025-09-22T02:03:04.178Z"
+    },
+    {
+      "name": "测试客户-全部出货",
+      "sourcePath": "C:\\test\\source\\shipped",
+      "outputPath": "C:\\test\\output\\shipped",
+      "status": "全部出货",
+      "packProgress": 100,
+      "lastUpdate": "2025-09-22T03:03:04.178Z",
+      "success": true,
+      "statusHistory": [
+        {
+          "status": "未打包",
+          "timestamp": "2025-09-21T23:03:04.178Z",
+          "operator": "系统",
+          "remark": "初始状态"
+        },
+        {
+          "status": "正在处理",
+          "previousStatus": "未打包",
+          "timestamp": "2025-09-21T23:33:04.178Z",
+          "operator": "系统",
+          "remark": "开始处理",
+          "packProgress": 50,
+          "packedParts": 5,
+          "totalParts": 10
+        },
+        {
+          "status": "已打包",
+          "previousStatus": "正在处理",
+          "timestamp": "2025-09-22T00:03:04.178Z",
+          "operator": "系统",
+          "remark": "打包完成",
+          "packProgress": 100,
+          "packedParts": 10,
+          "totalParts": 10
+        },
+        {
+          "status": "已归档",
+          "previousStatus": "已打包",
+          "timestamp": "2025-09-22T01:03:04.178Z",
+          "operator": "系统",
+          "remark": "归档完成",
+          "packProgress": 100,
+          "packedParts": 10,
+          "totalParts": 10
+        },
+        {
+          "status": "全部出货",
+          "previousStatus": "已归档",
+          "timestamp": "2025-09-22T03:03:04.178Z",
+          "operator": "系统",
+          "remark": "出货完成",
+          "packProgress": 100,
+          "packedParts": 10,
+          "totalParts": 10
+        }
+      ],
+      "packedParts": 10,
+      "totalParts": 10,
+      "packSeqs": ["001", "002"],
+      "lastPackCheck": "2025-09-22T01:03:04.178Z",
+      "packDate": "2025-09-22T01:03:04.178Z",
+      "archiveDate": "2025-09-22T02:03:04.178Z",
+      "shipmentDate": "2025-09-22T03:03:04.178Z"
+    }
+  ],
+  "packages": [],
+  "panels": [],
+  "archive": [],
+  "history": [],
+  "lastUpdate": "2025-09-22T03:03:04.178Z",
+  "version": "1.0.0-test"
+}

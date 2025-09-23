@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+    <id>001</id>
+    <customerName>测试客户-未打包</customerName>
+    <status>未打包</status>
+    <packProgress>0</packProgress>
+    <totalParts>8</totalParts>
+    <packedParts>0</packedParts>
+    <createTime>2025-09-22T02:33:04.178Z</createTime>
+    <updateTime>2025-09-22T02:33:04.178Z</updateTime>
+    <parts>
+        <part id="1" status="未完成" />
+        <part id="2" status="未完成" />
+        <part id="3" status="未完成" />
+        <part id="4" status="未完成" />
+        <part id="5" status="未完成" />
+        <part id="6" status="未完成" />
+        <part id="7" status="未完成" />
+        <part id="8" status="未完成" />
+    </parts>
+</package>

@@ -16,6 +16,8 @@ class CustomerStatusManager {
       NOT_PACKED: '未打包',
       IN_PROGRESS: '正在处理',
       PACKED: '已打包',
+      PARTIAL_SHIPPED: '部分出货',
+      FULL_SHIPPED: '全部出货',
       ARCHIVED: '已归档'
     };
 
@@ -39,6 +41,8 @@ class CustomerStatusManager {
       [this.STATUS.NOT_PACKED]: '#888888', // 灰色
       [this.STATUS.IN_PROGRESS]: '#2196F3', // 蓝色
       [this.STATUS.PACKED]: '#FFC107', // 黄色
+      [this.STATUS.PARTIAL_SHIPPED]: '#FFCA28', // 橙色
+      [this.STATUS.FULL_SHIPPED]: '#4CAF50', // 绿色
       [this.STATUS.ARCHIVED]: '#9C27B0' // 紫色
     };
 
@@ -286,9 +290,11 @@ class CustomerStatusManager {
       throw new Error('未打包的客户不能进行出货操作');
     }
 
+    // 出货状态更新时，保持客户状态不变，只更新出货状态
+    // 这样可以区分客户状态和出货状态，避免状态混淆
     const statusInfo = {
-      status: customerData.status || this.STATUS.NOT_PACKED,
-      shipmentStatus,
+      status: customerData.status || this.STATUS.NOT_PACKED, // 保持原有客户状态
+      shipmentStatus, // 只更新出货状态
       packedCount: customerData.packedParts || 0,
       totalParts: customerData.totalParts || 0,
       packProgress: customerData.packProgress || 0,

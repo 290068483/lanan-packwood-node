@@ -638,4 +638,10 @@ class CustomerFS {
 // 创建全局实例
 const customerFS = new CustomerFS();
 
-module.exports = customerFS;
+// 同时导出类和实例
+module.exports = {
+  CustomerFS: CustomerFS,
+  customerFS: customerFS,
+  // 为了向后兼容，默认导出实例
+  default: customerFS
+};

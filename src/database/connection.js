@@ -17,19 +17,27 @@ let dbOperations = null;
  * 切换数据库
  * @param {string} env - 环境名称 ('development', 'production', 'testing')
  */
+// 切换数据库
 function switchDatabase(env) {
   try {
     // 加载环境配置
     const config = envManager.loadEnvironment(env);
 
     currentDbType = env;
-    currentDbPath = path.join(__dirname, '../../', config.database.path);
+    // 修复路径计算问题：确保正确解析相对路径到项目根目录
+    const projectRoot = path.join(__dirname, '../../');
+    // 如果配置路径是相对路径（以../开头），则相对于项目根目录解析
+    if (config.database.path.startsWith('../')) {
+      currentDbPath = path.resolve(projectRoot, config.database.path.substring(3));
+    } else {
+      currentDbPath = path.resolve(projectRoot, config.database.path);
+    }
 
     // 确保数据目录存在
     ensureDataDirectory();
 
     // 重新加载数据库操作函数
-    const CustomerFS = require('./models/customer-fs');
+    const { CustomerFS } = require('./models/customer-fs');
 
     // 修改customer-fs模块的数据路径
     CustomerFS.setDataPath(currentDbPath);
@@ -76,7 +84,14 @@ function getCurrentDbPath() {
 function getDatabasePath(env) {
   try {
     const config = envManager.loadEnvironment(env);
-    return path.join(__dirname, '../../', config.database.path);
+    // 修复路径计算问题：确保正确解析相对路径到项目根目录
+    const projectRoot = path.join(__dirname, '../../');
+    // 如果配置路径是相对路径（以../开头），则相对于项目根目录解析
+    if (config.database.path.startsWith('../')) {
+      return path.resolve(projectRoot, config.database.path.substring(3));
+    } else {
+      return path.resolve(projectRoot, config.database.path);
+    }
   } catch (error) {
     console.error(`获取${env}环境数据库路径失败: ${error.message}`);
     return null;

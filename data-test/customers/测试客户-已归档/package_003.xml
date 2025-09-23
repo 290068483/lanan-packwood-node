@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+    <id>003</id>
+    <customerName>测试客户-已归档</customerName>
+    <status>已归档</status>
+    <packProgress>100</packProgress>
+    <totalParts>20</totalParts>
+    <packedParts>20</packedParts>
+    <createTime>2025-09-21T22:33:04.178Z</createTime>
+    <updateTime>2025-09-21T23:15:04.178Z</updateTime>
+    <archiveTime>2025-09-22T00:30:04.178Z</archiveTime>
+    <parts>
+        <part id="1" status="已完成" />
+        <part id="2" status="已完成" />
+        <part id="3" status="已完成" />
+        <part id="4" status="已完成" />
+        <part id="5" status="已完成" />
+        <part id="6" status="已完成" />
+        <part id="7" status="已完成" />
+        <part id="8" status="已完成" />
+        <part id="9" status="已完成" />
+        <part id="10" status="已完成" />
+        <part id="11" status="已完成" />
+        <part id="12" status="已完成" />
+        <part id="13" status="已完成" />
+        <part id="14" status="已完成" />
+        <part id="15" status="已完成" />
+        <part id="16" status="已完成" />
+        <part id="17" status="已完成" />
+        <part id="18" status="已完成" />
+        <part id="19" status="已完成" />
+        <part id="20" status="已完成" />
+    </parts>
+</package>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+    <id>001</id>
+    <customerName>测试客户-全部出货</customerName>
+    <status>全部出货</status>
+    <packProgress>100</packProgress>
+    <totalParts>5</totalParts>
+    <packedParts>5</packedParts>
+    <createTime>2025-09-21T23:33:04.178Z</createTime>
+    <updateTime>2025-09-22T00:03:04.178Z</updateTime>
+    <archiveTime>2025-09-22T01:03:04.178Z</archiveTime>
+    <shipmentTime>2025-09-22T03:03:04.178Z</shipmentTime>
+    <parts>
+        <part id="1" status="已完成" />
+        <part id="2" status="已完成" />
+        <part id="3" status="已完成" />
+        <part id="4" status="已完成" />
+        <part id="5" status="已完成" />
+    </parts>
+</package>
