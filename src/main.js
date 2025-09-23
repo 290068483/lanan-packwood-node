@@ -38,11 +38,17 @@ const PackageDataExtractor = require('./utils/package-data-extractor');
 
 // 添加Electron支持
 let isElectron = false;
+let isDevMode = false;
 
 try {
   // 尝试检测Electron环境
   if (process.versions && process.versions.electron) {
     isElectron = true;
+  }
+
+  // 检测是否为开发模式
+  if (process.env.NODE_ENV === 'development' || process.argv.includes('--dev')) {
+    isDevMode = true;
   }
 } catch (e) {
   // Electron环境不可用
@@ -233,14 +239,6 @@ function startServer(port = 3000) {
   server.listen(port, '0.0.0.0', () => {
     console.log(`🚀 HTTP服务器已启动，监听端口 ${port}`);
     logInfo('SYSTEM', 'SERVER', `HTTP服务器已启动，监听端口 ${port}`);
-
-    // 启动成功后尝试获取服务器地址信息
-    try {
-      const address = server.address();
-      console.log(`服务器地址信息:`, address);
-    } catch (e) {
-      console.error('获取服务器地址信息失败:', e);
-    }
   });
 
   // 错误处理
@@ -255,9 +253,8 @@ function startServer(port = 3000) {
     }
   });
 
-  // 添加服务器连接事件日志
   server.on('connection', (socket) => {
-    console.log(`🖧 收到新连接: ${socket.remoteAddress}:${socket.remotePort}`);
+    // 新连接建立
   });
 
   return server;
@@ -312,8 +309,6 @@ function setupIPCHandlers() {
       };
     }
   });
-
-  console.log('Electron IPC处理程序设置完成');
 }
 
 // 读取配置文件
@@ -358,7 +353,6 @@ function initFileWatcher() {
 
   // 添加UI更新回调函数
   fileWatcher.addUIUpdateCallback((eventType, data) => {
-    console.log(`UI更新事件: ${eventType}`, data);
     // 这里可以添加WebSocket或HTTP通知逻辑
     // 目前先记录日志，后续可以扩展为实时通知
   });
@@ -366,13 +360,9 @@ function initFileWatcher() {
   // 添加回调函数，当检测到packages.json变化时更新客户状态
   fileWatcher.addCallback(async (filePath, changes) => {
     try {
-      console.log(`检测到文件变化: ${filePath}`);
-
       // 从文件路径提取客户名称
       const dirName = path.basename(path.dirname(filePath));
       const customerName = dirName.replace(/\d{6}_/, '').replace(/[#.]$/, '');
-
-      console.log(`客户名称: ${customerName}`);
 
       // 从数据管理器获取客户数据
       const customerData = DataManager.getCustomerByName(customerName);
@@ -415,8 +405,6 @@ initFileWatcher();
  */
 async function processAllCustomers() {
   try {
-    console.log('🚀 开始处理客户数据...');
-
     // 确保源目录存在
     const sourceBaseDir = config.sourcePath;
     if (!fs.existsSync(sourceBaseDir)) {
@@ -433,8 +421,6 @@ async function processAllCustomers() {
 
     let successCount = 0;
     const totalCustomers = customerDirs.length;
-
-    console.log(`📁 发现 ${totalCustomers} 个客户目录`);
 
     // 处理每个客户
     for (const customerDir of customerDirs) {
@@ -595,20 +581,27 @@ async function stopExistingNodeProcesses() {
 // 程序入口点
 async function main() {
   try {
-    // 首先停止所有现有的Node.js进程
-    await stopExistingNodeProcesses();
+    // 在开发模式下，跳过停止现有进程的步骤
+    if (!isDevMode) {
+      // 首先停止所有现有的Node.js进程
+      await stopExistingNodeProcesses();
 
-    // 等待1秒确保进程完全停止
-    await new Promise(resolve => setTimeout(resolve, 1000));
+      // 等待1秒确保进程完全停止
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } else {
+      console.log('开发模式，跳过停止现有进程步骤');
+    }
 
-    // 如果在Electron环境中，不要立即执行，而是等待UI触发
-    if (isElectron) {
+    // 如果在Electron环境中且不是开发模式，不要立即执行，而是等待UI触发
+    if (isElectron && !isDevMode) {
       console.log(' Electron环境中，等待UI触发处理...');
       // 在Electron环境中，我们导出函数供UI调用
       // 同时启动HTTP服务器以支持API请求
       startServer(3000);
-      // 设置IPC处理程序
-      setupIPCHandlers();
+      // 设置IPC处理程序（如果可用）
+      if (ipcMain) {
+        setupIPCHandlers();
+      }
       return;
     }
 
@@ -637,3 +630,31 @@ module.exports = {
   initFileWatcher,
   startServer
 };
+
+/**
+ * 设置IPC处理程序（Electron环境）
+ */
+function setupIPCHandlers() {
+  if (!ipcMain) return;
+
+  console.log('设置IPC处理程序...');
+
+  // 处理来自UI的请求
+  ipcMain.handle('process-all-customers', async () => {
+    try {
+      return await processAllCustomers();
+    } catch (error) {
+      console.error('处理所有客户数据时出错:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('start-file-watcher', async (event, config) => {
+    try {
+      return await initFileWatcher(config);
+    } catch (error) {
+      console.error('启动文件监控时出错:', error);
+      throw error;
+    }
+  });
+}

@@ -96,12 +96,8 @@ function saveParsedXmlData(data, outputPath, customerName) {
  */
 function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCabinets = []) {
   try {
-    console.log(`DEBUG: 传入的tempXmlPath: ${tempXmlPath}`);
-    console.log(`DEBUG: 客户名称: ${customerName}`);
-
     // 确保输出目录存在
     const outputDir = path.dirname(tempXmlPath);
-    console.log(`DEBUG: 输出目录: ${outputDir}`);
 
     // 处理长路径问题（Windows系统）
     const normalizedPath = process.platform === 'win32' && outputDir.startsWith('\\\\')
@@ -126,13 +122,10 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCab
     // 替换文件名中的占位符（总是替换，不管是否包含占位符）
     let finalXmlPath = tempXmlPath;
     const fileName = path.basename(tempXmlPath);
-    console.log(`DEBUG: 文件名: ${fileName}`);
     // 总是替换占位符
     const newFileName = fileName.replace(/{customerName}/g, customerName);
-    console.log(`DEBUG: 替换后的文件名: ${newFileName}`);
     // 构建新的文件路径
     finalXmlPath = path.join(outputDir, newFileName);
-    console.log(`DEBUG: 最终文件路径: ${finalXmlPath}`);
 
     // 使用配置中的XML结构模板
     const xmlTemplate = JSON.parse(JSON.stringify(config.xmlStructureTemplate));
@@ -749,15 +742,10 @@ function generateTempXml(panels, tempXmlPath, customerName, lineDir, originalCab
 
     // 保存为XML文件
     if (simplifiedXml) {
-      console.log(`DEBUG: 准备写入文件: ${finalXmlPath}`);
       fs.writeFileSync(finalXmlPath, simplifiedXml, 'utf8');
       // 验证文件是否写入成功
       if (fs.existsSync(finalXmlPath)) {
-        console.log(`DEBUG: 文件写入成功: ${finalXmlPath}`);
         const stats = fs.statSync(finalXmlPath);
-        console.log(`DEBUG: 文件大小: ${stats.size} 字节`);
-      } else {
-        console.log(`DEBUG: 文件写入失败: ${finalXmlPath}`);
       }
       console.log(`✓ 简化版XML文件已生成到 ${finalXmlPath}`);
       logSuccess(

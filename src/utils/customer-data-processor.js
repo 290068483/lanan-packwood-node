@@ -407,15 +407,11 @@ async function processLineData(
     // 第一步：生成XML文件到srcFiles目录（使用配置中的文件名格式）
     console.log(`  📝 正在生成XML文件...`);
     let xmlFileName = config.outputXmlName || 'temp.xml';
-    console.log(`DEBUG: 配置中的outputXmlName: ${config.outputXmlName}`);
-    console.log(`DEBUG: 替换前的xmlFileName: ${xmlFileName}`);
     // 替换占位符为实际的客户名称，并去除#符号
     xmlFileName = xmlFileName.replace(/{customerName}/g, customerName);
     // 去除XML文件名中的#符号
     xmlFileName = xmlFileName.replace('#', '');
-    console.log(`DEBUG: 替换后的xmlFileName: ${xmlFileName}`);
     const tempXmlFilePath = path.join(srcFilesDir, xmlFileName);
-    console.log(`DEBUG: 最终的tempXmlFilePath: ${tempXmlFilePath}`);
     // 传递原始的Cabinet数据给generateTempXml，确保能正确创建多个<cabinets>标签
     const xmlGenerationResult = generateTempXml(preservedPanels, tempXmlFilePath, customerName, lineDir, cabinets);
 
@@ -536,7 +532,7 @@ async function processCustomerData(
     // 检查设备文件目录 (支持多种可能的路径结构)
     let deviceDir = path.join(customerSourcePath, 'N1产线', '0、排版文件');
     let foundDeviceDir = false;
-    
+
     // 尝试多种路径结构
     const possiblePaths = [
       path.join(customerSourcePath, 'N1产线', '0、排版文件'),
@@ -588,7 +584,7 @@ async function processCustomerData(
       // 检查特定文件名
       const possibleXmlFileNames = ['优化文件.xml', 'temp.xml', 'nesting_result.xml', 'NestingInputData.xml'];
       let foundXmlFile = false;
-      
+
       for (const fileName of possibleXmlFileNames) {
         const xmlFilePath = path.join(subDirPath, fileName);
         if (fs.existsSync(xmlFilePath)) {
@@ -598,7 +594,7 @@ async function processCustomerData(
           foundXmlFile = true;
           break;
         }
-        
+
         // 检查子目录中的常见文件夹
         const commonSubDirs = ['0、排版文件', '排版文件', 'xml', 'XML'];
         for (const commonSubDir of commonSubDirs) {
@@ -611,10 +607,10 @@ async function processCustomerData(
             break;
           }
         }
-        
+
         if (foundXmlFile) break;
       }
-      
+
       // 如果没有找到特定文件名，则查找任何XML文件
       if (!foundXmlFile) {
         const xmlFiles = findXmlFilesRecursively(subDirPath);
