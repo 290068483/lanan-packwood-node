@@ -7,6 +7,16 @@ const chalk = require('chalk');
  * 用于记录客户处理过程中的详细日志信息，包括错误上下文
  */
 
+/**
+ * 检查日志消息是否为重要信息
+ * @param {string} message - 日志消息
+ * @returns {boolean} - 是否为重要信息
+ */
+function isImportantLog(message) {
+  const importantKeywords = ['完成', '失败', '错误'];
+  return importantKeywords.some(keyword => message.includes(keyword));
+}
+
 // 确保日志目录存在
 const logDir = path.join(__dirname, '..', '..', 'logs');
 if (!fs.existsSync(logDir)) {
@@ -128,12 +138,14 @@ function logInfo(customer, module, message) {
   // 写入日志文件（追加模式）
   fs.appendFileSync(infoLogPath, logEntry);
 
-  // 控制台输出带颜色的信息
-  console.log(
-    chalk.blue('ℹ'),
-    chalk.gray(`[${customer}]`),
-    chalk.blue(message)
-  );
+  // 只输出重要信息到控制台
+  if (isImportantLog(message)) {
+    console.log(
+      chalk.blue('ℹ'),
+      chalk.gray(`[${customer}]`),
+      chalk.blue(message)
+    );
+  }
 }
 
 /**
@@ -176,12 +188,14 @@ function logSuccess(customer, module, message) {
   // 写入日志文件（追加模式）
   fs.appendFileSync(successLogPath, logEntry);
 
-  // 控制台输出带颜色的成功信息
-  console.log(
-    chalk.green('✓'),
-    chalk.gray(`[${customer}]`),
-    chalk.green(message)
-  );
+  // 只输出重要信息到控制台
+  if (isImportantLog(message)) {
+    console.log(
+      chalk.green('✓'),
+      chalk.gray(`[${customer}]`),
+      chalk.green(message)
+    );
+  }
 }
 
 /**
@@ -195,8 +209,10 @@ function logSystemInfo(message) {
   // 写入日志文件（追加模式）
   fs.appendFileSync(systemLogPath, logEntry);
 
-  // 控制台输出带颜色的系统信息
-  console.log(chalk.cyan('ℹ SYSTEM'), chalk.cyan(message));
+  // 只输出重要信息到控制台
+  if (isImportantLog(message)) {
+    console.log(chalk.cyan('ℹ SYSTEM'), chalk.cyan(message));
+  }
 }
 
 /**
@@ -231,6 +247,8 @@ function logDiagnostics(fileName, diagnostics) {
 
   // 写入日志文件（追加模式）
   fs.appendFileSync(diagnosticsLogPath, logEntry);
+
+  // 诊断日志不输出到控制台
 }
 
 module.exports = {
