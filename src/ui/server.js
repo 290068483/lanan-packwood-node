@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const DataManager = require('../utils/data-manager');
 const { processAllCustomers } = require('../main');
+const dbConnection = require('../database/connection');
 
 // MIME类型映射
 const mimeTypes = {
@@ -261,6 +262,14 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`服务器运行在端口 ${PORT}`);
     console.log(`访问地址: http://localhost:${PORT}`);
+
+    // 初始化数据库连接
+    try {
+        dbConnection.initializeDefaultConnection('production');
+        console.log('✅ 数据库连接初始化完成');
+    } catch (error) {
+        console.error('❌ 数据库连接初始化失败:', error.message);
+    }
 });
 
 module.exports = server;

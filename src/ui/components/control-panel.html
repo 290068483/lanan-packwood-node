@@ -1,0 +1,26 @@
+<div class="control-panel">
+  <div class="button-group">
+    <button id="syncDataBtn">同步数据源到数据库</button>
+    <button id="refreshBtn">刷新数据</button>
+    <button id="archiveHistoryBtn" class="archive-button">归档历史</button>
+    <button id="restartBtn" class="restart-button">重新启动</button>
+    <button id="configBtn" class="config-button">打开路径配置</button>
+    <div class="database-switch">
+      <label for="dbSwitch">数据库:</label>
+      <select id="dbSwitch">
+        <option value="production">生产数据库</option>
+        <option value="test">测试数据库</option>
+      </select>
+    </div>
+    <div id="syncStatus" class="sync-status">
+      <span class="sync-status-indicator sync-status-idle"></span>
+      <span>同步: 空闲</span>
+    </div>
+    <div id="dbStatus" class="db-status">
+      <span class="db-status-indicator db-status-disconnected"></span>
+      <span>数据库: 未连接</span>
+    </div>
+  </div>
+
+  <div id="processingStatus" class="processing-status"></div>
+</div>
