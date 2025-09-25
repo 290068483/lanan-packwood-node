@@ -6,7 +6,6 @@
 const fs = require('fs');
 const path = require('path');
 const { XMLParser } = require('fast-xml-parser');
-const { createOrUpdateCustomer } = require('../database/models/customer');
 
 /**
  * 从客户目录中提取数据
@@ -96,45 +95,40 @@ async function extractCustomerData(customerDirPath) {
 function extractPanelsFromXml(xmlData) {
   const panels = [];
 
-  // 根据XML结构提取面板数据
-  // 这里需要根据实际的XML结构调整
+  // 根据实际的XML结构提取面板数据
+  // 实际XML结构：package -> id, customer, quantity, weight
   try {
-    // 假设XML结构如下：
-    // Root -> Cabinets -> Cabinet -> Panels -> Panel
-
-    // 查找所有Cabinet节点
-    let cabinets = [];
-    if (xmlData.Root && xmlData.Root.Cabinets && xmlData.Root.Cabinets.Cabinet) {
-      cabinets = Array.isArray(xmlData.Root.Cabinets.Cabinet) 
-        ? xmlData.Root.Cabinets.Cabinet 
-        : [xmlData.Root.Cabinets.Cabinet];
+    // 查找package节点
+    let packages = [];
+    if (xmlData.package) {
+      packages = Array.isArray(xmlData.package)
+        ? xmlData.package
+        : [xmlData.package];
     }
 
-    // 遍历所有Cabinet，提取Panel数据
-    for (const cabinet of cabinets) {
-      if (cabinet.Panels && cabinet.Panels.Panel) {
-        const cabinetPanels = Array.isArray(cabinet.Panels.Panel) 
-          ? cabinet.Panels.Panel 
-          : [cabinet.Panels.Panel];
-
-        for (const panel of cabinetPanels) {
-          // 提取面板信息
-          const panelInfo = {
-            id: panel['@_id'] || panel.ID || generatePanelId(),
-            name: panel['@_name'] || panel.Name || '',
-            width: parseFloat(panel['@_width'] || panel.Width || 0),
-            height: parseFloat(panel['@_height'] || panel.Height || 0),
-            thickness: parseFloat(panel['@_thickness'] || panel.Thickness || 0),
-            material: panel['@_material'] || panel.Material || '',
-            edgeBand: panel['@_edgeBand'] || panel.EdgeBand || '',
-            edgeBandWidth: parseFloat(panel['@_edgeBandWidth'] || panel.EdgeBandWidth || 0),
-            edgeBandColor: panel['@_edgeBandColor'] || panel.EdgeBandColor || '',
-            isPacked: false
-          };
-
-          panels.push(panelInfo);
+    // 遍历所有package，提取数据作为面板
+    for (const pkg of packages) {
+      // 将package数据转换为面板信息
+      const panelInfo = {
+        id: pkg.id || generatePanelId(),
+        name: pkg.customer || '',
+        width: parseFloat(pkg.quantity || 0),
+        height: parseFloat(pkg.weight || 0),
+        thickness: 0,
+        material: '',
+        edgeBand: '',
+        edgeBandWidth: 0,
+        edgeBandColor: '',
+        isPacked: false,
+        // 保留原始package数据
+        originalData: {
+          customer: pkg.customer || '',
+          quantity: parseFloat(pkg.quantity || 0),
+          weight: parseFloat(pkg.weight || 0)
         }
-      }
+      };
+
+      panels.push(panelInfo);
     }
   } catch (error) {
     console.error('提取面板数据出错:', error);
@@ -253,8 +247,8 @@ async function extractAllCustomersData(sourcePath) {
         // 提取客户数据
         const customerData = await extractCustomerData(customerDirPath);
 
-        // 保存到数据库
-        await createOrUpdateCustomer(customerData);
+        // 跳过数据库保存步骤，直接添加到结果列表
+        // await createOrUpdateCustomer(customerData); // 注释掉数据库保存操作
 
         customers.push(customerData);
       } catch (error) {

@@ -318,34 +318,56 @@ async function getCustomer(name) {
  * @returns {Promise<Array>} 所有客户数据
  */
 async function getAllCustomers() {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const customers = JSON.parse(fs.readFileSync(getCustomerDataPath(), 'utf8'));
-      const panelsData = JSON.parse(fs.readFileSync(getPanelDataPath(), 'utf8'));
+      // 直接从XML文件提取数据，跳过数据库步骤
+      const { extractAllCustomersData } = require('../services/xml-extractor');
 
-      // 为每个客户添加面板数据
-      const customersWithPanels = customers.map(customer => {
-        const customerPanels = panelsData.filter(p => p.customerId == customer.id);
-        return {
-          ...customer,
-          panels: customerPanels.map(panel => ({
-            id: panel.panelId,
-            name: panel.name,
-            width: panel.width,
-            height: panel.height,
-            thickness: panel.thickness,
-            material: panel.material,
-            edgeBand: panel.edgeBand,
-            edgeBandWidth: panel.edgeBandWidth,
-            edgeBandColor: panel.edgeBandColor,
-            isPacked: panel.isPacked === 1
-          }))
-        };
-      });
+      // 获取配置文件中的源路径
+      const configPath = path.join(__dirname, '../../config.json');
+      let sourcePath = './data/customers'; // 默认路径
 
-      resolve(customersWithPanels);
+      if (fs.existsSync(configPath)) {
+        const configContent = fs.readFileSync(configPath, 'utf8');
+        const config = JSON.parse(configContent);
+        sourcePath = config.sourcePath || sourcePath;
+      }
+
+      // 直接从XML文件提取所有客户数据
+      const customers = await extractAllCustomersData(sourcePath);
+      resolve(customers);
     } catch (error) {
-      reject(error);
+      console.error('直接从XML文件提取客户数据失败:', error);
+
+      // 如果直接提取失败，尝试从数据库读取作为备用方案
+      try {
+        const customers = JSON.parse(fs.readFileSync(getCustomerDataPath(), 'utf8'));
+        const panelsData = JSON.parse(fs.readFileSync(getPanelDataPath(), 'utf8'));
+
+        // 为每个客户添加面板数据
+        const customersWithPanels = customers.map(customer => {
+          const customerPanels = panelsData.filter(p => p.customerId == customer.id);
+          return {
+            ...customer,
+            panels: customerPanels.map(panel => ({
+              id: panel.panelId,
+              name: panel.name,
+              width: panel.width,
+              height: panel.height,
+              thickness: panel.thickness,
+              material: panel.material,
+              edgeBand: panel.edgeBand,
+              edgeBandWidth: panel.edgeBandWidth,
+              edgeBandColor: panel.edgeBandColor,
+              isPacked: panel.isPacked === 1
+            }))
+          };
+        });
+
+        resolve(customersWithPanels);
+      } catch (fallbackError) {
+        reject(new Error(`直接提取XML数据失败，数据库备用方案也失败: ${error.message}`));
+      }
     }
   });
 }

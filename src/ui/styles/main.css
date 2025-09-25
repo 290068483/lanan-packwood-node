@@ -211,11 +211,13 @@ button:disabled {
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  width: 100%;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto; /* 改为auto以自适应内容宽度 */
 }
 
 th,
@@ -223,6 +225,44 @@ td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #eee;
+  min-width: 80px; /* 设置最小宽度 */
+  word-wrap: break-word; /* 允许长单词换行 */
+}
+
+/* 特定列的最小宽度设置 */
+#customersTable th:nth-child(1), /* 客户名称 */
+#customersTable td:nth-child(1) {
+  min-width: 120px;
+}
+
+#customersTable th:nth-child(2), /* 客户状态 */
+#customersTable td:nth-child(2),
+#customersTable th:nth-child(3), /* 出货状态 */
+#customersTable td:nth-child(3) {
+  min-width: 100px;
+  text-align: center; /* 状态列居中对齐 */
+}
+
+#customersTable th:nth-child(4), /* 打包进度 */
+#customersTable td:nth-child(4) {
+  min-width: 100px;
+  text-align: center; /* 进度列居中对齐 */
+}
+
+#customersTable th:nth-child(5), /* 包号 */
+#customersTable td:nth-child(5) {
+  min-width: 150px;
+}
+
+#customersTable th:nth-child(6), /* 操作 */
+#customersTable td:nth-child(6) {
+  min-width: 180px;
+  text-align: center; /* 操作列居中对齐 */
+}
+
+#customersTable th:nth-child(7), /* 最后更新时间 */
+#customersTable td:nth-child(7) {
+  min-width: 160px;
 }
 
 th {

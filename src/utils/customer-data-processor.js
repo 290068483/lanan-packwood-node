@@ -679,8 +679,8 @@ async function processCustomerData(
           '客户数据处理完成'
         );
 
-        // 保存更新后的数据
-        await DataManager.upsertCustomer(updatedData);
+        // 跳过数据库保存，直接显示到界面
+        // await DataManager.upsertCustomer(updatedData);
 
         logSuccess(
           customerName,
